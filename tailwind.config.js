@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {},
     colors: {
-      mainColor: '#AB654B'
+      mainColor: '#AB654B',
+      cancelColor: '#6366FF'
     },
 
   },
