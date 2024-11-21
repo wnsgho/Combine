@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
-  const location = useLocation(); 
+  const location = useLocation();
 
   // 로그인 페이지인지 회원가입 페이지인지 구별하기
   const isLoginPage = location.pathname === "/login";
@@ -16,7 +16,7 @@ const Header = () => {
       </div>
 
       {/* 매칭, 안내, 내정보 */}
-      <nav className="flex gap-60 text-3xl font-medium">
+      <nav className="hidden md:flex flex-1 justify-center items-center gap-16 lg:gap-32 xl:gap-60 text-3xl font-medium">
         <span>매칭</span>
         <span>안내</span>
         <span>내정보</span>
@@ -35,6 +35,15 @@ const Header = () => {
             회원가입
           </Link>
         )}
+      </div>
+
+      {/* 모바일 화면(헤더 및 아이콘) */}
+      <div className="md:hidden">
+        <img
+          src="/side.svg"
+          alt="Side menu"
+          className="w-12 h-12 cursor-pointer"
+        />
       </div>
     </header>
   );
