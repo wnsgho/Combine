@@ -31,7 +31,7 @@ const Header = () => {
         )}
       </div>
 
-      {/* 모바일 헤더 */}
+      {/* 모바일 화면(헤더 및 아이콘) */}
       <div className="md:hidden flex flex-1 justify-end">
         {/* 사이드 아이콘 */}
         <img
