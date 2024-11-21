@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Header = () => {
   const location = useLocation();
@@ -22,23 +22,18 @@ const Header = () => {
         <span>내정보</span>
       </nav>
 
-      {/* 로그인/ 회원가입 */}
-      <div className="text-2xl font-medium">
+      {/* 로그인 / 회원가입 */}
+      <div className="hidden md:block text-2xl font-medium">
         {isLoginPage || isSignupPage ? (
-          // 로그인 페이지가 아닌 경우 헤더 오른쪽을 로그인으로 설정
-          <Link to="/signup" className="hover:text-gray-700">
-            로그인
-          </Link>
+          <span className="hover:text-gray-700">로그인</span>
         ) : (
-          // 로그인 페이지인 경우 헤더 오른쪽을 회원가입으로 설정
-          <Link to="/login" className="hover:text-gray-700">
-            회원가입
-          </Link>
+          <span className="hover:text-gray-700">회원가입</span>
         )}
       </div>
 
-      {/* 모바일 화면(헤더 및 아이콘) */}
-      <div className="md:hidden">
+      {/* 모바일 헤더 */}
+      <div className="md:hidden flex flex-1 justify-end">
+        {/* 사이드 아이콘 */}
         <img
           src="/side.svg"
           alt="Side menu"
