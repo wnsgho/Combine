@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Header from "./components/Header";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Alarm from "./pages/Alarm";
@@ -17,7 +16,6 @@ import Preferences from "./pages/Preferences";
 function App() {
   return (
     <Router>
-      <Header /> {/* 헤더 */}
       <Routes>
         <Route path="/" element={<Main />} /> {/* 메인 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
