@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './index.css'
 
+import Header from './components/Header'
 import MatchingPage from './pages/matching/MatchingPage'
 import DetailPage from './pages/matching/DetailPage'
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { GoX, GoChevronRight } from "react-icons/go";
+import Header from "../../components/Header";
 
 const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
