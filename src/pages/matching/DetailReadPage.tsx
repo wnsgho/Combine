@@ -93,6 +93,10 @@ const DetailReadPage = () => {
               <p className="text-lg font-bold text-mainColor">성격</p>
               <p>얌전함</p>
             </div>
+            <div className="flex justify-between w-full">
+              <p className="text-lg font-bold text-mainColor">활동량</p>
+              <p>3</p>
+            </div>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
             <div className="flex justify-between w-full">
