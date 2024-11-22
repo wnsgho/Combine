@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
@@ -12,6 +13,10 @@ import WalkingCourse from "./pages/WalkingCourse";
 import MyWalkingCourse from "./pages/MyWalkingCourse";
 import MyInfo from "./pages/MyInfo";
 import Preferences from "./pages/Preferences";
+import MatchingPage from './pages/matching/MatchingPage'
+
+
+
 
 function App() {
   return (

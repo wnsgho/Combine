@@ -1,3 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-export const router = createBrowserRouter([{}]);
+import MatchingPage from './pages/matching/MatchingPage';
+
+export const router = createBrowserRouter([
+  {
+    path: '/matching',
+    Component: MatchingPage
+  }
+]);
