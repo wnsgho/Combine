@@ -16,6 +16,7 @@ import Preferences from "./pages/Preferences";
 import MatchingPage from './pages/matching/MatchingPage'
 import DetailPage from './pages/matching/DetailPage'
 import DetailReadPage from "./pages/matching/DetailReadPage";
+import PreferPage from "./pages/matching/PreferPage";
 
 
 
@@ -39,6 +40,7 @@ function App() {
         <Route path="/matching" element={<MatchingPage />} /> {/* 반려동물 매칭 페이지 */}
         <Route path="/detailadd" element={<DetailPage />} /> {/* 반려동물 상세정보 작성 페이지 (보호소) */}
         <Route path="/detail" element={<DetailReadPage />} /> {/* 반려동물 상세정보 페이지 */}
+        <Route path="/prefer" element={<PreferPage />} /> {/* 선호동물 입력 페이지 */}
       </Routes>
     </Router>
   );
