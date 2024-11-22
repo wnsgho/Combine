@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import mainImage from '../../assets/image/mainimage.webp';
-import pu from '../../assets/image/pu.avif';
+import mainImage from '../../assets/image/mainimage.webp'; //임시사진
+import pu from '../../assets/image/pu.avif'; //임시 사진
 import { GoChevronRight } from "react-icons/go";
 
 
 
 const MatchingPage = () => {
 
-  const shelter = true
+  const shelter = true // (임시) 보호소로 로그인시
   return (
     <>
       <div className='max-w-screen'>
