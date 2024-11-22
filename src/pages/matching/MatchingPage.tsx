@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-import mainImage from '../../assets/image/mainimage.webp'
-import pu from '../../assets/image/pu.avif'
+import mainImage from '../../assets/image/mainimage.webp';
+import pu from '../../assets/image/pu.avif';
 import { GoChevronRight } from "react-icons/go";
 
 
@@ -15,7 +16,9 @@ const MatchingPage = () => {
         <section>
           <div className='flex justify-evenly'>
             <p className='text-3xl text-mainColor'>선택 옵션</p>
+            <Link to="/detailadd">
             {shelter ? <button className='text-3xl text-cancelColor'>등록</button> : null}
+            </Link>
           </div>
         </section>
         <section className='flex flex-wrap items-center justify-center mt-10'>
