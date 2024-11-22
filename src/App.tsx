@@ -14,6 +14,7 @@ import MyWalkingCourse from "./pages/MyWalkingCourse";
 import MyInfo from "./pages/MyInfo";
 import Preferences from "./pages/Preferences";
 import MatchingPage from './pages/matching/MatchingPage'
+import DetailPage from './pages/matching/DetailPage'
 
 
 
@@ -34,6 +35,8 @@ function App() {
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}
         <Route path="/my-info" element={<MyInfo />} /> {/* 내정보 페이지 */}
         <Route path="/preferences" element={<Preferences />} /> {/* 선호동물 입력 및 수정 페이지 */}
+        <Route path="/matching" element={<MatchingPage />} /> {/* 반려동물 매칭 페이지 */}
+        <Route path="/detailadd" element={<DetailPage />} /> {/* 반려동물 상세정보 작성 페이지 (보호소) */}
       </Routes>
     </Router>
   );
