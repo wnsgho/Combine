@@ -180,13 +180,13 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="add">추가 정보(선택사항)</label>
-              <input type="text" id="add"/>
+              <input type="text" id="add" placeholder="동물 추가정보 작성" className="w-36"/>
             </div>
           </div>
         </section>
         <div className="flex gap-32 mt-20">
-          <button>등록</button>
-          <button>취소</button>
+          <button className="text-mainColor">등록</button>
+          <button className="text-cancelColor">취소</button>
         </div>
       </form>
     </>

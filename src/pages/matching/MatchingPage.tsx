@@ -4,16 +4,21 @@ import mainImage from '../../assets/image/mainimage.webp'
 import pu from '../../assets/image/pu.avif'
 import { GoChevronRight } from "react-icons/go";
 
+
+
 const MatchingPage = () => {
+
+  const shelter = true
   return (
     <>
       <div className='max-w-screen'>
         <section>
-          <div>
-            <p className='px-20 text-3xl text-mainColor'>선택 옵션</p>
+          <div className='flex justify-evenly'>
+            <p className='text-3xl text-mainColor'>선택 옵션</p>
+            {shelter ? <button className='text-3xl text-cancelColor'>등록</button> : null}
           </div>
         </section>
-        <section className='flex flex-wrap items-center justify-center mt-20'>
+        <section className='flex flex-wrap items-center justify-center mt-10'>
           <form className="flex flex-wrap max-w-xl gap-5 mx-3">
             <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-3xl focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
               <option selected>종류</option>
