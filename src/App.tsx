@@ -18,6 +18,7 @@ import DetailReadPage from "./pages/matching/DetailReadPage";
 import PreferPage from "./pages/matching/PreferPage";
 import DetailCorrect from "./pages/matching/DetailCorrect";
 import MyPageUser from './pages/my/MyPageUser';
+import MyPageShelter from "./pages/my/MyPageShelter";
 
 
 
@@ -42,6 +43,7 @@ function App() {
         <Route path="/detail" element={<DetailReadPage />} /> {/* 반려동물 상세정보 페이지 */}
         <Route path="/detail-correct" element={<DetailCorrect />} /> {/* 반려동물 상세정보 수정 페이지 (보호소) */}
         <Route path="/mypage-user" element={<MyPageUser />} /> {/* 마이페이지 (유저) */}
+        <Route path="/mypage-shelter" element={<MyPageShelter />} /> {/* 마이페이지 (유저) */}
       </Routes>
     </Router>
   );
