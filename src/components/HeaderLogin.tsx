@@ -1,6 +1,6 @@
 import React from "react";
 
-const Header = () => {
+const HeaderLogin = () => {
   return (
     <header className="flex items-center justify-between px-10 py-6 bg-white shadow-md">
       {/* TENPAWS */}
@@ -15,9 +15,9 @@ const Header = () => {
         <span className="hover:text-gray-700">내정보</span>
       </nav>
 
-      {/* 로그인 버튼 */}
+      {/* 회원가입 버튼 */}
       <div className="hidden md:block text-2xl font-medium">
-        <span className="hover:text-gray-700">로그인</span>
+        <span className="hover:text-gray-700">회원가입</span>
       </div>
 
       {/* 모바일 헤더 */}
@@ -32,4 +32,5 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderLogin;
+
