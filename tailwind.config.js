@@ -7,7 +7,6 @@ export default {
       mainColor: '#AB654B',
       cancelColor: '#6366FF'
     },
-
   },
   plugins: []
 };

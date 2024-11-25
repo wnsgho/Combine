@@ -16,7 +16,8 @@ import MatchingPage from './pages/matching/MatchingPage'
 import DetailPage from './pages/matching/DetailPage'
 import DetailReadPage from "./pages/matching/DetailReadPage";
 import PreferPage from "./pages/matching/PreferPage";
-
+import DetailCorrect from "./pages/matching/DetailCorrect";
+import MyPageUser from './pages/my/MyPageUser';
 
 
 
@@ -39,6 +40,8 @@ function App() {
         <Route path="/matching" element={<MatchingPage />} /> {/* 반려동물 매칭 페이지 */}
         <Route path="/detailadd" element={<DetailPage />} /> {/* 반려동물 상세정보 작성 페이지 (보호소) */}
         <Route path="/detail" element={<DetailReadPage />} /> {/* 반려동물 상세정보 페이지 */}
+        <Route path="/detail-correct" element={<DetailCorrect />} /> {/* 반려동물 상세정보 수정 페이지 (보호소) */}
+        <Route path="/mypage-user" element={<MyPageUser />} /> {/* 마이페이지 (유저) */}
       </Routes>
     </Router>
   );
