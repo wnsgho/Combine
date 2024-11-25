@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
+import MyPageModal from '../../components/MyPageModal';
 import matching from '../../assets/image/matching.png';
 import check from '../../assets/image/check.png';
 import complete from '../../assets/image/complete.png';
 import bar from '../../assets/image/bar.png';
-import pu from '../../assets/image/pu.avif'; // 임시 사진 데이터
+import pu from '../../assets/image/pu.avif';
 
 const MyPageUser = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [userInfo, setUserInfo] = useState({
-    name: "김임시",
-    address: "서울 구로구",
-    birthdate: "1994.01.01",
-    phone: "010-1111-1111",
+    name: '김임시',
+    address: '서울 구로구',
+    birthdate: '1994.01.01',
+    phone: '010-1111-1111',
   });
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,26 +23,21 @@ const MyPageUser = () => {
   };
 
   const handleEditSubmit = () => {
-    alert("정보가 수정되었습니다.");
+    alert('정보가 수정되었습니다.');
     setEditModalOpen(false);
   };
 
   const handleDeleteAccount = () => {
-    alert("회원탈퇴가 완료되었습니다.");
+    alert('회원탈퇴가 완료되었습니다.');
     setDeleteModalOpen(false);
   };
 
   return (
     <div className="relative">
-      {/* 흐림 처리 */}
-      {(isEditModalOpen || isDeleteModalOpen) && (
-        <div className="fixed inset-0 z-40 bg-black backdrop-blur-sm bg-opacity-30"></div>
-      )}
-
       <div className="flex flex-col items-center">
         <section className="flex flex-col items-center w-full max-w-lg gap-4 mt-8">
           <div className="flex justify-center">
-            <h3>마이페이지</h3>
+            <h3 className='text-xl font-bold'>마이페이지</h3>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
             <div className="flex justify-between w-full">
@@ -113,93 +109,75 @@ const MyPageUser = () => {
       </div>
 
       {/* 정보수정 모달 */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-            <h3 className="mb-4 text-lg font-bold">정보 수정</h3>
-            <div className="flex flex-col gap-4">
-              <label>
-                이름:
-                <input
-                  type="text"
-                  name="name"
-                  value={userInfo.name}
-                  onChange={handleEditChange}
-                  className="block w-full p-2 border rounded"
-                />
-              </label>
-              <label>
-                주소:
-                <input
-                  type="text"
-                  name="address"
-                  value={userInfo.address}
-                  onChange={handleEditChange}
-                  className="block w-full p-2 border rounded"
-                />
-              </label>
-              <label>
-                생년월일:
-                <input
-                  type="text"
-                  name="birthdate"
-                  value={userInfo.birthdate}
-                  onChange={handleEditChange}
-                  className="block w-full p-2 border rounded"
-                />
-              </label>
-              <label>
-                전화번호:
-                <input
-                  type="text"
-                  name="phone"
-                  value={userInfo.phone}
-                  onChange={handleEditChange}
-                  className="block w-full p-2 border rounded"
-                />
-              </label>
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <button className="text-mainColor" onClick={handleEditSubmit}>
-                수정완료
-              </button>
-              <button
-                className="text-cancelColor"
-                onClick={() => setEditModalOpen(false)}
-              >
-                취소
-              </button>
-            </div>
-          </div>
+      <MyPageModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
+        <h3 className="mb-4 text-lg font-bold">정보 수정</h3>
+        <div className="flex flex-col gap-4">
+          <label>
+            이름:
+            <input
+              type="text"
+              name="name"
+              value={userInfo.name}
+              onChange={handleEditChange}
+              className="block w-full p-2 border rounded"
+            />
+          </label>
+          <label>
+            주소:
+            <input
+              type="text"
+              name="address"
+              value={userInfo.address}
+              onChange={handleEditChange}
+              className="block w-full p-2 border rounded"
+            />
+          </label>
+          <label>
+            생년월일:
+            <input
+              type="text"
+              name="birthdate"
+              value={userInfo.birthdate}
+              onChange={handleEditChange}
+              className="block w-full p-2 border rounded"
+            />
+          </label>
+          <label>
+            전화번호:
+            <input
+              type="text"
+              name="phone"
+              value={userInfo.phone}
+              onChange={handleEditChange}
+              className="block w-full p-2 border rounded"
+            />
+          </label>
         </div>
-      )}
+        <div className="flex justify-end gap-4 mt-6">
+          <button className="text-mainColor" onClick={handleEditSubmit}>
+            수정완료
+          </button>
+          <button className="text-cancelColor" onClick={() => setEditModalOpen(false)}>
+            취소
+          </button>
+        </div>
+      </MyPageModal>
 
       {/* 회원탈퇴 모달 */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-            <h3 className="mb-4 text-lg font-bold">정말로 탈퇴하시겠습니까?</h3>
-            <div className="flex justify-end gap-4 mt-6">
-              <button
-                className="text-mainColor"
-                onClick={handleDeleteAccount}
-              >
-                네
-              </button>
-              <button
-                className="text-cancelColor"
-                onClick={() => setDeleteModalOpen(false)}
-              >
-                아니오
-              </button>
-            </div>
-          </div>
+      <MyPageModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <h3 className="mb-4 text-lg font-bold">정말로 탈퇴하시겠습니까?</h3>
+        <div className="flex justify-end gap-4 mt-6">
+          <button className="text-mainColor" onClick={handleDeleteAccount}>
+            네
+          </button>
+          <button className="text-cancelColor" onClick={() => setDeleteModalOpen(false)}>
+            아니오
+          </button>
         </div>
-      )}
+      </MyPageModal>
     </div>
   );
 };
 
 export default MyPageUser;
-
 
