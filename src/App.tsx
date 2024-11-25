@@ -18,6 +18,8 @@ import MyPageShelter from "./pages/my/MyPageShelter";
 
 function App() {
   return (
+    <Router>    
+      <Routes>
         <Route path="/facilities" element={<Facilities />} /> {/* 반려동물 관련 시설 페이지 */}
         <Route path="/walking-course" element={<WalkingCourse />} /> {/* 산책 코스 페이지 */}
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}
@@ -32,4 +34,4 @@ function App() {
         <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
       </Routes>
     </Router>
-  );
+  )};
