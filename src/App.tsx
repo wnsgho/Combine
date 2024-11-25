@@ -12,9 +12,6 @@ import Facilities from "./pages/Facilities";
 import WalkingCourse from "./pages/WalkingCourse";
 import MyWalkingCourse from "./pages/MyWalkingCourse";
 import MyInfo from "./pages/MyInfo";
-// import Preferences from "./pages/Preferences";
-// import CreateUser1 from "./pages/CreateUser1";
-// import CreateUser2 from "./pages/CreateUser2";
 
 function App() {
   return (
@@ -31,9 +28,6 @@ function App() {
         <Route path="/walking-course" element={<WalkingCourse />} /> {/* 산책 코스 페이지 */}
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}
         <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
-        // <Route path="/preferences" element={<Preferences />} /> {/* 선호동물 입력 및 수정 페이지 */}
-        // <Route path="/create-user1" element={<CreateUser1 />} /> {/* 유저정보생성(개인) 페이지 1 */}
-        // <Route path="/create-user2" element={<CreateUser2 />} /> {/* 유저정보생성(보호소) 페이지 2 */}
       </Routes>
     </Router>
   );
