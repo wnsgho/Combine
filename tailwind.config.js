@@ -8,5 +8,5 @@ export default {
       cancelColor: '#6366FF'
     },
   },
-  plugins: []
+  plugins: [require("tailwind-scrollbar-hide"),],
 };
