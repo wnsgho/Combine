@@ -21,6 +21,19 @@ const DetailReadPage = () => {
     );
   };
 
+  const [petInfo, setPetInfo] = useState({
+    species: '강아지',
+    old: '0 ~ 3살',
+    gender: '수컷',
+    inoculation: '3차',
+    neutering: '완료',
+    personality: '얌전함',
+    activity: 3,  
+    reason: '유기',
+    home: '임시보호',
+    add: '',
+  })
+
   const shelter = true // (임시) 보호소로 로그인시
 
   return (
@@ -69,47 +82,47 @@ const DetailReadPage = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">종류</p>
-              <p className="text-lg">강아지</p>
+              <p className="text-lg">{petInfo.species}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">나이</p>
-              <p className="text-lg">0 ~ 3살</p>
+              <p className="text-lg">{petInfo.old}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">성별</p>
-              <p className="text-lg">수컷</p>
+              <p className="text-lg">{petInfo.gender}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">접종 유무</p>
-              <p className="text-lg">3차</p>
+              <p className="text-lg">{petInfo.inoculation}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">중성화 유무</p>
-              <p className="text-lg">유</p>
+              <p className="text-lg">{petInfo.neutering}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">성격</p>
-              <p className="text-lg">얌전함</p>
+              <p className="text-lg">{petInfo.personality}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">활동량</p>
-              <p className="text-lg">3</p>
+              <p className="text-lg">{petInfo.activity}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호소로 오게 된 이유</p>
-              <p className="text-lg">유기</p>
+              <p className="text-lg">{petInfo.reason}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">맡겨지기 전 가정환경</p>
-              <p className="text-lg">임시보호</p>
+              <p className="text-lg">{petInfo.home}</p>
             </div>
           </div>
           <div className="flex items-center justify-between">
@@ -120,7 +133,7 @@ const DetailReadPage = () => {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-xl font-bold text-mainColor">추가정보</p>
-            <p className="text-lg">추가정보입니다</p>
+            <p className="text-lg">{petInfo.add}</p>
           </div>
         </section>
         {shelter ?  <section className="flex gap-24 my-8">

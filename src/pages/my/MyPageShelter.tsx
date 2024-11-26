@@ -41,7 +41,7 @@ const MyPageShelter = () => {
         {/* 헤더 */}
         <Header />
         <div className="flex flex-col items-center">
-          <section className="flex flex-col items-center w-full max-w-lg gap-4 mt-8">
+          <section className="flex flex-col items-center w-full max-w-lg gap-4 m-8">
             <div className="flex justify-center">
               <h3 className='text-2xl font-bold'>마이페이지</h3>
             </div>
