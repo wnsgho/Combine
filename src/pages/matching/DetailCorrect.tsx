@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { GoX, GoChevronRight } from "react-icons/go";
+import Header from '../../components/Header';
 
 const DetailCorrect = () => {
 
@@ -39,8 +40,9 @@ const DetailCorrect = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center">
-        <section className="flex flex-wrap gap-4">
+      <Header />
+      <div className="flex flex-col items-center mt-10">
+        <section className="flex flex-wrap gap-8">
           {/* 미리보기 이미지 렌더링 */}
           {previewImg.map((imgSrc, i) => (
             <div
@@ -86,22 +88,22 @@ const DetailCorrect = () => {
             className="hidden"
           />
         </section>
-      <section className="flex flex-col w-full max-w-lg gap-4 mt-8">
+      <section className="flex flex-col w-full max-w-lg gap-8 mt-8">
           <div className="flex justify-center">
             <h3 className="text-2xl font-bold text-mainColor">댕구</h3>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">종류</p>
-              <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">종류</p>
+              <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>종류</option>
                 <option value="dog">강아지</option>
                 <option value="cat">고양이</option>
               </select>
             </div>
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">나이</p>
-              <select id="old" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">나이</p>
+              <select id="old" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>연령</option>
                 <option value="young">0~3살</option>
                 <option value="middleAge">4~6살</option>
@@ -109,18 +111,18 @@ const DetailCorrect = () => {
               </select>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">성별</p>
-              <select id="gender" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">성별</p>
+              <select id="gender" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>성별</option>
                 <option value="cock">수컷</option>
                 <option value="female">암컷</option>
               </select>
             </div>
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">접종 유무</p>
-              <select id="inoculation" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">접종 유무</p>
+              <select id="inoculation" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>접종유무</option>
                 <option value="1">1차</option>
                 <option value="2">2차</option>
@@ -132,18 +134,18 @@ const DetailCorrect = () => {
               </select>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">중성화 유무</p>
-              <select id="neutering" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">중성화 유무</p>
+              <select id="neutering" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>중성화유무</option>
                 <option value="yes">완료</option>
                 <option value="no">미완료</option>
               </select>
             </div>
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">성격</p>
-              <select id="personality" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">성격</p>
+              <select id="personality" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>성격</option>
                 <option value="good">얌전함</option>
                 <option value="activity">활발함</option>
@@ -151,8 +153,8 @@ const DetailCorrect = () => {
               </select>
             </div>
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">활동량</p>
-              <select id="personality" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <p className="text-xl font-bold text-mainColor">활동량</p>
+              <select id="personality" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>적음 1 ~ 많음 5</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -162,32 +164,32 @@ const DetailCorrect = () => {
               </select>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">보호소로 오게 된 이유</p>
-              <input type="text" id="reason" placeholder="예) 유기, 보호자 병환" className="w-36"/>
+              <p className="text-xl font-bold text-mainColor">보호소로 오게 된 이유</p>
+              <input type="text" id="reason" placeholder="예) 유기, 보호자 병환" className="w-40 text-lg"/>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">맡겨지기 전 가정환경</p>
-              <input type="text" id="home" placeholder="예) 임시보호, 사육장" className="w-36"/>
+              <p className="text-xl font-bold text-mainColor">맡겨지기 전 가정환경</p>
+              <input type="text" id="home" placeholder="예) 임시보호, 사육장" className="w-40 text-lg"/>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-lg font-bold text-mainColor">보호기관</p>
-            <button className="flex items-center gap-1 text-blue-500">
+            <p className="text-xl font-bold text-mainColor">보호기관</p>
+            <button className="flex items-center gap-1 text-lg">
               펫케어 <GoChevronRight />
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-lg font-bold text-mainColor">추가정보</p>
-            <input type="text" id="add" placeholder="동물 추가정보 작성" className="w-36"/>
+            <p className="text-xl font-bold text-mainColor">추가정보</p>
+            <input type="text" id="add" placeholder="동물 추가정보 작성" className="w-40 text-lg"/>
           </div>
         </section>
-        <section className="flex gap-24 mt-8">
-          <button className="px-4 py-2 text-white bg-gray-400 rounded hover:bg-gray-500 text-cancelColor">취소</button>
-          <button className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 text-mainColor">완료</button>
+        <section className="flex gap-24 my-8">
+          <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">취소</button>
+          <button className="px-4 py-2 text-lg hover:bg-blue-600 text-mainColor">완료</button>
         </section>
       </div>
     </>

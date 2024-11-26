@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import pu from "../../assets/image/pu.avif"; // 임시 사진
 import mainimage from "../../assets/image/mainimage.webp" //임시사진
+import Header from "../../components/Header";
 
 const images = [pu, mainimage, pu, mainimage, pu]; // 이미지 배열
 
@@ -20,11 +21,25 @@ const DetailReadPage = () => {
     );
   };
 
+  const [petInfo, setPetInfo] = useState({
+    species: '강아지',
+    old: '0 ~ 3살',
+    gender: '수컷',
+    inoculation: '3차',
+    neutering: '완료',
+    personality: '얌전함',
+    activity: 3,  
+    reason: '유기',
+    home: '임시보호',
+    add: '',
+  })
+
   const shelter = true // (임시) 보호소로 로그인시
 
   return (
     <>
-      <div className="flex flex-col items-center">
+      <Header />
+      <div className="flex flex-col items-center mt-10">
         <section className="relative w-full max-w-lg overflow-hidden">
           <div className="flex items-center">
             <button
@@ -60,78 +75,78 @@ const DetailReadPage = () => {
           </div>
         </section>
 
-        <section className="flex flex-col w-full max-w-lg gap-4 mt-8">
+        <section className="flex flex-col w-full max-w-lg gap-8 mt-8">
           <div className="flex justify-center">
             <h3 className="text-2xl font-bold text-mainColor">댕구</h3>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">종류</p>
-              <p>강아지</p>
+              <p className="text-xl font-bold text-mainColor">종류</p>
+              <p className="text-lg">{petInfo.species}</p>
             </div>
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">나이</p>
-              <p>0 ~ 3살</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap justify-center gap-4">
-            <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">성별</p>
-              <p>수컷</p>
-            </div>
-            <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">접종 유무</p>
-              <p>3차</p>
+              <p className="text-xl font-bold text-mainColor">나이</p>
+              <p className="text-lg">{petInfo.old}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">중성화 유무</p>
-              <p>유</p>
+              <p className="text-xl font-bold text-mainColor">성별</p>
+              <p className="text-lg">{petInfo.gender}</p>
             </div>
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">성격</p>
-              <p>얌전함</p>
-            </div>
-            <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">활동량</p>
-              <p>3</p>
+              <p className="text-xl font-bold text-mainColor">접종 유무</p>
+              <p className="text-lg">{petInfo.inoculation}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">보호소로 오게 된 이유</p>
-              <p>유기</p>
+              <p className="text-xl font-bold text-mainColor">중성화 유무</p>
+              <p className="text-lg">{petInfo.neutering}</p>
+            </div>
+            <div className="flex justify-between w-full">
+              <p className="text-xl font-bold text-mainColor">성격</p>
+              <p className="text-lg">{petInfo.personality}</p>
+            </div>
+            <div className="flex justify-between w-full">
+              <p className="text-xl font-bold text-mainColor">활동량</p>
+              <p className="text-lg">{petInfo.activity}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
-              <p className="text-lg font-bold text-mainColor">맡겨지기 전 가정환경</p>
-              <p>임시보호</p>
+              <p className="text-xl font-bold text-mainColor">보호소로 오게 된 이유</p>
+              <p className="text-lg">{petInfo.reason}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8">
+            <div className="flex justify-between w-full">
+              <p className="text-xl font-bold text-mainColor">맡겨지기 전 가정환경</p>
+              <p className="text-lg">{petInfo.home}</p>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-lg font-bold text-mainColor">보호기관</p>
-            <button className="flex items-center gap-1 text-blue-500">
+            <p className="text-xl font-bold text-mainColor">보호기관</p>
+            <button className="flex items-center gap-1 text-lg text-blue-500">
               펫케어 <GoChevronRight />
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-lg font-bold text-mainColor">추가정보</p>
-            <p>추가정보입니다</p>
+            <p className="text-xl font-bold text-mainColor">추가정보</p>
+            <p className="text-lg">{petInfo.add}</p>
           </div>
         </section>
-        {shelter ?  <section className="flex gap-24 mt-8">
-            <button className="px-4 py-2 text-white bg-gray-400 rounded hover:bg-gray-500 text-cancelColor">삭제</button>
-            <button className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 text-mainColor">완료</button>
-            <button className="px-4 py-2 text-white bg-gray-400 rounded hover:bg-gray-500 text-cancelColor">수정</button>
+        {shelter ?  <section className="flex gap-24 my-8">
+            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">삭제</button>
+            <button className="px-4 py-2 text-lg font-bold hover:bg-blue-600 text-mainColor">완료</button>
+            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">수정</button>
           </section>
         : 
-          <section className="flex gap-32 mt-8">
-            <button className="px-4 py-2 text-white bg-gray-400 rounded hover:bg-gray-500 text-cancelColor">
+          <section className="flex gap-32 my-8">
+            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">
               취소
             </button>
-            <button className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 text-mainColor">
+            <button className="px-4 py-2 text-lg font-bold hover:bg-blue-600 text-mainColor">
               입양신청
             </button>
           </section>
