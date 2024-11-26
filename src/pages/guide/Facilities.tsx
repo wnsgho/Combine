@@ -1,6 +1,6 @@
-import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png";
 import { useEffect, useRef, useState } from "react";
+import GuideNavigationMap from "../../components/GuideNavigationMap";
 
 declare global {
   interface Window {
@@ -15,6 +15,21 @@ const Facilities = () => {
   const [markers, setMarkers] = useState<{ [key: string]: any }>({});
   const [overlays, setOverlays] = useState<{ [key: string]: any }>({});
   const [map, setMap] = useState<any>(null);
+  const [selectCategory, setSelectCategory] = useState<string | null>(null);
+
+  //카테고리 구분 및 거리정렬 함수
+  const filterCategory = selectCategory
+    ? places
+        .filter((place) => place.category_name.includes(selectCategory))
+        .sort((a, b) => parseInt(a.distance) - parseInt(b.distance))
+    : places;
+
+  const categories = [
+    { id: "hospital", name: "동물병원", keyword: "동물병원" },
+    { id: "cafe", name: "애견카페", keyword: "애견카페" },
+    { id: "shop", name: "애견용품", keyword: "동물용품" },
+    { id: "beauty", name: "애견미용", keyword: "반려동물미용" }
+  ];
 
   //사용자 위치 geolocation api
   useEffect(() => {
@@ -54,7 +69,7 @@ const Facilities = () => {
       };
 
       const mapInstance = new window.kakao.maps.Map(mapRef.current, options);
-      setMap(mapInstance);  // map 객체 저장
+      setMap(mapInstance); // map 객체 저장
 
       // 현재 위치 마커
       const currentMarker = new window.kakao.maps.CustomOverlay({
@@ -127,9 +142,9 @@ const Facilities = () => {
               xAnchor: 0.5,
               yAnchor: 1.7
             });
-            
-            setMarkers(prev => ({ ...prev, [place.id]: marker }));
-            setOverlays(prev => ({ ...prev, [place.id]: customOverlay }));
+
+            setMarkers((prev) => ({ ...prev, [place.id]: marker }));
+            setOverlays((prev) => ({ ...prev, [place.id]: customOverlay }));
 
             //마커호버
             window.kakao.maps.event.addListener(marker, "mouseover", () => {
@@ -168,52 +183,57 @@ const Facilities = () => {
           <img src={Walk} alt="walk" className="w-full h-[400px] opacity-85 object-cover object-bottom" />
           <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
             <div className="text-[50px] pb-2">반려동물 관련 시설</div>
-            <div className="text-[25px]">주변 관리 시설을 찾아드립니다.</div>
+            <div className="text-[25px]">현재위치를 기반으로 반경 3km 내의 관련 시설을 찾아드립니다.</div>
           </div>
         </div>
         <div className="mb-8">
-          <GuideNavigation />
+          <GuideNavigationMap />
         </div>
-
-        <div className="bg-[#AB654B]/90 p-8">
-          <div ref={mapRef} className="w-full h-[600px] my-10 rounded-lg"></div>
-          {!userLocation && <div className="text-center text-gray-500">위치 정보를 불러오는 중입니다..</div>}
-          <div className="font-bold text-3xl text-white text-center">
-            반경 3km내의 시설들을 찾아드리고 있습니다. 아래에서 자세하게 확인해보세요!
-          </div>
-          <div className="flex space-x-32 text-3xl font-bold text-white mt-10 justify-center items-center">
-          <div className="">동물병원</div>
-          <div>애견카페</div>
-          <div>동물용품</div>
-          <div>애견미용</div>
+        <div className="flex space-x-4 text-[24px] font-bold text-white justify-end mr-14">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className={`cursor-pointer bg-[#AB654B]/90 pt-1 px-2 rounded-t-2xl ${
+                selectCategory
+                  ? selectCategory === category.keyword
+                    ? "text-yellow-200 opacity-100"
+                    : "hover:text-yellow-200 opacity-30"
+                  : "hover:text-yellow-200 opacity-100"
+              }`}
+              onClick={() => setSelectCategory(selectCategory === category.keyword ? null : category.keyword)}>
+              {category.name}
+            </div>
+          ))}
         </div>
-        </div>
-        
-        <div className="bg-[#AB654B]/90 p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {places.map((place) => (
-              <div
-                key={place.id}
-                className="p-3 bg-white rounded-lg cursor-pointer transform transition-all hover:scale-105 hover:shadow-2xl"
-                onClick={() => window.open(place.place_url, "_blank")}
-                onMouseEnter={() => {
-                  if (overlays[place.id]) {
-                    overlays[place.id].setMap(map);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (overlays[place.id]) {
-                    overlays[place.id].setMap(null);
-                  }
-                }}
-              >
-                <div className="text-lg text-blue-600 font-bold">{getLastCategory(place.category_name)}</div>
-                <div className="font-bold text-[25px]">{place.place_name}</div>
-                <div className="text-lg mt-2">{place.road_address_name}</div>
-                <div className="text-lg">{place.phone || ""}</div>
-                <div className="text-sm text-gray-500">현재 위치로부터 {place.distance}m</div>
+        <div className="bg-[#AB654B]/90 p-8 flex rounded-lg mb-4">
+          <div ref={mapRef} className="w-full h-[700px] rounded-lg "></div>
+          <div className="w-full pl-8 h-[700px] flex flex-col">
+            <div className="overflow-y-scroll flex-1 scrollbar-hide">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-7">
+                {filterCategory.map((place) => (
+                  <div
+                    key={place.id}
+                    className="p-3 bg-white rounded-lg cursor-pointer transform transition-all  hover:shadow-2xl hover:bg-yellow-100"
+                    onClick={() => window.open(place.place_url, "_blank")}
+                    onMouseEnter={() => {
+                      if (overlays[place.id]) {
+                        overlays[place.id].setMap(map);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (overlays[place.id]) {
+                        overlays[place.id].setMap(null);
+                      }
+                    }}>
+                    <div className="text-lg text-blue-600 font-bold">{getLastCategory(place.category_name)}</div>
+                    <div className="font-bold text-[22px]">{place.place_name}</div>
+                    <div className="text-lg mt-2">{place.road_address_name}</div>
+                    <div className="text-lg">{place.phone || ""}</div>
+                    <div className="text-sm text-gray-500">현재 위치로부터 {place.distance}m</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
