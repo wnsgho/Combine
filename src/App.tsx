@@ -14,6 +14,8 @@ import DetailCorrect from "./pages/matching/DetailCorrect";
 import MyPageUser from './pages/my/MyPageUser';
 import MyPageShelter from "./pages/my/MyPageShelter";
 
+import HeaderLogin from "./components/HeaderLogin";
+
 
 
 function App() {
@@ -35,3 +37,5 @@ function App() {
       </Routes>
     </Router>
   )};
+
+export default App;

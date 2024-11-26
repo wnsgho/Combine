@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import Header from '../../components/Header';
+
 import mainImage from '../../assets/image/mainimage.webp'; //임시사진
 import pu from '../../assets/image/pu.avif'; //임시 사진
 import { GoChevronRight } from "react-icons/go";
@@ -10,10 +12,12 @@ import { GoChevronRight } from "react-icons/go";
 const MatchingPage = () => {
 
   const shelter = true // (임시) 보호소로 로그인시
+  
   return (
     <>
       <div className='max-w-screen'>
-        <section>
+        <Header />
+        <section className='mt-20'>
           <div className='flex justify-evenly'>
             <p className='text-3xl text-mainColor'>선택 옵션</p>
             <Link to="/detailadd">
@@ -46,7 +50,7 @@ const MatchingPage = () => {
         <section className='mt-20'>
           <div className='flex flex-col items-center justify-center'>
             <h3 className='mb-5 text-4xl font-bold'>매칭이 어려우신가요?</h3>
-            <button className='flex items-center justify-center text-mainColor'>AI매칭 바로가기<GoChevronRight /></button>
+            <button className='flex items-center justify-center text-lg text-mainColor'>AI매칭 바로가기<GoChevronRight /></button>
           </div>
         </section>
         <section className='flex items-center justify-center m-20'>
