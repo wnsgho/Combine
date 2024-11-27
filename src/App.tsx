@@ -22,6 +22,8 @@ import Announcementpostcreate from "./pages/guide/Announcementpostcreate";
 import QAndA from "./pages/guide/QAndA";
 import QAandApost from "./pages/guide/QAandApost";
 import QAandApostcreate from "./pages/guide/QAandApostcreate";
+import CreateUser1 from "./pages/CreateUser1";
+import CreateUser2 from "./pages/CreateUser2";
 import ShelterAddress from "./pages/my/ShelterAddress";
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
         <Route path="/" element={<Main />} /> {/* 메인 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
         <Route path="/signup" element={<Signup />} /> {/* 회원가입 페이지 */}
+        <Route path="/create-user1" element={<CreateUser1 />} /> {/* 유저정보생성(개인) 페이지 1 */}
+        <Route path="/create-user2" element={<CreateUser2 />} /> {/* 유저정보생성(보호소) 페이지 2 */}
         <Route path="/alarm" element={<Alarm />} /> {/* 알람 페이지 */}
         <Route path="/guide" element={<Announcement />} /> {/* 안내 페이지*/}
         <Route path="/guide/announcement" element={<Announcement />} /> {/* 공지사항 페이지*/}
