@@ -22,6 +22,7 @@ import Announcementpostcreate from "./pages/guide/Announcementpostcreate";
 import QAndA from "./pages/guide/QAndA";
 import QAandApost from "./pages/guide/QAandApost";
 import QAandApostcreate from "./pages/guide/QAandApostcreate";
+import ShelterAddress from "./pages/my/ShelterAddress";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
         <Route path="/mypage-user" element={<MyPageUser />} /> {/* 마이페이지 (유저) */}
         <Route path="/mypage-shelter" element={<MyPageShelter />} /> {/* 마이페이지 (보호소) */}
         <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
+        <Route path="/shelter-address" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
       </Routes>
     </Router>
 

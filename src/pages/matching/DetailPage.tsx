@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 
 import { GoX, GoChevronRight } from "react-icons/go";
 import Header from "../../components/Header";
@@ -178,7 +179,9 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="protect" className="text-xl">보호기관</label>
-              <button id="protect" className="flex items-center justify-center">펫케어 <GoChevronRight /></button>
+              <Link to="/shelter-address">
+                <button id="protect" className="flex items-center justify-center">펫케어 <GoChevronRight /></button>
+              </Link>
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="add" className="text-xl">추가 정보(선택사항)</label>

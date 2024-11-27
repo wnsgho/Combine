@@ -70,8 +70,8 @@ const PreferPage = () => {
           </div>
         </section>
         <section className="flex gap-24 mt-8">
-          <button className="px-4 py-2 text-lg hover:bg-gray-500 text-mainColor ">등록</button>
-          <button className="px-4 py-2 text-lg hover:bg-blue-600 text-cancelColor">취소</button>
+          <button className="px-4 py-2 text-lg text-mainColor ">등록</button>
+          <button className="px-4 py-2 text-lg text-cancelColor">취소</button>
         </section>
       </form>
     </>
