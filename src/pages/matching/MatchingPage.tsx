@@ -21,24 +21,24 @@ const MatchingPage = () => {
           <div className='flex justify-evenly'>
             <p className='text-3xl text-mainColor'>선택 옵션</p>
             <Link to="/detailadd">
-            {shelter ? <button className='text-3xl text-cancelColor'>등록</button> : null}
+            {shelter ? <button className='text-2xl text-cancelColor'>등록</button> : null}
             </Link>
           </div>
         </section>
         <section className='flex flex-wrap items-center justify-center mt-10'>
-          <form className="flex flex-wrap max-w-xl gap-5 mx-3">
-            <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-3xl focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          <form className="flex flex-wrap max-w-xl gap-20 mx-10">
+            <select id="species" className="text-3xl border-2 border-mainColor">
               <option selected>종류</option>
               <option value="dog">강아지</option>
               <option value="cat">고양이</option>
             </select>
-            <select id="old" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-3xl focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <select id="old" className="text-3xl border-2 border-mainColor">
               <option selected>연령</option>
               <option value="young">0~3살</option>
               <option value="middleAge">4~6살</option>
               <option value="oldAge">7~10살</option>
             </select>
-            <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-3xl focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <select id="species" className="text-3xl border-2 border-mainColor">
               <option selected>색상</option>
               <option value="black">검정색</option>
               <option value="white">흰색</option>
