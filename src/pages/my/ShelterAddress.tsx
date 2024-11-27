@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
@@ -13,107 +13,80 @@ const ShelterAddress = () => {
   const [markers, setMarkers] = useState<{ [key: string]: any }>({});
   const [overlays, setOverlays] = useState<{ [key: string]: any }>({});
   const [map, setMap] = useState<any>(null);
-  
-  const [shelterInfo, setShelterInfo] = useState({
-    name: '경남유기동물보호소',
-    address: '김해 대동면',
-    phone: '010-1111-1111',
 
+  const [shelterInfo, setShelterInfo] = useState({
+    name: "수로왕릉",
+    address: "김해 대동면",
+    phone: "010-1111-1111",
   });
 
-  //사용자 위치 geolocation api
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
+  const [tempShelterInfo, setTempShelterInfo] = useState(shelterInfo); // 임시 저장 정보
+
+  // 사용자 위치 가져오기 (Geolocation API)
   useEffect(() => {
     if ("geolocation" in navigator) {
       const options = {
         enableHighAccuracy: true,
         maximumAge: 0,
-        timeout: 5000
+        timeout: 5000,
       };
-  
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           });
         },
         (error) => {
           console.error("Error getting location:", error);
-        }
-      ),
-        options;
+        },
+        options
+      );
     }
   }, []);
-  
-  //카카오 api 연동
+
+  // 카카오 지도 API 연동
   useEffect(() => {
     if (!userLocation) return;
-    if (places.length > 0) return;
-  
+
     window.kakao.maps.load(() => {
       if (!mapRef.current) return;
-  
-      const options = {
+
+      // 지도 초기화
+      const mapOptions = {
         center: new window.kakao.maps.LatLng(userLocation.lat, userLocation.lng),
-        level: 5 // 지도 반경
+        level: 5, // 지도 확대 수준
       };
-  
-      const mapInstance = new window.kakao.maps.Map(mapRef.current, options);
-      setMap(mapInstance); // map 객체 저장
-  
-      // 현재 위치 마커
-      const currentMarker = new window.kakao.maps.CustomOverlay({
-        position: new window.kakao.maps.LatLng(userLocation.lat, userLocation.lng),
-        map: mapInstance,
-        content: `
-          <div style="
-            width: 30px;
-            height: 30px;
-            background: red;
-            border: 3px solid white;
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-          "></div>
-        `
-      });
-  
-      // 현재 위치 텍스트 조절
-      const currentOverlay = new window.kakao.maps.CustomOverlay({
-        position: currentMarker.getPosition(),
-        content: `
-          <div style="
-            padding: 10px;
-            text-align: center;
-            background: white;
-            border-radius: 4px;
-            font-weight: bold;
-            min-width: 120px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            font-size: 18px;
-          ">
-            현재 위치
-          </div>
-        `,
-        xAnchor: 0.5,
-        yAnchor: 1.5
-      });
-      currentOverlay.setMap(mapInstance);
-  
-      // 장소 검색
+      const mapInstance = new window.kakao.maps.Map(mapRef.current, mapOptions);
+      setMap(mapInstance);
+
+      // Places API 인스턴스 생성
       const ps = new window.kakao.maps.services.Places(mapInstance);
-  
-      // 검색 결과
+
+      // 검색 콜백
       const placesSearchCB = (data: any, status: any) => {
         if (status === window.kakao.maps.services.Status.OK) {
-          setPlaces((prev) => [...prev, ...data]);
-          data.forEach((place: any) => {
-            const marker = new window.kakao.maps.Marker({
-              position: new window.kakao.maps.LatLng(place.y, place.x),
-              map: mapInstance
+          setPlaces(data); // 모든 검색 결과 저장
+
+          // 첫 번째 검색 결과를 기준으로 지도 이동 및 마커 생성
+          const firstPlace = data[0];
+          if (firstPlace) {
+            const placePosition = new window.kakao.maps.LatLng(firstPlace.y, firstPlace.x);
+
+            // 지도 중심 이동
+            mapInstance.setCenter(placePosition);
+
+            // 보호소 마커
+            const shelterMarker = new window.kakao.maps.Marker({
+              position: placePosition,
+              map: mapInstance,
             });
-  
-            const customOverlay = new window.kakao.maps.CustomOverlay({
-              position: marker.getPosition(),
+
+            // 마커 오버레이 (정보 표시)
+            const shelterOverlay = new window.kakao.maps.CustomOverlay({
+              position: placePosition,
               content: `
                 <div style="
                   padding: 10px;
@@ -125,114 +98,162 @@ const ShelterAddress = () => {
                   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
                   font-size: 18px;
                 ">
-                  ${place.place_name}
-                  <div style="font-size: 12px; color: #888;">${place.category_group_name}</div>
+                  ${firstPlace.place_name}
+                  <div style="font-size: 12px; color: #888;">${firstPlace.road_address_name || firstPlace.address_name}</div>
                 </div>
               `,
               xAnchor: 0.5,
-              yAnchor: 1.7
+              yAnchor: 1.5,
             });
-  
-            setMarkers((prev) => ({ ...prev, [place.id]: marker }));
-            setOverlays((prev) => ({ ...prev, [place.id]: customOverlay }));
-  
-            //마커호버
-            window.kakao.maps.event.addListener(marker, "mouseover", () => {
-              customOverlay.setMap(mapInstance);
+
+            shelterOverlay.setMap(mapInstance);
+
+            // 마커 클릭 시 오버레이 표시
+            window.kakao.maps.event.addListener(shelterMarker, "click", () => {
+              shelterOverlay.setMap(mapInstance);
             });
-            window.kakao.maps.event.addListener(marker, "mouseout", () => {
-              customOverlay.setMap(null);
-            });
-          });
+
+            // 마커 제거 및 다시 표시를 위한 상태 관리
+            setMarkers({ [firstPlace.id]: shelterMarker });
+            setOverlays({ [firstPlace.id]: shelterOverlay });
+          }
+        } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+          console.warn("검색 결과가 없습니다.");
+        } else {
+          console.error("검색 중 오류 발생:", status);
         }
       };
-  
-      const searchOption = {
+
+      // 검색 옵션
+      const searchOptions = {
         location: new window.kakao.maps.LatLng(userLocation.lat, userLocation.lng),
-        radius: 3000, //반경 km
-        sort: window.kakao.maps.services.SortBy.DISTANCE
+        radius: 3000, // 검색 반경 (단위: 미터)
+        sort: window.kakao.maps.services.SortBy.DISTANCE,
       };
-  
-      setPlaces([]);
-      ps.keywordSearch(shelterInfo.name, placesSearchCB, searchOption);
+
+      // Places API로 보호소 이름 검색
+      ps.keywordSearch(shelterInfo.name, placesSearchCB, searchOptions);
     });
-  }, [userLocation]);
-  
-  const getLastCategory = (categoryName: string) => {
-    return categoryName.split(">").pop()?.trim() || categoryName;
+  }, [userLocation, shelterInfo.name]);
+
+  const openModal = () => {
+    setTempShelterInfo(shelterInfo); // 현재 정보를 임시 상태에 복사
+    setIsModalOpen(true); // 모달 열기
   };
 
+  const closeModal = () => setIsModalOpen(false); // 모달 닫기
 
-  const shelter = true; //임시
+  const saveChanges = () => {
+    setShelterInfo(tempShelterInfo); // 변경된 정보 저장
+    setIsModalOpen(false); // 모달 닫기
+  };
+
+  const shelter = true; // 임시 상태 (수정 가능)
 
   return (
     <div>
       <div className="flex flex-col items-center">
         <section>
-          <h2 className='text-2xl font-bold'>보호소 주소</h2>
+          <h2 className="text-2xl font-bold">보호소 주소</h2>
         </section>
-        <section className="flex flex-col items-center w-full max-w-lg gap-4 m-8">
-          <div className="flex flex-wrap justify-center gap-4">
+        <section className="flex flex-col items-center w-full max-w-lg m-8">
+          <div className="flex flex-wrap justify-center gap-10">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호기관 이름</p>
-              <p className='text-lg'>{shelterInfo.name}</p>
+              <p className="text-lg">{shelterInfo.name}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">주소</p>
-              <p className='text-lg'>{shelterInfo.address}</p>
+              <p className="text-lg">{shelterInfo.address}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">전화번호</p>
-              <p className='text-lg'>{shelterInfo.phone}</p>
+              <p className="text-lg">{shelterInfo.phone}</p>
             </div>
           </div>
         </section>
         <section>
-          {shelter ?  <section className="flex gap-24 my-8">
-            <button className="px-4 py-2 text-lg font-bold hover:bg-blue-600 text-mainColor">확인</button>
-            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">수정</button>
-          </section>
-        : 
-          <section className="flex gap-32 my-8">
-            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-mainColor">
-              확인
-            </button>
-          </section>
-        }
+          {shelter ? (
+            <section className="flex gap-24 my-8">
+              <button className="px-4 py-2 text-lg font-bold text-mainColor">
+                확인
+              </button>
+              <button
+                className="px-4 py-2 text-lg text-cancelColor"
+                onClick={openModal}
+              >
+                수정
+              </button>
+            </section>
+          ) : (
+            <section className="flex gap-32 my-8">
+              <button className="px-4 py-2 text-lg text-mainColor">
+                확인
+              </button>
+            </section>
+          )}
         </section>
       </div>
       <div ref={mapRef} className="w-full h-[700px] rounded-lg "></div>
-        <div className="w-full pl-8 h-[700px] flex flex-col">
-          <div className="flex-1 overflow-y-scroll scrollbar-hide">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-7">
-              {places.map((place) => (
-                <div
-                  key={place.id}
-                  className="p-3 transition-all transform bg-white rounded-lg cursor-pointer hover:shadow-2xl hover:bg-yellow-100"
-                  onClick={() => window.open(place.place_url, "_blank")}
-                  onMouseEnter={() => {
-                    if (overlays[place.id]) {
-                      overlays[place.id].setMap(map);
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    if (overlays[place.id]) {
-                      overlays[place.id].setMap(null);
-                    }
-                  }}>
-                <div className="text-lg font-bold text-blue-600">{getLastCategory(place.category_name)}</div>
-                <div className="font-bold text-[22px]">{place.place_name}</div>
-                <div className="mt-2 text-lg">{place.road_address_name}</div>
-                <div className="text-lg">{place.phone || ""}</div>
-                <div className="text-sm text-gray-500">현재 위치로부터 {place.distance}m</div>
-              </div>
-            ))}
+
+      {/* 모달 */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="p-6 bg-white rounded-lg w-96">
+            <h3 className="mb-4 text-xl font-bold">정보 수정</h3>
+            <div className="mb-4">
+              <label className="block mb-2 font-bold">보호기관 이름</label>
+              <input
+                type="text"
+                value={tempShelterInfo.name}
+                onChange={(e) =>
+                  setTempShelterInfo((prev) => ({ ...prev, name: e.target.value }))
+                }
+                className="w-full px-3 py-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 font-bold">주소</label>
+              <input
+                type="text"
+                value={tempShelterInfo.address}
+                onChange={(e) =>
+                  setTempShelterInfo((prev) => ({ ...prev, address: e.target.value }))
+                }
+                className="w-full px-3 py-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 font-bold">전화번호</label>
+              <input
+                type="text"
+                value={tempShelterInfo.phone}
+                onChange={(e) =>
+                  setTempShelterInfo((prev) => ({ ...prev, phone: e.target.value }))
+                }
+                className="w-full px-3 py-2 border rounded"
+              />
+            </div>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-white bg-gray-500 rounded"
+              >
+                취소
+              </button>
+              <button
+                onClick={saveChanges}
+                className="px-4 py-2 text-white bg-blue-500 rounded"
+              >
+                저장
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
-    
   );
 };
 
 export default ShelterAddress;
+

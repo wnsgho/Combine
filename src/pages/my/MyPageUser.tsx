@@ -98,13 +98,13 @@ const MyPageUser = () => {
               <img src={matching} alt="" id="matching" />
               <label htmlFor="matching">매칭 신청</label>
             </div>
-            <img src={bar} alt="" className="w-36" />
-            <div className="flex flex-col items-center justify-center gap-3">
+            <img src={bar} alt="" className="h-20 w-36" />
+            <div className="flex flex-col items-center justify-center gap-3 opacity-30">
               <img src={check} alt="" id="check" />
               <label htmlFor="check">보호소 확인</label>
             </div>
-            <img src={bar} alt="" className="w-36" />
-            <div className="flex flex-col items-center justify-center gap-3">
+            <img src={bar} alt="" className="h-20 w-36" />
+            <div className="flex flex-col items-center justify-center gap-3 opacity-30">
               <img src={complete} alt="" id="complete" />
               <label htmlFor="complete">승인 완료</label>
             </div>

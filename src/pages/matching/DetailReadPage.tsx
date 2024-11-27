@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import pu from "../../assets/image/pu.avif"; // 임시 사진
 import mainimage from "../../assets/image/mainimage.webp" //임시사진
@@ -127,9 +128,11 @@ const DetailReadPage = () => {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-xl font-bold text-mainColor">보호기관</p>
-            <button className="flex items-center gap-1 text-lg text-blue-500">
-              펫케어 <GoChevronRight />
-            </button>
+            <Link to="/shelter-address">
+              <button className="flex items-center gap-1 text-lg text-blue-500">
+                펫케어 <GoChevronRight />
+              </button>
+            </Link>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-xl font-bold text-mainColor">추가정보</p>
@@ -137,9 +140,9 @@ const DetailReadPage = () => {
           </div>
         </section>
         {shelter ?  <section className="flex gap-24 my-8">
-            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">삭제</button>
-            <button className="px-4 py-2 text-lg font-bold hover:bg-blue-600 text-mainColor">완료</button>
-            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">수정</button>
+            <button className="px-4 py-2 text-lg text-cancelColor">삭제</button>
+            <button className="px-4 py-2 text-lg font-bold text-mainColor">완료</button>
+            <button className="px-4 py-2 text-lg text-cancelColor">수정</button>
           </section>
         : 
           <section className="flex gap-32 my-8">

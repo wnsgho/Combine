@@ -133,7 +133,7 @@ const MyPageShelter = () => {
             </label>
             <label>
               주소:
-              <Link to='prefer'>
+              <Link to='/shelter-address'>
                 <button className="flex items-center w-full p-2 bg-white border rounded;">
                   {userInfo.address}
                   <GoChevronRight />
