@@ -1,11 +1,11 @@
 import React from "react";
-import Header from "../components/Header";
+import HeaderLogin from "../components/HeaderLogin";
 
 const Login = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* 헤더 */}
-      <Header />
+      <HeaderLogin />
 
       {/* 로그인 페이지 */}
       <main className="flex-grow bg-[#CDC3BF] flex items-center justify-center relative">
