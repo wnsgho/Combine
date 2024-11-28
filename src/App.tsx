@@ -27,8 +27,12 @@ import CreateUser1 from "./pages/CreateUser1";
 import CreateUser2 from "./pages/CreateUser2";
 import ShelterAddress from "./pages/my/ShelterAddress";
 import AdoptionList from "./pages/my/AdoptionList";
+import Error from "./pages/Error";
 
 function App() {
+
+  const errorCode = 404; 
+  
   return (
     <Router>
       <Routes>
@@ -60,6 +64,7 @@ function App() {
         <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
         <Route path="/shelter-address" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
         <Route path="/adoption-list" element={<AdoptionList />} /> {/* 입양리스트 페이지 */}
+        <Route path="/errorpage" element={<Error errorCode={errorCode}/>} /> {/* 에러페이지 (임시로 이곳에 위치) */}
       </Routes>
     </Router>
 
