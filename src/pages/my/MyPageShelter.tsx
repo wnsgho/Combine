@@ -77,6 +77,11 @@ const MyPageShelter = () => {
                 회원탈퇴
               </button>
             </div>
+            <div>
+              <Link to='/adoption-list'>
+                <button className="text-lg text-mainColor">입양 신청 리스트</button>
+              </Link>
+            </div>
           </section>
           <section className="flex flex-col items-center justify-center w-full max-w-lg gap-4 mt-8">
             <div>
