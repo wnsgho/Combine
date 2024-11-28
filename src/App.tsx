@@ -18,6 +18,7 @@ import QAandApost from "./pages/guide/QAandApost";
 import QAandApostcreate from "./pages/guide/QAandApostcreate";
 import Facilities from "./pages/guide/Facilities";
 import WalkingCourse from "./pages/guide/WalkingCourse";
+import Worldcup from "./pages/worldcup/worldcup";
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
         <Route path="/guide/facilities" element={<Facilities />} />
         {/* 산책 코스 페이지 */}
         <Route path="/guide/walking-course" element={<WalkingCourse />} />
+        {/* 이상형 월드컵 페이지 */}
+        <Route path="/worldcup" element={<Worldcup />} />
         
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}
         <Route path="/my-info" element={<MyInfo />} /> {/* 내정보 페이지 */}
