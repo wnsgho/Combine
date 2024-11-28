@@ -29,7 +29,7 @@ const CreateUser2 = () => {
         {/* 네모 박스 */}
         <div className="w-full max-w-7xl bg-white shadow-lg rounded-lg p-10 sm:p-12 md:p-16 lg:p-20">
           {/* 제목 */}
-          <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-6xl font-bold text-gray-800 mb-10 text-center">
+          <h1 className="text-5xl sm:text-5xl md:text-6xl font-bold text-gray-800 mb-10 text-center">
             단체 회원가입
           </h1>
 
