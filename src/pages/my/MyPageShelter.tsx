@@ -79,7 +79,8 @@ const MyPageShelter = () => {
             </div>
             <div>
               <Link to='/adoption-list'>
-                <button className="text-lg text-mainColor">입양 신청 리스트</button>
+                <button className="flex items-center justify-centert ext-lg text-mainColor">입양 신청 리스트 <GoChevronRight />
+                </button>
               </Link>
             </div>
           </section>
