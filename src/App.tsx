@@ -25,6 +25,7 @@ import QAandApostcreate from "./pages/guide/QAandApostcreate";
 import CreateUser1 from "./pages/CreateUser1";
 import CreateUser2 from "./pages/CreateUser2";
 import ShelterAddress from "./pages/my/ShelterAddress";
+import AdoptionList from "./pages/my/AdoptionList";
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
         <Route path="/mypage-shelter" element={<MyPageShelter />} /> {/* 마이페이지 (보호소) */}
         <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
         <Route path="/shelter-address" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
+        <Route path="/adoption-list" element={<AdoptionList />} /> {/* 입양리스트 페이지 */}
       </Routes>
     </Router>
 
