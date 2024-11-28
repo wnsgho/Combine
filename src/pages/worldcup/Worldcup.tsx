@@ -172,20 +172,22 @@ return (
   <div>
     {round === 1 ? (
       <div className="text-center">
-        <div className="text-4xl font-bold mb-4">🏆 우승 🏆</div>
+        <div className="text-4xl font-bold my-8"> 우승 </div>
         <div className="relative inline-block">
           <img 
             src={display[0]?.image} 
             alt={display[0]?.name} 
             className="w-[400px] h-[500px] object-cover rounded-lg"
           />
-          <div className="absolute top-0 left-0 w-full bg-black/50 text-white p-4 rounded-t-lg">
+          <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-4 rounded-t-lg">
             <div className="font-bold text-3xl">{display[0]?.name}</div>
           </div>
         </div>
-        <button className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+        <div>
+        <button className="mt-8 px-6 py-2 bg-black/50 text-white rounded-lg">
           다시하기
         </button>
+        </div>
       </div>
     ) : (
       <div>
