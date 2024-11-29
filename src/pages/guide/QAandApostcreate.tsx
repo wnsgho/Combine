@@ -1,12 +1,32 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png";
-import { NavLink, useBlocker } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 
 const QAandApostcreate = () => {
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("")
+  const navigate = useNavigate()
+
+
+    const handleSubmit = async() => {
+      try{
+        const response = await axios.post("api/qna",{
+          title,
+          content,
+          createdAt: new Date().toISOString(),
+        })
+        if(response.status === 201){
+          navigate("/guide/qna")
+        }
+      }catch(error){
+        console.error("작성 실패", error)
+        alert('포스트 작성에 실패했습니다.');
+      }
+    }
 
   const modules = {
     toolbar: [
@@ -39,14 +59,6 @@ const QAandApostcreate = () => {
     "image"
   ];
 
-  // //글작성 중 이탈 시도 경고
-  // useBlocker(({ currentLocation, nextLocation }) => {
-  //   if (currentLocation.pathname !== nextLocation.pathname) {
-  //     return !window.confirm("작성 된 내용은 저장되지않습니다. 정말 나가시겠습니까?");
-  //   }
-  //   return false;
-  // });
-
   return (
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto ">
@@ -59,10 +71,11 @@ const QAandApostcreate = () => {
           </div>
         </div>
         <GuideNavigation />
+
         <div className="max-w-[1100px] mx-auto ">
           <div className="bg-[#AB654B]/90 p-8 rounded-lg">
             <div className="mb-6">
-              <input type="text" className="w-full p-3" />
+              <input type="text" className="w-full p-3" value={title} onChange={(e)=> setTitle(e.target.value)}/>
             </div>
             <div className="h-[1000px] bg-white">
               <ReactQuill
@@ -79,17 +92,17 @@ const QAandApostcreate = () => {
           <div className="mt-7">
             <button
               className="float-right   mb-20 bg-[#AB654B]
-                  /90 p-4 text-white font-bold text-[20px]">
+                  /90 p-4 text-white font-bold text-[20px]"
+                  onClick={handleSubmit}>
               작성하기
             </button>
 
-            <NavLink to="/guide/qna">
               <button
                 className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={() => navigate("/guide/qna")}>
                 취소
               </button>
-            </NavLink>
           </div>
         </div>
       </div>

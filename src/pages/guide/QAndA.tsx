@@ -1,8 +1,32 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+interface QnA {
+  id:number;
+  title:string;
+  content:string;
+  createdAt:string;
+}
 
 const QAndA = () => {
+  const [QnA, setQnA] = useState<QnA[]>([])
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchQnA = async () => {
+      try{
+        const response = await axios.get("/inquries")
+        setQnA(response.data)
+      }catch(error){
+        console.error("호출 실패", error)
+      }
+    }
+    fetchQnA()
+  },[])
+
   return (
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto ">
@@ -26,6 +50,17 @@ const QAndA = () => {
             </tr>
           </thead>
           <tbody>
+            {/* {QnA.map((QnA) => (
+              <tr className="text-[20px]" key={QnA.id}>
+              <td className=" text-center">{QnA.id}</td>
+              <td className="text-left px-4 py-5 font-normal max-w-[588px] whitespace-nowrap overflow-hidden truncate">
+                <NavLink to="/guide/qna/{QnA.id}">
+                  {QnA.title}
+                </NavLink>
+              </td>
+              <td className="font-normal text-center">{QnA.createdAt}</td>
+            </tr>
+            ))} */}
             <tr className="text-[20px]">
               <td className=" text-center">2</td>
               <td className="text-left px-4 py-5 font-normal max-w-[588px] whitespace-nowrap overflow-hidden truncate">

@@ -1,23 +1,32 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png";
-import { NavLink, useBlocker } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 
 const Announcementpostcreate = () => {
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("")
+  const navigate = useNavigate()
 
-  // //글작성 중 이탈 시도 경고
-  // useBlocker(
-  //   ({ currentLocation, nextLocation }) => {
-  //     if (currentLocation.pathname !== nextLocation.pathname) {
-  //       return !window.confirm("작성 된 내용은 저장되지않습니다. 정말 나가시겠습니까?");
-  //     }
-  //     return false;
-  //   }
-  // );
-
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post('/api/announcements', {
+        title,
+        content,
+        createdAt: new Date().toISOString(),
+      });
+      
+      if (response.status === 201) {
+        navigate("/guide/announcement");
+      }
+    } catch (error) {
+      console.error('공지사항 작성 실패:', error);
+      alert('공지사항 작성에 실패했습니다.');
+    }
+  };
 
   const modules = {
     toolbar: [
@@ -69,7 +78,7 @@ const Announcementpostcreate = () => {
               <option value="support">지원</option>
             </select>
             <div className="mb-6">
-              <input type="text" className="w-full p-3" placeholder="제목을 입력하세요" />
+              <input type="text" className="w-full p-3" placeholder="제목을 입력하세요" value={title} onChange={(e) => setTitle(e.target.value)}/>
             </div>
             <div className="h-[1000px] bg-white">
               <ReactQuill
@@ -86,16 +95,16 @@ const Announcementpostcreate = () => {
           <div className="mt-7">
             <button
               className="float-right   mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={handleSubmit}>
               작성하기
             </button>
-            <NavLink to="/guide/announcement">
               <button
                 className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={()=> navigate("/guide/announcement")}>
                 취소
               </button>
-            </NavLink>
           </div>
         </div>
       </div>
