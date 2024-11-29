@@ -30,6 +30,7 @@ import AdoptionList from "./pages/my/AdoptionList";
 import Error from "./pages/Error";
 import Worldcup from "./pages/worldcup/Worldcup";
 import AnnouncementEdit from "./pages/guide/AnnouncementEdit";
+import QAandAEdit from "./pages/guide/QAndAEdit";
 
 function App() {
 
@@ -55,6 +56,7 @@ function App() {
         <Route path="/guide/qna" element={<QAndA />} /> {/* 질의응답 페이지 */}
         <Route path="/guide/qna/postId" element={<QAandApost />} /> {/* 질의응답 포스트 페이지 */}
         <Route path="/guide/qna/create" element={<QAandApostcreate />} /> {/* 질의응답 작성 페이지 */}
+        <Route path="/guide/qna/Edit" element={<QAandAEdit />} /> {/* 질의응답 수정 페이지 */}
         <Route path="/guide/facilities" element={<Facilities />} /> {/* 반려동물 관련 시설 페이지 */}
         <Route path="/guide/walking-course" element={<WalkingCourse />} /> {/* 산책 코스 페이지 */}
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}

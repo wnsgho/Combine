@@ -29,6 +29,7 @@ const QAandApost = () => {
   const navigate = useNavigate()
   const { id } = useParams()
 
+  //조회
   useEffect(()=>{
     const fetchQnapost = async() => {
       try{
@@ -43,6 +44,21 @@ const QAandApost = () => {
       fetchQnapost()
     }
   },[id])
+
+  //삭제
+  const handleDelete = async () => {
+    if(!window.confirm("정말로 게시글을 삭제하시겠습니까?")) return;
+    
+    try{
+      await axios.delete(`/inquries/${id}`)
+      alert("삭제되었습니다.")
+      navigate("/guide/qna")
+    }catch(error){
+      console.error("삭제 실패", error)
+      alert("삭제에 실패하였습니다.")
+    }
+  }
+
 
   return (
     <div className="flex flex-col justify-center items-center ">
@@ -73,12 +89,14 @@ const QAandApost = () => {
             </button>
           <button
             className="float-right mr-8  mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={handleDelete}>
             삭제하기
           </button>
           <button
             className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={()=> navigate(`/guide/qna/edit`)}>
             수정하기
           </button>
         </div>
@@ -126,13 +144,15 @@ const QAandApost = () => {
             </button>
           <button
             className="float-right mr-8  mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={handleDelete}>
             삭제하기
           </button>
 
           <button
             className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px]"
+              onClick={()=> navigate(`/guide/qna/edit`)}>
             수정하기
           </button>
         </div>

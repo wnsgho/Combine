@@ -46,11 +46,6 @@ const Announcementpost = () => {
     }
   }
 
-  //수정페이지 이동
-  const moveEdit = () => {
-    navigate(`/guide/announcement/edit/${id}`)
-  }
-
   return (
     <div className="flex flex-col items-center scrollbar-hide">
       <div className="max-w-[1200px] mx-auto w-full">
@@ -131,7 +126,7 @@ const Announcementpost = () => {
           <button
             className="float-right mr-8 mb-20 bg-[#AB654B]
               /90 p-4 text-white font-bold text-[20px]"
-              onClick={moveEdit}>
+              onClick={()=> navigate(`/guide/announcement/edit`)}>
             수정하기
           </button>
         </div>
