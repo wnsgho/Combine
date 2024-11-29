@@ -8,15 +8,15 @@ import "react-quill/dist/quill.snow.css";
 const Announcementpostcreate = () => {
   const [content, setContent] = useState("");
 
-  //글작성 중 이탈 시도 경고
-  useBlocker(
-    ({ currentLocation, nextLocation }) => {
-      if (currentLocation.pathname !== nextLocation.pathname) {
-        return !window.confirm("작성 된 내용은 저장되지않습니다. 정말 나가시겠습니까?");
-      }
-      return false;
-    }
-  );
+  // //글작성 중 이탈 시도 경고
+  // useBlocker(
+  //   ({ currentLocation, nextLocation }) => {
+  //     if (currentLocation.pathname !== nextLocation.pathname) {
+  //       return !window.confirm("작성 된 내용은 저장되지않습니다. 정말 나가시겠습니까?");
+  //     }
+  //     return false;
+  //   }
+  // );
 
 
   const modules = {

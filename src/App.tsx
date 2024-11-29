@@ -28,6 +28,7 @@ import CreateUser2 from "./pages/CreateUser2";
 import ShelterAddress from "./pages/my/ShelterAddress";
 import AdoptionList from "./pages/my/AdoptionList";
 import Error from "./pages/Error";
+import Worldcup from "./pages/worldcup/Worldcup";
 
 function App() {
 
@@ -47,6 +48,8 @@ function App() {
         <Route path="/guide/announcement" element={<Announcement />} /> {/* 공지사항 페이지*/}
         <Route path="/guide/announcement/postId" element={<Announcementpost />} /> {/* 공지사항 포스트 페이지*/}
         <Route path="/guide/announcement/create" element={<Announcementpostcreate />} /> {/* 공지사항 작성 페이지*/}
+        {/* 이상형 월드컵 페이지 */}
+        <Route path="/worldcup" element={<Worldcup />} />
         <Route path="/guide/qna" element={<QAndA />} /> {/* 질의응답 페이지 */}
         <Route path="/guide/qna/postId" element={<QAandApost />} /> {/* 질의응답 포스트 페이지 */}
         <Route path="/guide/qna/create" element={<QAandApostcreate />} /> {/* 질의응답 작성 페이지 */}

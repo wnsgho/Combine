@@ -3,6 +3,7 @@ import Walk from "../../../public/walk.png";
 import { NavLink, useBlocker } from "react-router-dom";
 import { useState } from "react";
 import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const QAandApostcreate = () => {
   const [content, setContent] = useState("");
@@ -38,13 +39,13 @@ const QAandApostcreate = () => {
     "image"
   ];
 
-  //글작성 중 이탈 시도 경고
-  useBlocker(({ currentLocation, nextLocation }) => {
-    if (currentLocation.pathname !== nextLocation.pathname) {
-      return !window.confirm("작성 된 내용은 저장되지않습니다. 정말 나가시겠습니까?");
-    }
-    return false;
-  });
+  // //글작성 중 이탈 시도 경고
+  // useBlocker(({ currentLocation, nextLocation }) => {
+  //   if (currentLocation.pathname !== nextLocation.pathname) {
+  //     return !window.confirm("작성 된 내용은 저장되지않습니다. 정말 나가시겠습니까?");
+  //   }
+  //   return false;
+  // });
 
   return (
     <div className="flex flex-col justify-center items-center ">
