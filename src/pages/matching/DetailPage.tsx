@@ -103,6 +103,12 @@ const DetailPage = () => {
               </select>
             </div>
             <div className="flex items-center justify-between">
+              <label htmlFor="species" className="text-xl">이름</label>
+              <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <input type="text" placeholder="동물 이름을 입력해 주세요" />
+              </select>
+            </div>
+            <div className="flex items-center justify-between">
               <label htmlFor="old" className="text-xl">연령</label>
               <select id="old" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option selected>연령</option>
