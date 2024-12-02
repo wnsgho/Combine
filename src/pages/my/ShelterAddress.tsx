@@ -1,4 +1,6 @@
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -6,7 +8,16 @@ declare global {
   }
 }
 
-const ShelterAddress = () => {
+interface ShelterInfo {
+  shelterName: string;
+  phoneNumber: string;
+  address: string;
+}
+
+
+const ShelterAddress: React.FC = () => {
+  const { id } = useParams<{ id: string }>(); // URL에서 Id 추출
+  const Id: number = parseInt(id || '1', 10); // 기본값으로 1 설정
   const mapRef = useRef<HTMLDivElement>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [places, setPlaces] = useState<any[]>([]);
@@ -14,10 +25,26 @@ const ShelterAddress = () => {
   const [overlays, setOverlays] = useState<{ [key: string]: any }>({});
   const [map, setMap] = useState<any>(null);
 
+    // 쉘터 정보 가져오기
+    useEffect(() => {
+      const fetchShelterInfo = async () => {
+        try {
+          const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
+          setShelterInfo(response.data);
+        } catch (error) {
+          console.error('유저 정보를 불러오는 중 오류 발생:', error);
+        }
+      };
+  
+      fetchShelterInfo();
+    }, [Id]);
+
+
+
   const [shelterInfo, setShelterInfo] = useState({
-    name: "수로왕릉",
-    address: "김해 대동면",
-    phone: "010-1111-1111",
+    shelterName: "",
+    address: "",
+    phoneNumber: "",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
@@ -132,9 +159,9 @@ const ShelterAddress = () => {
       };
 
       // Places API로 보호소 이름 검색
-      ps.keywordSearch(shelterInfo.name, placesSearchCB, searchOptions);
+      ps.keywordSearch(shelterInfo.shelterName, placesSearchCB, searchOptions);
     });
-  }, [userLocation, shelterInfo.name]);
+  }, [userLocation, shelterInfo.shelterName]);
 
   const openModal = () => {
     setTempShelterInfo(shelterInfo); // 현재 정보를 임시 상태에 복사
@@ -148,8 +175,9 @@ const ShelterAddress = () => {
     setIsModalOpen(false); // 모달 닫기
   };
 
-  const shelter = true; // 임시 상태 (수정 가능)
+  const shelter = shelterInfo.shelterName !== ""; // 쉘터이름으로 쉘터, 일반 확인
 
+  console.log(shelter)
   return (
     <div>
       <div className="flex flex-col items-center">
@@ -160,7 +188,7 @@ const ShelterAddress = () => {
           <div className="flex flex-wrap justify-center gap-10">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호기관 이름</p>
-              <p className="text-lg">{shelterInfo.name}</p>
+              <p className="text-lg">{shelterInfo.shelterName}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">주소</p>
@@ -168,7 +196,7 @@ const ShelterAddress = () => {
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">전화번호</p>
-              <p className="text-lg">{shelterInfo.phone}</p>
+              <p className="text-lg">{shelterInfo.phoneNumber}</p>
             </div>
           </div>
         </section>
@@ -205,7 +233,7 @@ const ShelterAddress = () => {
               <label className="block mb-2 font-bold">보호기관 이름</label>
               <input
                 type="text"
-                value={tempShelterInfo.name}
+                value={tempShelterInfo.shelterName}
                 onChange={(e) =>
                   setTempShelterInfo((prev) => ({ ...prev, name: e.target.value }))
                 }
@@ -227,7 +255,7 @@ const ShelterAddress = () => {
               <label className="block mb-2 font-bold">전화번호</label>
               <input
                 type="text"
-                value={tempShelterInfo.phone}
+                value={tempShelterInfo.phoneNumber}
                 onChange={(e) =>
                   setTempShelterInfo((prev) => ({ ...prev, phone: e.target.value }))
                 }

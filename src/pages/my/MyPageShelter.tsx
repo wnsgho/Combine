@@ -1,39 +1,122 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoChevronRight } from "react-icons/go";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import MyPageModal from '../../components/MyPageModal';
 
 import Header from '../../components/Header';
 
 import mainImage from '../../assets/image/mainimage.webp'; //임시사진
 import pu from '../../assets/image/pu.avif'; //임시 사진
+import axios from 'axios';
 
-const MyPageShelter = () => {
+interface ShelterInfo {
+  email: string;
+  shelterName: string;
+  phoneNumber: string;
+  address: string;
+  password: string;
+}
+
+const MyPageShelter: React.FC = () => {
+  const { id } = useParams<{ id: string }>(); // URL에서 Id 추출
+  const Id: number = parseInt(id || '1', 10); // 기본값으로 1 설정
 
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
 
-  const [userInfo, setUserInfo] = useState({
-    name: '펫케어',
-    address: '서울 구로구',
-    email: 'aaa@naver.com',
-    phone: '010-1111-1111',
+  const [shelterInfo, setShelterInfo] = useState({
+    shelterName: '',
+    address: '',
+    email: '',
+    phoneNumber: '',
   });
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 유저 정보 가져오기
+  useEffect(() => {
+    const fetchShelterInfo = async () => {
+      try {
+        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
+        setShelterInfo(response.data);
+      } catch (error) {
+        console.error('보호소 정보를 불러오는 중 오류 발생:', error);
+      }
+    };
+    fetchShelterInfo();
+  }, [Id]);
+
+  // 비밀번호 유효성 검증 함수
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8 || password.length > 12) {
+      return '비밀번호는 8자 이상 12자 이하로 설정해야 합니다.';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return '비밀번호에 최소 1개의 대문자가 포함되어야 합니다.';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return '비밀번호에 최소 1개의 특수문자가 포함되어야 합니다.';
+    }
+    return null;
+  };
+
+
+
+  // 입력값 변경 처리
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setUserInfo((prev) => ({ ...prev, [name]: value }));
+  
+    if (shelterInfo) { // 먼저 userInfo가 null이 아닌지 확인
+      setShelterInfo((prev) =>
+        prev ? { ...prev, [name]: value } : prev
+      );
+  
+      if (name === 'password') {
+        const error = validatePassword(value);
+        setPasswordError(error);
+      }
+    }
+  };
+  
+
+  // 정보 수정 제출
+
+  const handleEditSubmit = async (): Promise<void> => {
+    if (!shelterInfo) return;
+
+    // 비밀번호 검증
+    if (passwordError) { // passwordError 상태로 검증
+      alert(passwordError);
+      return;
+    }
+
+
+    try {
+      await axios.put(`/api/v1/shelters/${Id}`, shelterInfo);
+      alert('정보가 수정되었습니다.');
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error('정보 수정 중 오류 발생:', error);
+      alert('정보 수정에 실패했습니다.');
+    }
   };
 
-  const handleEditSubmit = () => {
-    alert('정보가 수정되었습니다.');
-    setEditModalOpen(false);
-  };
-
-  const handleDeleteAccount = () => {
-    alert('회원탈퇴가 완료되었습니다.');
-    setDeleteModalOpen(false);
-  };
+    // 회원 탈퇴 처리
+    const handleDeleteAccount = async (): Promise<void> => {
+      try {
+        await axios.delete(`/api/v1/shelters/${Id}`);
+        alert('회원탈퇴가 완료되었습니다.');
+        setDeleteModalOpen(false);
+        // 필요시 리다이렉트 로직 추가
+      } catch (error) {
+        console.error('회원탈퇴 중 오류 발생:', error);
+        alert('회원탈퇴에 실패했습니다.');
+      }
+    };
+  
+    if (!shelterInfo) {
+      return <div>로딩 중...</div>;
+    }
+  
 
   return (
     <>
@@ -48,19 +131,19 @@ const MyPageShelter = () => {
             <div className="flex flex-wrap justify-center gap-4">
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">단체이름</p>
-                <p className='text-lg'>{userInfo.name}</p>
+                <p className='text-lg'>{shelterInfo.shelterName}</p>
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">주소</p>
-                <button className='flex items-center justify-center text-lg'>{userInfo.address}<GoChevronRight /></button>
+                <button className='flex items-center justify-center text-lg'>{shelterInfo.address}<GoChevronRight /></button>
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">단체 메일</p>
-                <p className='text-lg'>{userInfo.email}</p>
+                <p className='text-lg'>{shelterInfo.email}</p>
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">전화번호</p>
-                <p className='text-lg'>{userInfo.phone}</p>
+                <p className='text-lg'>{shelterInfo.phoneNumber}</p>
               </div>
             </div>
             <div className="flex gap-32 mt-10">
@@ -132,7 +215,7 @@ const MyPageShelter = () => {
               <input
                 type="text"
                 name="name"
-                value={userInfo.name}
+                value={shelterInfo.shelterName}
                 onChange={handleEditChange}
                 className="block w-full p-2 border rounded"
               />
@@ -141,7 +224,7 @@ const MyPageShelter = () => {
               주소:
               <Link to='/shelter-address'>
                 <button className="flex items-center w-full p-2 bg-white border rounded;">
-                  {userInfo.address}
+                  {shelterInfo.address}
                   <GoChevronRight />
                 </button>
               </Link>
@@ -151,7 +234,7 @@ const MyPageShelter = () => {
               <input
                 type="text"
                 name="phone"
-                value={userInfo.phone}
+                value={shelterInfo.phoneNumber}
                 onChange={handleEditChange}
                 className="block w-full p-2 border rounded"
               />
