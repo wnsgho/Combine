@@ -1,63 +1,79 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
-const QAandApostcreate = () => {
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("")
-  const navigate = useNavigate()
-
-    
-    const handleSubmit = async() => {
-      try{
-        const response = await axios.post("/inquries",{
-          title,
-          content,
-          createdAt: new Date().toISOString(),
-        })
-        if(response.status === 201){
-          navigate("/guide/qna")
+const QAandAEdit = () => {
+    const [content, setContent] = useState("");
+    const [title, setTitle] = useState("");
+    const navigate = useNavigate();
+    const { id } = useParams();
+  
+    //기존 내용 불러오기
+    useEffect(() => {
+      const fetchPost = async () => {
+        try {
+          const response = await axios.get(`/inquries/${id}`);
+          setTitle(response.data.title);
+          setContent(response.data.content);
+        } catch (error) {
+          console.error("내용을 불러올수 없습니다.", error);
+          navigate("/guide/qna");
         }
-      }catch(error){
-        console.error("작성 실패", error)
-        alert('포스트 작성에 실패했습니다.');
+      };
+      if (id) {
+        fetchPost();
       }
-    }
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      [{ font: [] }],
-      [{ size: ["small", false, "large", "huge"] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ color: [] }, { background: [] }],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ align: [] }],
-      ["link", "image"],
-      ["clean"]
-    ]
-  };
-
-  const formats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "color",
-    "background",
-    "list",
-    "bullet",
-    "align",
-    "link",
-    "image"
-  ];
+    }, [id]);
+  
+    //수정 요청
+    const handleSubmit = async () => {
+      try {
+        await axios.put(`/inquries/${id}`, {
+          title,
+          content
+        });
+        alert("수정 되었습니다.");
+        navigate(`/guide/qna/${id}`);
+      } catch (error) {
+        console.error("수정 실패:", error);
+        alert("수정에 실패했습니다.");
+      }
+    };
+  
+    const modules = {
+      toolbar: [
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        [{ font: [] }],
+        [{ size: ["small", false, "large", "huge"] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ color: [] }, { background: [] }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["link", "image"],
+        ["clean"]
+      ]
+    };
+  
+    const formats = [
+      "header",
+      "font",
+      "size",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "color",
+      "background",
+      "list",
+      "bullet",
+      "align",
+      "link",
+      "image"
+    ];
 
   return (
     <div className="flex flex-col justify-center items-center ">
@@ -94,13 +110,17 @@ const QAandApostcreate = () => {
               className="float-right   mb-20 bg-[#AB654B]
                   /90 p-4 text-white font-bold text-[20px]"
                   onClick={handleSubmit}>
-              작성하기
+              수정하기
             </button>
 
               <button
                 className="float-right mr-8 mb-20 bg-[#AB654B]
               /90 p-4 text-white font-bold text-[20px]"
-              onClick={() => navigate("/guide/qna")}>
+              onClick={() => {
+                if (window.confirm('수정을 취소하시겠습니까?')) {
+                  navigate("/guide/qna");
+                }
+              }}>
                 취소
               </button>
           </div>
@@ -110,4 +130,4 @@ const QAandApostcreate = () => {
   );
 };
 
-export default QAandApostcreate;
+export default QAandAEdit;

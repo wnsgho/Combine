@@ -1,30 +1,46 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
-const Announcementpostcreate = () => {
+const AnnouncementEdit = () => {
   const [content, setContent] = useState("");
-  const [title, setTitle] = useState("")
-  const navigate = useNavigate()
+  const [title, setTitle] = useState("");
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-  const handleSubmit = async () => {
-    try {
-      const response = await axios.post('/api/announcements', {
-        title,
-        content,
-        createdAt: new Date().toISOString(),
-      });
-      
-      if (response.status === 201) {
+  //기존 내용 불러오기
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await axios.get(`/announcements/${id}`);
+        setTitle(response.data.title);
+        setContent(response.data.content);
+      } catch (error) {
+        console.error("게시글을 불러올수 없습니다.", error);
         navigate("/guide/announcement");
       }
+    };
+    if (id) {
+      fetchPost();
+    }
+  }, [id]);
+
+  //수정 요청
+  const handleSubmit = async () => {
+    try {
+      await axios.put(`/announcements/${id}`, {
+        title,
+        content
+      });
+      alert("수정 되었습니다.");
+      navigate(`/guide/announcement/${id}`);
     } catch (error) {
-      console.error('공지사항 작성 실패:', error);
-      alert('공지사항 작성에 실패했습니다.');
+      console.error("수정 실패:", error);
+      alert("수정에 실패했습니다.");
     }
   };
 
@@ -78,7 +94,13 @@ const Announcementpostcreate = () => {
               <option value="support">지원</option>
             </select>
             <div className="mb-6">
-              <input type="text" className="w-full p-3" placeholder="제목을 입력하세요" value={title} onChange={(e) => setTitle(e.target.value)}/>
+              <input
+                type="text"
+                className="w-full p-3"
+                placeholder="제목을 입력하세요"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
             <div className="h-[1000px] bg-white">
               <ReactQuill
@@ -97,14 +119,18 @@ const Announcementpostcreate = () => {
               className="float-right   mb-20 bg-[#AB654B]
               /90 p-4 text-white font-bold text-[20px]"
               onClick={handleSubmit}>
-              작성하기
+              수정하기
             </button>
-              <button
-                className="float-right mr-8 mb-20 bg-[#AB654B]
+            <button
+              className="float-right mr-8 mb-20 bg-[#AB654B]
               /90 p-4 text-white font-bold text-[20px]"
-              onClick={()=> navigate("/guide/announcement")}>
-                취소
-              </button>
+              onClick={() => {
+                if (window.confirm('수정을 취소하시겠습니까?')) {
+                  navigate("/guide/announcement");
+                }
+              }}>
+              취소
+            </button>
           </div>
         </div>
       </div>
@@ -112,4 +138,4 @@ const Announcementpostcreate = () => {
   );
 };
 
-export default Announcementpostcreate;
+export default AnnouncementEdit;

@@ -1,8 +1,31 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png"
 import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+interface Announcement {
+  id:number;
+  title:string;
+  content:string;
+  createdAt:string;
+}
 
 const Announcement = () => {
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+
+  useEffect(()=>{
+    const fetchAnnouncements = async() => {
+      try{
+        const response = await axios.get("/announcements");
+        setAnnouncements(response.data)
+      }catch(error){
+        console.error("조회를 실패했습니다.", error)
+      }
+    }
+    fetchAnnouncements()
+  },[])
+
   return (
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto w-full">
@@ -19,26 +42,24 @@ const Announcement = () => {
           <thead>
             <tr className="text-[28px]">
               <th className="px-8 pb-5">구분</th>
-              <th className="w-[775px] px-4 pb-5 text-left pl-[266px]">제목</th>
+              <th className="w-[920px] px-4 pb-5 text-left pl-[376px]">제목</th>
               <th className="px-8 pb-5">작성일</th>
-              <th className="px-8 pb-5">조회수</th>
             </tr>
           </thead>
           <tbody>
+            {/* {announcements.map((announcement)=>(
+              <tr className="text-[20px]" key={announcement.id}>
+              <th className="text-red-600">공지</th>
+              <NavLink to="/guide/announcement/{announcement.id}" className="float-left px-4 py-3 font-normal">{announcement.title}</NavLink>
+              <th className="font-normal">{announcement.createdAt}</th>
+            </tr>
+            ))} */}
             <tr className="text-[20px]">
               <th className="text-red-600">공지</th>
-              <NavLink to="/guide/announcement/postId" className="float-left px-4 py-3 font-normal">분양 서비스 시작</NavLink>
+              <NavLink to="/guide/announcement/postId" className="float-left px-7 py-3 font-normal">분양 서비스 시작</NavLink>
               <th className="font-normal">2024-11-21</th>
-              <th className="font-normal">79</th>
             </tr>
-            <tr className="text-[20px]">
-              <th className="text-blue-600">지원</th>
-              <NavLink to="/guide/announcement/postId" className="float-left px-4 py-3 font-normal">
-                [시립마포노인종합복지관] 취업사관학교 시즌2 요양보호직 참여자 모집
-              </NavLink>
-              <th className="font-normal">2024-11-20</th>
-              <th className="font-normal">59</th>
-            </tr>
+            
             
           </tbody>
         </table>
