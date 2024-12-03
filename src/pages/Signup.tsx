@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
 const Signup = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* 헤더 */}
@@ -33,10 +36,15 @@ const Signup = () => {
               />
             </div>
 
-            {/* 로그인 질문하기 */}
+            {/* 로그인하기 */}
             <div className="text-sm md:text-2xl lg:text-2xl xl:text-3xl text-gray-600 flex items-center gap-1 md:gap-2 lg:gap-3">
               <p>이미 계정이 있으신가요?</p>
-              <p className="font-bold">로그인하기</p>
+              <button
+                className="font-bold transition-transform transform hover:scale-105"
+                onClick={() => navigate("/login")}
+              >
+                로그인하기
+              </button>
             </div>
           </div>
 
@@ -47,12 +55,18 @@ const Signup = () => {
               회원가입하기
             </h1>
 
-            {/* 회원가입 버튼(개인 회원 버튼 + 보호소 버튼)*/}
+            {/* 회원가입 버튼(개인 회원 및 보호소) */}
             <div className="flex flex-col items-center justify-center flex-grow gap-8">
-              <button className="w-[480px] sm:w-[480px] md:w-[330px] lg:w-[450px] xl:w-[500px] h-[120px] sm:h-[120px] md:h-[100px] lg:h-[110px] xl:h-[130px] bg-[#B8A399] rounded-2xl text-6xl sm:text-6xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-black shadow-md">
+              <button
+                className="w-[480px] sm:w-[480px] md:w-[330px] lg:w-[450px] xl:w-[500px] h-[120px] sm:h-[120px] md:h-[100px] lg:h-[110px] xl:h-[130px] bg-[#B8A399] rounded-2xl text-6xl sm:text-6xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-black shadow-md transition-transform transform hover:scale-105"
+                onClick={() => navigate("/create-user1")}
+              >
                 개인 회원
               </button>
-              <button className="w-[480px] sm:w-[480px] md:w-[330px] lg:w-[450px] xl:w-[500px] h-[120px] sm:h-[120px] md:h-[100px] lg:h-[110px] xl:h-[130px] bg-[#D8D8D8] rounded-2xl text-6xl sm:text-6xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-black shadow-md">
+              <button
+                className="w-[480px] sm:w-[480px] md:w-[330px] lg:w-[450px] xl:w-[500px] h-[120px] sm:h-[120px] md:h-[100px] lg:h-[110px] xl:h-[130px] bg-[#D8D8D8] rounded-2xl text-6xl sm:text-6xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-black shadow-md transition-transform transform hover:scale-105"
+                onClick={() => navigate("/create-user2")}
+              >
                 보호소
               </button>
             </div>
@@ -64,4 +78,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
