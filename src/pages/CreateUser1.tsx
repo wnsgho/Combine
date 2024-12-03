@@ -386,7 +386,6 @@ const CreateUser1 = () => {
               {birthError && <p className="text-red-600 mt-2">{birthError}</p>}
             </div>
 
-
             {/* 전화번호 */}
             <div>
               <label
@@ -458,7 +457,6 @@ const CreateUser1 = () => {
                 } overflow-hidden truncate`}
               />
             </div>
-
 
             {/* 선호 동물 크기 */}
             <div>
