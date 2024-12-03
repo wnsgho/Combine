@@ -1,8 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 
 import { GoX, GoChevronRight } from "react-icons/go";
 import Header from "../../components/Header";
+import axios from "axios";
+
+interface PetAdd {
+  species: string;
+  name: string;
+  age: string;
+  gender: string;
+  reason: string;
+  inoculation: string;
+  neutering: string;
+  personality: string;
+  exerciseLevel: number;
+  size: string;
+  home: string;
+  add: string;
+}
 
 
 const DetailPage = () => {
@@ -38,6 +54,33 @@ const DetailPage = () => {
       });
     }
   };
+
+  const [addPet, setAddPet] = useState({
+    species: "",
+    name: "",
+    age: "",
+    gender: "",
+    reason: "",
+    inoculation: "", 
+    neutering: "",
+    personality: "",
+    exerciseLevel: 0,
+    size: "",
+    home: "",
+    add: "",
+  })
+
+  useEffect(() => {
+    const addPet = async () => {
+      try {
+        const response = await axios.post(`/api/v1/pets/{shelterId}`);
+        setAddPet(response.data);
+      } catch(error) {
+        console.error('동물 등록 중 오류 발생:', error);
+      }
+    }
+    addPet();
+  }, [])
 
   return (
     <>
@@ -93,24 +136,22 @@ const DetailPage = () => {
           />
         </section>
         <section className="mt-20">
-          <div className="flex flex-col flex-wrap gap-3">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col flex-wrap gap-6">
+            <div className="flex items-center justify-between gap-72">
               <label htmlFor="species" className="text-xl">종류</label>
-              <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="species" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>종류</option>
                 <option value="dog">강아지</option>
                 <option value="cat">고양이</option>
               </select>
             </div>
             <div className="flex items-center justify-between">
-              <label htmlFor="species" className="text-xl">이름</label>
-              <select id="species" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <input type="text" placeholder="동물 이름을 입력해 주세요" />
-              </select>
+              <label htmlFor="petname" className="text-xl">이름</label>
+              <input type="text" id="petname" placeholder="예) 코코, 흰둥이" className="pl-3 w-36"/>
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="old" className="text-xl">연령</label>
-              <select id="old" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="old" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>연령</option>
                 <option value="young">0~3살</option>
                 <option value="middleAge">4~6살</option>
@@ -119,7 +160,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="gender" className="text-xl">성별</label>
-              <select id="gender" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="gender" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>성별</option>
                 <option value="cock">수컷</option>
                 <option value="female">암컷</option>
@@ -127,11 +168,11 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="reason" className="text-xl">보호소로 오게 된 이유</label>
-              <input type="text" id="reason" placeholder="예) 유기, 보호자 병환" className="w-36"/>
+              <input type="text" id="reason" placeholder="예) 유기, 보호자 병환" className="pl-2 w-36"/>
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="inoculation" className="text-xl">접종 유무</label>
-              <select id="inoculation" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="inoculation" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>접종유무</option>
                 <option value="1">1차</option>
                 <option value="2">2차</option>
@@ -144,7 +185,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="neutering" className="text-xl">중성화 유무</label>
-              <select id="neutering" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="neutering" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>중성화유무</option>
                 <option value="yes">완료</option>
                 <option value="no">미완료</option>
@@ -152,7 +193,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="personality" className="text-xl">성격</label>
-              <select id="personality" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="personality" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>성격</option>
                 <option value="good">얌전함</option>
                 <option value="activity">활발함</option>
@@ -161,7 +202,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="activityLevel" className="text-xl">활동량</label>
-              <select id="activityLevel" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="activityLevel" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>적음 1 ~ 많음 5</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -172,7 +213,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="size" className="text-xl">크기</label>
-              <select id="size" className="bg-gray-50 border-2 border-mainColor text-gray-900 text-xs focus:ring-blue-500 focus:border-blue-500 block w-fit p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="size" className="pl-2 text-xs border bg-gray-50 border-mainColor">
                 <option selected>크기</option>
                 <option value="small">소형</option>
                 <option value="middle">중형</option>
@@ -181,7 +222,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="home" className="text-xl">맡겨지기 전 가정환경</label>
-              <input type="text" id="home" placeholder="예) 임시보호, 사육장" className="w-36"/>
+              <input type="text" id="home" placeholder="예) 임시보호, 사육장" className="pl-2 w-36"/>
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="protect" className="text-xl">보호기관</label>
@@ -191,7 +232,7 @@ const DetailPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="add" className="text-xl">추가 정보(선택사항)</label>
-              <input type="text" id="add" placeholder="동물 추가정보 작성" className="w-36"/>
+              <input type="text" id="add" placeholder="동물 추가정보 작성" className="pl-2 w-36"/>
             </div>
           </div>
         </section>

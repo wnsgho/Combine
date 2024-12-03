@@ -40,8 +40,6 @@ interface UserInfo {
 }
 
 const AdoptionList: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // URL에서 shelterId 추출
-  const shelterId: number = parseInt(id || '1', 10); // 기본값 1 설정
 
   // 여러 펫의 정보를 관리하는 상태
   const [pets, setPets] = useState<ProcessedPet[]>([]);
@@ -54,7 +52,7 @@ const AdoptionList: React.FC = () => {
     const fetchApplyPets = async () => {
       try {
         // API 호출로 펫 신청 정보 가져오기
-        const response = await axios.get<ApplyPet[]>(`/api/v1/applypet/shelter/${shelterId}`);
+        const response = await axios.get<ApplyPet[]>(`/api/v1/applypet/shelter/{shelterId}`);
         const fetchedPets: ProcessedPet[] = response.data.map((applyPet) => ({
           id: applyPet.id,
           species: applyPet.pet.species,
@@ -90,7 +88,7 @@ const AdoptionList: React.FC = () => {
     };
 
     fetchApplyPets();
-  }, [shelterId]);
+  }, []);
 
   // 토글 함수: 특정 펫 ID의 상태를 토글
   const toggleDetails = (id: number): void => {

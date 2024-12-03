@@ -25,8 +25,6 @@ interface UserInfo {
 }
 
 const MyPageUser: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>(); // URL에서 userId 추출
-  const Id: number = parseInt(userId || '1', 10); // 기본값으로 1 설정
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -36,7 +34,7 @@ const MyPageUser: React.FC = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.get<UserInfo>(`/api/v1/users/${Id}`);
+        const response = await axios.get<UserInfo>(`/api/v1/users/{Id}`);
         setUserInfo(response.data);
       } catch (error) {
         console.error('유저 정보를 불러오는 중 오류 발생:', error);
@@ -44,7 +42,7 @@ const MyPageUser: React.FC = () => {
     };
 
     fetchUserInfo();
-  }, [Id]);
+  }, []);
 
 
   // 비밀번호 유효성 검증 함수
@@ -92,7 +90,7 @@ const MyPageUser: React.FC = () => {
 
 
     try {
-      await axios.put(`/api/v1/users/${Id}`, userInfo);
+      await axios.put(`/api/v1/users/{Id}`, userInfo);
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -104,7 +102,7 @@ const MyPageUser: React.FC = () => {
   // 회원 탈퇴 처리
   const handleDeleteAccount = async (): Promise<void> => {
     try {
-      await axios.delete(`/api/v1/users/${Id}`);
+      await axios.delete(`/api/v1/users/{Id}`);
       alert('회원탈퇴가 완료되었습니다.');
       setDeleteModalOpen(false);
       // 필요시 리다이렉트 로직 추가

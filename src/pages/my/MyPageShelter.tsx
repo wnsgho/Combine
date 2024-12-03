@@ -18,9 +18,6 @@ interface ShelterInfo {
 }
 
 const MyPageShelter: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // URL에서 Id 추출
-  const Id: number = parseInt(id || '1', 10); // 기본값으로 1 설정
-
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
@@ -36,14 +33,14 @@ const MyPageShelter: React.FC = () => {
   useEffect(() => {
     const fetchShelterInfo = async () => {
       try {
-        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
+        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/{Id}`);
         setShelterInfo(response.data);
       } catch (error) {
         console.error('보호소 정보를 불러오는 중 오류 발생:', error);
       }
     };
     fetchShelterInfo();
-  }, [Id]);
+  }, []);
 
   // 비밀번호 유효성 검증 함수
   const validatePassword = (password: string): string | null => {
@@ -91,7 +88,7 @@ const MyPageShelter: React.FC = () => {
 
 
     try {
-      await axios.put(`/api/v1/shelters/${Id}`, shelterInfo);
+      await axios.put(`/api/v1/shelters/{Id}`, shelterInfo);
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -103,7 +100,7 @@ const MyPageShelter: React.FC = () => {
     // 회원 탈퇴 처리
     const handleDeleteAccount = async (): Promise<void> => {
       try {
-        await axios.delete(`/api/v1/shelters/${Id}`);
+        await axios.delete(`/api/v1/shelters/{Id}`);
         alert('회원탈퇴가 완료되었습니다.');
         setDeleteModalOpen(false);
         // 필요시 리다이렉트 로직 추가
@@ -135,7 +132,7 @@ const MyPageShelter: React.FC = () => {
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">주소</p>
-                <button className='flex items-center justify-center text-lg'>{shelterInfo.address}<GoChevronRight /></button>
+                <button className='flex items-center justify-center text-lg'>{shelterInfo.address}</button>
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">단체 메일</p>
