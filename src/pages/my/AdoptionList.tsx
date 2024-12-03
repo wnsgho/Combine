@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { GoChevronUp, GoChevronDown } from 'react-icons/go';
 import { useParams } from 'react-router-dom';
+import Header from "../../components/Header";
 
 // 데이터 타입 정의
 interface Pet {
@@ -99,74 +100,78 @@ const AdoptionList: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {/* 헤더 섹션 */}
-      <section className="flex flex-col items-center w-full max-w-lg gap-4 mt-8">
-        <div className="flex justify-center">
-          <h2 className="text-3xl font-bold">입양신청 리스트</h2>
-        </div>
-      </section>
+    <div>
+      {/* 헤더 */}
+      <Header />
+      <div className="flex flex-col items-center">
+        <section className="flex flex-col items-center w-full max-w-lg gap-4 mt-8">
+          <div className="flex justify-center">
+            <h2 className="text-3xl font-bold">입양신청 리스트</h2>
+          </div>
+        </section>
 
-      {/* 리스트 섹션 */}
-      <section className="mt-20">
-        <div>
-          <ul className="flex flex-col gap-10">
-            {/* 여러 펫 항목 렌더링 */}
-            {pets.map((pet) => (
-              <li
-                key={pet.id}
-                className="flex flex-col justify-between pb-4 mb-4 border-b"
-              >
-                <div className="flex items-center justify-between">
-                  {/* 기본 정보 표시 */}
-                  <span>펫 ID: {pet.id}</span>
-                  {/* 토글 버튼 */}
-                  <button
-                    onClick={() => toggleDetails(pet.id)}
-                    className="ml-32 text-blue-500 underline"
-                  >
-                    {visibleDetails[pet.id] ? <GoChevronUp /> : <GoChevronDown />}
-                  </button>
-                </div>
-
-                {/* 상세 정보: 해당 ID의 상태에 따라 표시 */}
-                {visibleDetails[pet.id] && (
-                  <div className="p-2 mt-2 bg-gray-100 rounded">
-                    <h3 className="text-lg font-semibold">펫 정보</h3>
-                    <p>종류: {pet.species}</p>
-                    <p>크기: {pet.size}</p>
-                    <p>나이: {pet.age}</p>
-                    <p>성격: {pet.personality}</p>
-                    <p>활동량: {pet.exerciseLevel}</p>
-
-                    <h3 className="mt-4 text-lg font-semibold">입양 신청자 정보</h3>
-                    {pet.userInfo ? (
-                      <>
-                        <p>이름: {pet.userInfo.username}</p>
-                        <p>이메일: {pet.userInfo.email}</p>
-                        <p>연락처: {pet.userInfo.phoneNumber}</p>
-                        <p>주소: {pet.userInfo.address}</p>
-                      </>
-                    ) : (
-                      <p>유저 정보를 불러오는 중...</p>
-                    )}
-                    {/* 승인/거절 버튼 */}
-                    <div className="flex gap-2 mt-2">
-                      <button className="px-4 py-2 text-white bg-green-500 rounded">
-                        입양 승인
-                      </button>
-                      <button className="px-4 py-2 text-white bg-red-500 rounded">
-                        입양 거절
-                      </button>
-                    </div>
+        {/* 리스트 섹션 */}
+        <section className="mt-20">
+          <div>
+            <ul className="flex flex-col gap-10">
+              {/* 여러 펫 항목 렌더링 */}
+              {pets.map((pet) => (
+                <li
+                  key={pet.id}
+                  className="flex flex-col justify-between pb-4 mb-4 border-b"
+                >
+                  <div className="flex items-center justify-between">
+                    {/* 기본 정보 표시 */}
+                    <span>펫 ID: {pet.id}</span>
+                    {/* 토글 버튼 */}
+                    <button
+                      onClick={() => toggleDetails(pet.id)}
+                      className="ml-32 text-blue-500 underline"
+                    >
+                      {visibleDetails[pet.id] ? <GoChevronUp /> : <GoChevronDown />}
+                    </button>
                   </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+
+                  {/* 상세 정보: 해당 ID의 상태에 따라 표시 */}
+                  {visibleDetails[pet.id] && (
+                    <div className="p-2 mt-2 bg-gray-100 rounded">
+                      <h3 className="text-lg font-semibold">펫 정보</h3>
+                      <p>종류: {pet.species}</p>
+                      <p>크기: {pet.size}</p>
+                      <p>나이: {pet.age}</p>
+                      <p>성격: {pet.personality}</p>
+                      <p>활동량: {pet.exerciseLevel}</p>
+
+                      <h3 className="mt-4 text-lg font-semibold">입양 신청자 정보</h3>
+                      {pet.userInfo ? (
+                        <>
+                          <p>이름: {pet.userInfo.username}</p>
+                          <p>이메일: {pet.userInfo.email}</p>
+                          <p>연락처: {pet.userInfo.phoneNumber}</p>
+                          <p>주소: {pet.userInfo.address}</p>
+                        </>
+                      ) : (
+                        <p>유저 정보를 불러오는 중...</p>
+                      )}
+                      {/* 승인/거절 버튼 */}
+                      <div className="flex gap-2 mt-2">
+                        <button className="px-4 py-2 text-white bg-green-500 rounded">
+                          입양 승인
+                        </button>
+                        <button className="px-4 py-2 text-white bg-red-500 rounded">
+                          입양 거절
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
     </div>
+
   );
 };
 

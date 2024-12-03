@@ -52,7 +52,7 @@ const PreferPage: React.FC = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-3/4">
                 <p className="text-xl font-bold text-mainColor">종류</p>
-                <select id="species" className="text-lg border-2 bg-gray-50 border-mainColor ">
+                <select id="species" className="text-lg border bg-gray-50 border-mainColor ">
                   <option selected>종류</option>
                   <option value="dog">강아지</option>
                   <option value="cat">고양이</option>
@@ -60,7 +60,7 @@ const PreferPage: React.FC = () => {
             </div>
             <div className="flex justify-between w-3/4">
               <p className="text-xl font-bold text-mainColor">나이</p>
-              <select id="old" className="text-lg border-2 bg-gray-50 border-mainColor ">
+              <select id="old" className="text-lg border bg-gray-50 border-mainColor ">
                 <option selected>크기</option>
                 <option value="young">소형</option>
                 <option value="middleAge">중형</option>
@@ -69,7 +69,7 @@ const PreferPage: React.FC = () => {
             </div>
             <div className="flex justify-between w-3/4">
               <p className="text-xl font-bold text-mainColor">성격</p>
-              <select id="personality" className="text-lg border-2 bg-gray-50 border-mainColor ">
+              <select id="personality" className="text-lg border bg-gray-50 border-mainColor ">
                 <option selected>성격</option>
                 <option value="good">얌전함</option>
                 <option value="activity">활발함</option>
@@ -78,7 +78,7 @@ const PreferPage: React.FC = () => {
             </div>
             <div className="flex justify-between w-3/4">
               <p className="text-xl font-bold text-mainColor">활동량</p>
-              <select id="personality" className="text-lg border-2 bg-gray-50 border-mainColor">
+              <select id="personality" className="text-lg border bg-gray-50 border-mainColor">
                 <option selected>적음 1 ~ 많음 5</option>
                 <option value="1">1</option>
                 <option value="2">2</option>

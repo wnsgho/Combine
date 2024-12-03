@@ -107,11 +107,11 @@ const ShelterAddress: React.FC = () => {
   };
 
 
-  const shelter = true;
+  const shelter = true; // 임시 쉘터 설정
 
   return (
     <div>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center mt-20">
         <section>
           <h2 className="text-2xl font-bold">보호소 주소</h2>
         </section>
