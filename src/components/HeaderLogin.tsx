@@ -131,10 +131,10 @@ const HeaderLogin = () => {
                 {/* 매칭 세부사항 */}
                 <div className="flex-1 flex flex-col items-center px-4">
                   <Link
-                    to="/detailadd"
+                    to="/matching"
                     className="font-normal text-black mb-2 text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-2xl hover:scale-105 transition-transform duration-200"
                   >
-                    반려동물 등록
+                    반려동물 조회
                   </Link>
                   <Link
                     to="/ai-matching"
@@ -178,15 +178,15 @@ const HeaderLogin = () => {
                   >
                     선호 동물 입력 및 수정
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/my-walking-course"
                     className="font-normal text-black mb-3 text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-2xl hover:scale-105 transition-transform duration-200"
                   >
                     나의 산책 코스
-                  </Link>
+                  </Link> */}
                   {isLoggedIn && (
                     <div
-                      className="flex items-center justify-end w-full hover:scale-105 cursor-pointer"
+                      className="flex items-center justify-end w-full hover:scale-105 cursor-pointer mt-8"
                       onClick={handleLogout}
                     >
                       <span className="text-black text-sm sm:text-base md:text-base lg:text-lg xl:text-xl font-medium">
@@ -282,7 +282,7 @@ const HeaderLogin = () => {
                     name: "매칭",
                     link: "#",
                     items: [
-                      { name: "반려동물 등록", link: "/detailadd" },
+                      { name: "반려동물 조회", link: "/matching" },
                       { name: "AI 매칭 시스템", link: "/ai-matching" },
                     ],
                   },
@@ -301,7 +301,7 @@ const HeaderLogin = () => {
                     items: [
                       { name: "나의 정보", link: getUserInfoLink() },
                       { name: "선호동물 입력 및 수정", link: "/prefer" },
-                      { name: "나의 산책 코스", link: "/my-walking-course" },
+                      // { name: "나의 산책 코스", link: "/my-walking-course" },
                     ],
                   },
                   // 로그인 상태에서만 사이드바에 알림 목록이 나타나도록 구현
