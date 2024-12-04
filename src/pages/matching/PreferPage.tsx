@@ -25,7 +25,7 @@ const PreferPage: React.FC = () => {
 
   // ID 불러오기
   useEffect(() => {
-    const shelterId = async () => {
+    const userId = async () => {
       try {
         const response = await axios.get(`/api/v1/features/check-id`);
         setId(response.data);
@@ -33,7 +33,7 @@ const PreferPage: React.FC = () => {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
       }
     };
-    shelterId();
+    userId();
   }, [])
 
   // 정보 수정 제출

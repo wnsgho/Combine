@@ -26,14 +26,28 @@ interface ShelterName {
 
 
 const DetailPage = () => {
-
-  
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
   const [Id, setId] = useState("");
   const [shelterInfo, setShelterInfo] = useState({
     shelterName: ""
   });
+  const [addPet, setAddPet] = useState<PetAdd>({
+    species: "",
+    name: "",
+    age: "",
+    gender: "",
+    reason: "",
+    inoculation: "", 
+    neutering: "",
+    personality: "",
+    exerciseLevel: 0,
+    size: "",
+    home: "",
+    add: "",
+  });
+
+
 
   // ID 불러오기
   useEffect(() => {
@@ -92,20 +106,6 @@ const DetailPage = () => {
     }
   };
 
-  const [addPet, setAddPet] = useState({
-    species: "",
-    name: "",
-    age: "",
-    gender: "",
-    reason: "",
-    inoculation: "", 
-    neutering: "",
-    personality: "",
-    exerciseLevel: 0,
-    size: "",
-    home: "",
-    add: "",
-  })
 
   const InputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -121,8 +121,24 @@ const DetailPage = () => {
   };
 
   const addPetInfo = async (): Promise<void> => {
+    const formData = new FormData();
+
+    // Add pet data
+    Object.entries(addPet).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Add images
+    postImg.forEach((file) => {
+      formData.append("images", file);
+    });
+
     try {
-      await axios.post(`/api/v1/pets/${Id}`, addPet);
+      await axios.post(`/api/v1/pets/${Id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       alert('동물 등록이 완료되었습니다.');
     } catch (error) {
       console.error('동물 등록 중 오류 발생:', error);
