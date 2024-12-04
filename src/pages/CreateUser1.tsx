@@ -10,7 +10,7 @@ const CreateUser1 = () => {
     passwordConfirm: "",
     username: "",
     birthDate: "",
-    phone: "",
+    phoneNumber: "",
     address: "",
     species: "",
     preferredSize: "",
@@ -25,7 +25,7 @@ const CreateUser1 = () => {
   const [passwordConfirmError, setPasswordConfirmError] = useState<string | null>(null);  
   const [userError, setUserError] = useState<string | null>(null);
   const [birthError, setBirthError] = useState<string | null>(null);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
   const [exerciseLevelError, setExerciseLevelError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -54,8 +54,8 @@ const CreateUser1 = () => {
       setBirthError(null);
     }
 
-    if (id === "phone") {
-      setPhoneError(null);
+    if (id === "phoneNumber") {
+      setPhoneNumberError(null);
     }
 
     if (id === "address") {
@@ -114,9 +114,9 @@ const CreateUser1 = () => {
   };
 
   const validateInputs = () => {
-    const { email, password, passwordConfirm, username, birthDate, phone, address, preferredExerciseLevel } = inputValues;
+    const { email, password, passwordConfirm, username, birthDate, phoneNumber, address, preferredExerciseLevel } = inputValues;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const phoneRegex = /^\d{3}-\d{4}-\d{4}$/;
+    const phoneNumberRegex = /^\d{3}-\d{4}-\d{4}$/;
 
     if (!email) {
       setEmailCheckStatus("이메일을 입력해주세요.");
@@ -173,12 +173,12 @@ const CreateUser1 = () => {
       return false;
     }
 
-    if (!phone) {
-      setPhoneError("전화번호를 입력해주세요.");
+    if (!phoneNumber) {
+      setPhoneNumberError("전화번호를 입력해주세요.");
       alert("전화번호를 입력해주세요.");
       return false;
-    } else if (!phoneRegex.test(phone)) {
-      setPhoneError("유효한 전화번호 형식이 아닙니다.");
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      setPhoneNumberError("유효한 전화번호 형식이 아닙니다.");
       alert("유효한 전화번호 형식이 아닙니다.");
       return false;
     }
@@ -211,7 +211,7 @@ const CreateUser1 = () => {
           username: inputValues.username,
           password: inputValues.password,
           birthDate: inputValues.birthDate,
-          phoneNumber: inputValues.phone,
+          phoneNumber: inputValues.phoneNumber,
           address: inputValues.address,
           species: inputValues.species || null,
           preferredSize: inputValues.preferredSize || null,
@@ -389,26 +389,26 @@ const CreateUser1 = () => {
             {/* 전화번호 */}
             <div>
               <label
-                htmlFor="phone"
+                htmlFor="phoneNumber"
                 className="block text-2xl sm:text-2xl md:text-3xl font-medium text-gray-700 mb-4"
               >
                 전화번호
               </label>
               <input
-                id="phone"
+                id="phoneNumber"
                 type="tel"
                 placeholder="전화번호를 입력해주세요. (예: 010-0000-0000)"
-                value={inputValues.phone}
+                value={inputValues.phoneNumber}
                 onChange={handleInputChange}
                 className={`w-full px-5 py-4 sm:py-5 md:py-6 border rounded-lg text-2xl sm:text-2xl md:text-2xl ${
-                  phoneError
+                  phoneNumberError
                     ? "border-red-500 bg-red-100"
-                    : inputValues.phone
+                    : inputValues.phoneNumber
                     ? "border-gray-300 bg-gray-100"
                     : "border-gray-300 bg-white"
                 } overflow-hidden truncate`}
               />
-              {phoneError && <p className="text-red-600 mt-2">{phoneError}</p>}
+              {phoneNumberError && <p className="text-red-600 mt-2">{phoneNumberError}</p>}
             </div>
 
             {/* 주소 */}
