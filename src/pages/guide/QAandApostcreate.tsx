@@ -7,6 +7,7 @@ import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
 const QAandApostcreate = () => {
+  const [userId, setUserId] = useState(7)
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("")
   const navigate = useNavigate()
@@ -14,10 +15,10 @@ const QAandApostcreate = () => {
     
     const handleSubmit = async() => {
       try{
-        const response = await axios.post("/inquries",{
+        const response = await axios.post("http://15.164.103.160:8080/api/v1/inquries",{
+          userId,
           title,
           content,
-          createdAt: new Date().toISOString(),
         })
         if(response.status === 201){
           navigate("/guide/qna")

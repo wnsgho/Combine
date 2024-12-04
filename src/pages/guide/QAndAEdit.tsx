@@ -6,17 +6,19 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
+// userID가 뭔지 알고 전역으로 설정해 놔야할듯
 const QAandAEdit = () => {
+  const [userId, setUserId] = useState(7)
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
     const navigate = useNavigate();
     const { id } = useParams();
   
-    //기존 내용 불러오기
+    //기존 내용 불러오기(상세조회)
     useEffect(() => {
       const fetchPost = async () => {
         try {
-          const response = await axios.get(`/inquries/${id}`);
+          const response = await axios.get(`http://15.164.103.160:8080/api/v1/inquries/${id}`);
           setTitle(response.data.title);
           setContent(response.data.content);
         } catch (error) {
@@ -32,7 +34,8 @@ const QAandAEdit = () => {
     //수정 요청
     const handleSubmit = async () => {
       try {
-        await axios.put(`/inquries/${id}`, {
+        await axios.put(`http://15.164.103.160:8080/api/v1/inquries/${id}`, {
+          userId,
           title,
           content
         });

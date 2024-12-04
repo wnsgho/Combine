@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const HeaderLogin = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null); 
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -15,7 +15,6 @@ const HeaderLogin = () => {
   const hideDropdown = () => setIsDropdownVisible(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  // 로그아웃 
   const handleLogout = async () => {
     const accessToken = localStorage.getItem("accessToken");
 
@@ -26,8 +25,8 @@ const HeaderLogin = () => {
     }
 
     try {
-      await axios.post(
-        "http://localhost:8080/logout", // 로그아웃 API
+      await axiosInstance.post(
+        "/logout",
         {},
         {
           headers: {
@@ -36,32 +35,30 @@ const HeaderLogin = () => {
         }
       );
 
-      // 로그아웃에 성공하면 localStorage에서 사용자 정보 삭제하도록 구현(백엔드 구현 사항 반영)
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userId");
       setIsLoggedIn(false);
       alert("로그아웃 되었습니다.");
-      navigate("/"); // 로그아웃 후 메인페이지로 이동하기
+      navigate("/");
     } catch (error) {
       console.error("로그아웃 실패:", error);
       alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
-  // 유저 역할에 대한 정보 요청하기(마이페이지를 내정보 or 보호소로 연결하는데 필요)
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     setIsLoggedIn(!!accessToken);
 
     if (accessToken) {
-      axios
-        .get("http://localhost:8080/api/v1/auths/role", {
+      axiosInstance
+        .get("/api/v1/features/role", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         })
         .then((response) => {
-          setUserRole(response.data.role);
+          setUserRole(response.data.role); 
         })
         .catch((error) => {
           console.error("유저의 역할을 가져오는 데 실패했습니다:", error);
@@ -69,8 +66,7 @@ const HeaderLogin = () => {
         });
     }
   }, []);
- 
-  // 마이페이지에 대한 링크 구분
+
   const getUserInfoLink = () => {
     return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/my-info";
   };
@@ -135,10 +131,10 @@ const HeaderLogin = () => {
                 {/* 매칭 세부사항 */}
                 <div className="flex-1 flex flex-col items-center px-4">
                   <Link
-                    to="/detailadd"
+                    to="/matching"
                     className="font-normal text-black mb-2 text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-2xl hover:scale-105 transition-transform duration-200"
                   >
-                    반려동물 등록
+                    반려동물 조회
                   </Link>
                   <Link
                     to="/ai-matching"
@@ -182,15 +178,15 @@ const HeaderLogin = () => {
                   >
                     선호 동물 입력 및 수정
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/my-walking-course"
                     className="font-normal text-black mb-3 text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-2xl hover:scale-105 transition-transform duration-200"
                   >
                     나의 산책 코스
-                  </Link>
+                  </Link> */}
                   {isLoggedIn && (
                     <div
-                      className="flex items-center justify-end w-full hover:scale-105 cursor-pointer"
+                      className="flex items-center justify-end w-full hover:scale-105 cursor-pointer mt-8"
                       onClick={handleLogout}
                     >
                       <span className="text-black text-sm sm:text-base md:text-base lg:text-lg xl:text-xl font-medium">
@@ -286,7 +282,7 @@ const HeaderLogin = () => {
                     name: "매칭",
                     link: "#",
                     items: [
-                      { name: "반려동물 등록", link: "/detailadd" },
+                      { name: "반려동물 조회", link: "/matching" },
                       { name: "AI 매칭 시스템", link: "/ai-matching" },
                     ],
                   },
@@ -305,7 +301,7 @@ const HeaderLogin = () => {
                     items: [
                       { name: "나의 정보", link: getUserInfoLink() },
                       { name: "선호동물 입력 및 수정", link: "/prefer" },
-                      { name: "나의 산책 코스", link: "/my-walking-course" },
+                      // { name: "나의 산책 코스", link: "/my-walking-course" },
                     ],
                   },
                   // 로그인 상태에서만 사이드바에 알림 목록이 나타나도록 구현
