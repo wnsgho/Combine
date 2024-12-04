@@ -222,11 +222,12 @@ const CreateUser1 = () => {
           userRole: "ROLE_USER",
         });
 
-        if (response.status === 200) {
+        if (response.status === 201) {
           alert("회원가입이 완료되었습니다!");
           navigate("/");
         }
       } catch (error) {
+        console.error(error); 
         alert("회원가입을 할 수 없습니다.");
       }
     }
