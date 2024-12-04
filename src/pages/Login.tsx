@@ -14,7 +14,7 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // 일반 로그인
+  // 일반 로그인 메세지 + 백엔드 요청
   const handleLogin = async () => {
     if (!email && !password) {
       alert("이메일과 비밀번호를 입력해주세요.");
@@ -39,11 +39,17 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const response = await axiosInstance.post("/login", {
-        username: email,
-        password,
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+  
+      const response = await axiosInstance.post("/login", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", 
+        },
       });
-
+  
+      // 로그인 후 토큰 저장
       localStorage.setItem("accessToken", response.data.accessToken);
       alert("로그인 되었습니다.");
       navigate("/");
