@@ -144,10 +144,15 @@ const DetailReadPage = () => {
     );
   };
 
-    // 취소 버튼 클릭시 뒤로가기
-    const Cancel = () => {
-      navigate(-1); // 이전 페이지로 이동
-    };
+  // 취소 버튼 클릭시 뒤로가기
+  const Cancel = () => {
+    navigate(-1); // 이전 페이지로 이동
+  };
+
+  // 상세정보 수정 페이지로 이동하는 링크 생성 함수
+  const petLink = (petId:any) => {
+    return `/adoption-list/${petId}`; // 입양신청 리스트 페이지 URL 생성
+  };
 
   const shelter = role == "ROLE_SHELTER" && applyInfo.userId == petInfo.shelterId
 
@@ -256,8 +261,9 @@ const DetailReadPage = () => {
         {shelter ?  <section className="flex gap-24 my-8">
             <button className="px-4 py-2 text-lg text-cancelColor"  onClick={() => setDeleteModalOpen(true)}>삭제</button>
             <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>완료</button>
-            
-            <button className="px-4 py-2 text-lg text-cancelColor">수정</button>
+            <Link to={petLink(petId)}>
+              <button className="px-4 py-2 text-lg text-cancelColor">수정</button>
+            </Link>
           </section>
         : 
           <section className="flex gap-32 my-8">
