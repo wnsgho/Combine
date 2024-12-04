@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
-import pu from "../../assets/image/pu.avif"; // 임시 사진
-import mainimage from "../../assets/image/mainimage.webp" //임시사진
 import Header from "../../components/Header";
 import axios from "axios";
 import MyPageModal from "../../components/MyPageModal";
 
-const images = [pu, mainimage, pu, mainimage, pu]; // 이미지 배열
+
 
 interface PetInfo {
   species: string;
@@ -24,6 +22,7 @@ interface PetInfo {
   shelterName: string;
   add: string;
   imageUrls: [];
+  shelterId: number;
 }
 
 
@@ -49,12 +48,13 @@ const DetailReadPage = () => {
     home: '',
     shelterName: '',
     add: '',
-    imageUrls: []
+    imageUrls: [],
+    shelterId: 0
   })
 
   const [applyInfo, setApplyInfo] = useState({
     petId: "",
-    userId: ""
+    userId: 0
   })
 
 
@@ -134,13 +134,13 @@ const DetailReadPage = () => {
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? petInfo.imageUrls.length - 1 : prevIndex - 1
     );
   };
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === petInfo.imageUrls.length - 1 ? 0 : prevIndex + 1
     );
   };
 
@@ -149,7 +149,7 @@ const DetailReadPage = () => {
       navigate(-1); // 이전 페이지로 이동
     };
 
-  const shelter = role == "ROLE_SHELTER"
+  const shelter = role == "ROLE_SHELTER" && applyInfo.userId == petInfo.shelterId
 
   return (
     <>
@@ -165,7 +165,7 @@ const DetailReadPage = () => {
             </button>
             <div className="flex items-center justify-center w-full h-64">
               <img
-                src={images[currentIndex]}
+                src={petInfo.imageUrls[currentIndex]}
                 alt={`Slide ${currentIndex + 1}`}
                 className="object-contain w-full h-full"
               />
@@ -178,7 +178,7 @@ const DetailReadPage = () => {
             </button>
           </div>
           <div className="flex justify-center gap-2 mt-4">
-            {images.map((_, index) => (
+            {petInfo.imageUrls.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}

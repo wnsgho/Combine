@@ -17,6 +17,7 @@ interface PetAdd {
   home: string;
   shelterName: string;
   add: string;
+  shelterId: number;
 }
 
 interface ShelterName {
@@ -27,7 +28,7 @@ interface ShelterName {
 const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
-  const [Id, setId] = useState("");
+  const [Id, setId] = useState(0);
   const [shelterInfo, setShelterInfo] = useState({
     shelterName: ""
   });
@@ -45,6 +46,7 @@ const DetailPage = () => {
     home: "",
     shelterName: "",
     add: "",
+    shelterId: Id 
   });
 
 
@@ -53,7 +55,7 @@ const DetailPage = () => {
   useEffect(() => {
     const shelterId = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/check-id`);
+        const response = await axios.get<number>(`/api/v1/features/check-id`);
         setId(response.data);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
