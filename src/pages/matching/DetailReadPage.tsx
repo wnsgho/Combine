@@ -1,14 +1,136 @@
-import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import pu from "../../assets/image/pu.avif"; // 임시 사진
 import mainimage from "../../assets/image/mainimage.webp" //임시사진
 import Header from "../../components/Header";
+import axios from "axios";
+import MyPageModal from "../../components/MyPageModal";
 
 const images = [pu, mainimage, pu, mainimage, pu]; // 이미지 배열
 
+interface PetInfo {
+  species: string;
+  name: string;
+  age: string;
+  gender: string;
+  reason: string;
+  inoculation: string;
+  neutering: string;
+  personality: string;
+  exerciseLevel: number;
+  size: string;
+  home: string;
+  shelterName: string;
+  add: string;
+  imageUrls: [];
+}
+
+
 const DetailReadPage = () => {
+  const { petId } = useParams();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate(); // useNavigate 훅 사용
+  const [role, setRole] = useState("");
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
+
+  const [petInfo, setPetInfo] = useState({
+    species: '',
+    name: '',
+    age: '',
+    gender: '',
+    reason: '',
+    inoculation: '',
+    neutering: '',
+    personality: '',
+    exerciseLevel: 0,  
+    size: '',
+    home: '',
+    shelterName: '',
+    add: '',
+    imageUrls: []
+  })
+
+  const [applyInfo, setApplyInfo] = useState({
+    petId: "",
+    userId: ""
+  })
+
+
+
+  // 동물 상세정보 불러오기
+  useEffect(() => {
+    const pets = async () => {
+      try{
+        const response = await axios.get<PetInfo>(`/api/v1/pets/${petId}`);
+        setPetInfo(response.data);
+      }catch(error) {
+        console.error("동물 상세정보 불러오는 중 오류 발생", error)
+      }
+    }
+    pets();
+  }, [])
+
+  // 유저 Id 불러오기
+  useEffect(() => {
+    const userId = async () => {
+      try{
+        const response = await axios.get(`/api/v1/features/user-id`);
+        setApplyInfo(response.data);
+      }catch(error) {
+        console.error("유저 ID 불러오는 중 오류 발생", error)
+      }
+    }
+    userId();
+  }, [])
+
+  // petId 추가하기
+  useEffect(() => {
+    if (petId) {
+      setApplyInfo(prevState => ({
+        ...prevState,
+        petId: petId
+      }));
+    }
+  }, [petId]);
+
+  // 유저 role 불러오기
+  useEffect(() => {
+    const roles = async () => {
+      try{
+        const response = await axios.get(`/api/v1/features/role`);
+        setRole(response.data);
+      }catch(error) {
+        console.error("유저 Role 불러오는 중 오류 발생", error)
+      }
+    }
+    roles();
+  }, [])
+
+  // 입양 신청 
+  const applypet = async () => {
+    try {
+      await axios.post(`/api/v1/applypet`, applyInfo, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error) {
+      console.error("입양 신청 보내는 중 오류 발생", error);
+    }
+  };
+
+
+  // 보호소 동물 삭제
+  const deletePet = async () => {
+    try {
+      await axios.delete(`/api/v1/pets/${applyInfo.userId}/${petId}`);
+    } catch (error) {
+      console.error("동물 삭제 중 오류 발생", error);
+    }
+  };
+
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) =>
@@ -22,20 +144,12 @@ const DetailReadPage = () => {
     );
   };
 
-  const [petInfo, setPetInfo] = useState({
-    species: '강아지',
-    old: '0 ~ 3살',
-    gender: '수컷',
-    inoculation: '3차',
-    neutering: '완료',
-    personality: '얌전함',
-    activity: 3,  
-    reason: '유기',
-    home: '임시보호',
-    add: '',
-  })
+    // 취소 버튼 클릭시 뒤로가기
+    const Cancel = () => {
+      navigate(-1); // 이전 페이지로 이동
+    };
 
-  const shelter = true // (임시) 보호소로 로그인시
+  const shelter = role == "ROLE_SHELTER"
 
   return (
     <>
@@ -78,7 +192,7 @@ const DetailReadPage = () => {
 
         <section className="flex flex-col w-full max-w-lg gap-8 mt-8">
           <div className="flex justify-center">
-            <h3 className="text-2xl font-bold text-mainColor">댕구</h3>
+            <h3 className="text-2xl font-bold text-mainColor">{petInfo.name}</h3>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
@@ -87,7 +201,7 @@ const DetailReadPage = () => {
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">나이</p>
-              <p className="text-lg">{petInfo.old}</p>
+              <p className="text-lg">{petInfo.age}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
@@ -111,7 +225,7 @@ const DetailReadPage = () => {
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">활동량</p>
-              <p className="text-lg">{petInfo.activity}</p>
+              <p className="text-lg">{petInfo.exerciseLevel}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
@@ -130,7 +244,7 @@ const DetailReadPage = () => {
             <p className="text-xl font-bold text-mainColor">보호기관</p>
             <Link to="/shelter-address">
               <button className="flex items-center gap-1 text-lg text-blue-500">
-                펫케어 <GoChevronRight />
+                {petInfo.shelterName} <GoChevronRight />
               </button>
             </Link>
           </div>
@@ -140,21 +254,45 @@ const DetailReadPage = () => {
           </div>
         </section>
         {shelter ?  <section className="flex gap-24 my-8">
-            <button className="px-4 py-2 text-lg text-cancelColor">삭제</button>
-            <button className="px-4 py-2 text-lg font-bold text-mainColor">완료</button>
+            <button className="px-4 py-2 text-lg text-cancelColor"  onClick={() => setDeleteModalOpen(true)}>삭제</button>
+            <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>완료</button>
+            
             <button className="px-4 py-2 text-lg text-cancelColor">수정</button>
           </section>
         : 
           <section className="flex gap-32 my-8">
-            <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">
+            <button className="px-4 py-2 text-lg text-cancelColor" onClick={Cancel}>
               취소
             </button>
-            <button className="px-4 py-2 text-lg font-bold hover:bg-blue-600 text-mainColor">
+            <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={() => setApplyModalOpen(true)}>
               입양신청
             </button>
           </section>
         }
-        
+        {/* 입양 신청 모달 */}
+        <MyPageModal isOpen={isApplyModalOpen} onClose={() => setApplyModalOpen(false)}>
+          <h3 className="mb-4 text-lg font-bold">입양 신청 하시겠습니까?</h3>
+          <div className="flex justify-end gap-4 mt-6">
+            <button className="text-mainColor" onClick={applypet}>
+              네
+            </button>
+            <button className="text-cancelColor" onClick={() => setApplyModalOpen(false)}>
+              아니오
+            </button>
+          </div>
+        </MyPageModal>
+        {/* 동물 삭제 모달 */}
+        <MyPageModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+          <h3 className="mb-4 text-lg font-bold">정말로 삭제하시겠습니까?</h3>
+          <div className="flex justify-end gap-4 mt-6">
+            <button className="text-mainColor" onClick={deletePet}>
+              네
+            </button>
+            <button className="text-cancelColor" onClick={() => setDeleteModalOpen(false)}>
+              아니오
+            </button>
+          </div>
+        </MyPageModal>
       </div>
     </>
   );

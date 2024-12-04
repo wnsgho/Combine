@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -16,10 +16,11 @@ interface ShelterInfo {
 
 
 const ShelterAddress: React.FC = () => {
+  const { shelterId } = useParams();
   const mapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate(); // useNavigate 훅 사용
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [Id, setId] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
   const [role, setRole] = useState<string>("")
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
     shelterName: "",
@@ -35,7 +36,7 @@ const ShelterAddress: React.FC = () => {
     const shelterId = async () => {
       try {
         const response = await axios.get(`/api/v1/features/check-id`);
-        setId(response.data.id);
+        setUserId(response.data.id);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
       }
@@ -57,7 +58,7 @@ const ShelterAddress: React.FC = () => {
   useEffect(() => {
     const shelterInfo = async () => {
       try {
-        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
+        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${shelterId}`);
         setShelterInfo(response.data);
       } catch (error) {
         console.error("보호소 정보를 불러오는 중 오류 발생:", error);
@@ -142,7 +143,7 @@ const ShelterAddress: React.FC = () => {
     if (!shelterInfo) return;
 
     try {
-      await axios.put(`/api/v1/shelter/${Id}`, shelterInfo);
+      await axios.put(`/api/v1/shelter/${userId}`, shelterInfo);
       alert('정보가 수정되었습니다.');
       setIsModalOpen(false)
     } catch (error) {
@@ -157,7 +158,8 @@ const ShelterAddress: React.FC = () => {
   };
 
 
-  const shelter = role == "ROLE_SHELTER";
+  const shelter = role == "ROLE_SHELTER" && userId == shelterId;
+
 
   return (
     <div>

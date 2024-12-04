@@ -6,6 +6,7 @@ import Header from '../../components/Header';
 import axios from 'axios';
 
 import mainImage from '../../assets/image/mainimage.webp';
+import ShelterAddress from './ShelterAddress';
 
 interface ShelterInfo {
   email: string;
@@ -29,7 +30,7 @@ const MyPageShelter: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
-  const [Id, setId] = useState<string>("")
+  const [shelterId, setShelterId] = useState<number>(0)
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
     shelterName: '',
     address: '',
@@ -45,7 +46,7 @@ const MyPageShelter: React.FC = () => {
     const shelterId = async () => {
       try {
         const response = await axios.get(`/api/v1/features/check-id`);
-        setId(response.data.id);
+        setShelterId(response.data.id);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
       }
@@ -57,27 +58,27 @@ const MyPageShelter: React.FC = () => {
   useEffect(() => {
     const shelterInfo = async () => {
       try {
-        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
+        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${shelterId}`);
         setShelterInfo(response.data);
       } catch (error) {
         console.error('보호소 정보를 불러오는 중 오류 발생:', error);
       }
     };
     shelterInfo();
-  }, [Id]);
+  }, [shelterId]);
 
   //보호소 등록 동물 리스트
   useEffect(() => {
     const petList = async () => {
       try {
-        const response = await axios.get(`/api/v1/pets/${Id}/list`);
+        const response = await axios.get(`/api/v1/pets/${shelterId}/list`);
         setPetLists(response.data)
       }catch(error) {
         console.error('동물리스트 정보를 불러오는 중 오류 발생:', error);
       }
     }
     petList();
-  }, [Id])
+  }, [shelterId])
 
   // 비밀번호 유효성 검증 함수
   const validatePassword = (password: string): string | null => {
@@ -125,7 +126,7 @@ const MyPageShelter: React.FC = () => {
 
 
     try {
-      await axios.put(`/api/v1/shelters/{Id}`, shelterInfo);
+      await axios.put(`/api/v1/shelters/${shelterId}`, shelterInfo);
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -137,7 +138,7 @@ const MyPageShelter: React.FC = () => {
     // 회원 탈퇴 처리
     const deleteAccount = async (): Promise<void> => {
       try {
-        await axios.delete(`/api/v1/shelters/{Id}`);
+        await axios.delete(`/api/v1/shelters/${shelterId}`);
         alert('회원탈퇴가 완료되었습니다.');
         setDeleteModalOpen(false);
         // 필요시 리다이렉트 로직 추가
@@ -145,6 +146,10 @@ const MyPageShelter: React.FC = () => {
         console.error('회원탈퇴 중 오류 발생:', error);
         alert('회원탈퇴에 실패했습니다.');
       }
+    };
+
+    const ShelterAddressLink = (shelterId:number) => {
+      return `/shelter-address/${shelterId}`; // 상세 페이지 URL 생성
     };
   
     if (!shelterInfo) {
@@ -245,7 +250,7 @@ const MyPageShelter: React.FC = () => {
             </label>
             <label>
               주소:
-              <Link to='/shelter-address'>
+              <Link to={ShelterAddressLink(shelterId)}>
                 <button className="flex items-center w-full p-2 bg-white border rounded;">
                   {shelterInfo.address}
                   <GoChevronRight />

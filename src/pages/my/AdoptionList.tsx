@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { GoChevronUp, GoChevronDown } from 'react-icons/go';
 import Header from "../../components/Header";
 import MyPageModal from '../../components/MyPageModal';
+import { useParams } from 'react-router-dom';
 
 // 데이터 타입 정의
 interface Pet {
@@ -41,6 +42,8 @@ interface UserInfo {
 }
 
 const AdoptionList: React.FC = () => {
+
+  const { shelterId } = useParams();
 
   // 여러 펫의 정보를 관리하는 상태
   const [pets, setPets] = useState<ProcessedPet[]>([]);

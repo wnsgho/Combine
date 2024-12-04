@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
-
-import { GoX, GoChevronRight } from "react-icons/go";
+import { GoX } from "react-icons/go";
 import Header from "../../components/Header";
 import axios from "axios";
 
@@ -17,6 +15,7 @@ interface PetAdd {
   exerciseLevel: number;
   size: string;
   home: string;
+  shelterName: string;
   add: string;
 }
 
@@ -44,6 +43,7 @@ const DetailPage = () => {
     exerciseLevel: 0,
     size: "",
     home: "",
+    shelterName: "",
     add: "",
   });
 
@@ -122,29 +122,33 @@ const DetailPage = () => {
 
   const addPetInfo = async (): Promise<void> => {
     const formData = new FormData();
-
+  
     // Add pet data
     Object.entries(addPet).forEach(([key, value]) => {
       formData.append(key, value);
     });
-
+  
+    // Add shelterName explicitly
+    formData.append("shelterName", shelterInfo.shelterName);
+  
     // Add images
     postImg.forEach((file) => {
-      formData.append("images", file);
+      formData.append("imageUrls", file);
     });
-
+  
     try {
       await axios.post(`/api/v1/pets/${Id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      alert('동물 등록이 완료되었습니다.');
+      alert("동물 등록이 완료되었습니다.");
     } catch (error) {
-      console.error('동물 등록 중 오류 발생:', error);
-      alert('동물 등록에 실패했습니다.');
+      console.error("동물 등록 중 오류 발생:", error);
+      alert("동물 등록에 실패했습니다.");
     }
   };
+  
 
   return (
     <>
@@ -289,8 +293,13 @@ const DetailPage = () => {
               <input type="text" id="home" placeholder="예) 임시보호, 사육장" className="pl-2 w-36" onChange={InputChange}/>
             </div>
             <div className="flex items-center justify-between">
-              <label htmlFor="protect" className="text-xl">보호기관</label>
-              <p id="protect" className="flex items-center justify-center">{shelterInfo.shelterName}</p>
+              <label htmlFor="shelterName" className="text-xl">보호기관</label>
+              <input
+                id="shelterName"
+                className="pl-2 bg-gray-100 cursor-not-allowed w-36" // 읽기 전용 스타일 추가
+                value={shelterInfo.shelterName} // 보호소 이름
+                readOnly // 읽기 전용으로 설정
+              />
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="add" className="text-xl">추가 정보(선택사항)</label>

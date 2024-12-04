@@ -25,21 +25,27 @@ interface UserInfo {
   password: string;
 }
 
-
 interface PetInfo {
-  petId: string;
-  species: string;
-  size: string;
-  age: string;
-  personality: string;
-  exerciseLevel: number;
-  imageUrls: string[]
+  id: number;
+  pet: {
+    petId: number;
+    species: string;
+    size: string;
+    age: string;
+    personality: string;
+    exerciseLevel: number;
+    imageUrls: string[];
+  };
+  userId: number;
+  applyDate: string;
+  applyStatus: string;
 }
 
 
 const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<UserInfo>({
     email: "",
     username: "",
@@ -51,15 +57,23 @@ const MyPageUser: React.FC = () => {
     preferredExerciseLevel: 0,
     password: ""
   });
+
   const [petInfo, setPetInfo] = useState<PetInfo>({
-    petId: "",
-    species: "",
-    size: "",
-    age: "",
-    personality: "",
-    exerciseLevel: 0,
-    imageUrls: [],
+    id: 0,
+    pet: {
+      petId: 0,
+      species: "",
+      size: "",
+      age: "",
+      personality: "",
+      exerciseLevel: 0,
+      imageUrls: [],
+    },
+    userId: 0,
+    applyDate: "",
+    applyStatus: ""
   });
+
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
   const [Id, setId] = useState<string>("")
 
@@ -104,6 +118,14 @@ const MyPageUser: React.FC = () => {
     };
     petInfo();
   }, [Id])
+
+  const deleteApply = async() => {
+    try{
+      await axios.post(`/api/v1/applypet/${petInfo.id}/cancel?userId=${Id}`);
+    }catch(error) {
+      console.error("입양 취소 중 오류가 발생했습니다", error);
+    }
+  }
 
 
   // 비밀번호 유효성 검증 함수
@@ -166,7 +188,6 @@ const MyPageUser: React.FC = () => {
       await axios.delete(`/api/v1/users/${Id}`);
       alert('회원탈퇴가 완료되었습니다.');
       setDeleteModalOpen(false);
-      // 필요시 리다이렉트 로직 추가
     } catch (error) {
       console.error('회원탈퇴 중 오류 발생:', error);
       alert('회원탈퇴에 실패했습니다.');
@@ -235,34 +256,38 @@ const MyPageUser: React.FC = () => {
           <div>
             <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
-          <div className="flex justify-center">
-            <div className="flex flex-col items-center justify-center gap-3">
-              <img src={matching} alt="" id="matching" />
-              <label htmlFor="matching">매칭 신청</label>
-            </div>
-            <img src={bar} alt="" className="h-20 w-36" />
-            <div className="flex flex-col items-center justify-center gap-3 opacity-30">
-              <img src={check} alt="" id="check" />
-              <label htmlFor="check">보호소 확인</label>
-            </div>
-            <img src={bar} alt="" className="h-20 w-36" />
-            <div className="flex flex-col items-center justify-center gap-3 opacity-30">
-              <img src={complete} alt="" id="complete" />
-              <label htmlFor="complete">승인 완료</label>
-            </div>
-          </div>
         </section>
-        <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
-          <div>
-          <img 
-            src={petInfo.imageUrls && petInfo.imageUrls.length > 0 ? petInfo.imageUrls[0] : mainImage} 
-            alt="동물 사진" 
-          />
+        {petInfo && petInfo.pet && (
+          <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
+            <div>
+              <img 
+                src={petInfo.pet.imageUrls && petInfo.pet.imageUrls.length > 0 
+                  ? petInfo.pet.imageUrls[0] 
+                  : mainImage} 
+                alt="동물 사진" 
+              />
+            </div>
+            <div className="flex flex-col items-center gap-3 my-5">
+              <p>{petInfo.pet.species} / {petInfo.pet.size} / {petInfo.pet.age} / {petInfo.pet.personality} / {petInfo.pet.exerciseLevel}</p>
+            </div>
+            <div className="flex flex-col items-center gap-3 my-5">
+              <button className='text-cancelColor' onClick={() => setApplyModalOpen(true)}>입양 신청 취소</button>
+            </div>
+          </section>
+        )}
+
+        {/* 입양 취소 모달 */}
+        <MyPageModal isOpen={isApplyModalOpen} onClose={() => setApplyModalOpen(false)}>
+          <h3 className="mb-4 text-lg font-bold">입양 취소 하시겠습니까?</h3>
+          <div className="flex justify-end gap-4 mt-6">
+            <button className="text-mainColor" onClick={deleteApply}>
+              네
+            </button>
+            <button className="text-cancelColor" onClick={() => setApplyModalOpen(false)}>
+              아니오
+            </button>
           </div>
-          <div className="flex flex-col items-center gap-3 my-5">
-            <p>{petInfo.species} / {petInfo.size} / {petInfo.age} / {petInfo.personality} / {petInfo.exerciseLevel}</p>
-          </div>
-        </section>
+        </MyPageModal>
 
         {/* 수정 모달 */}
         <MyPageModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
