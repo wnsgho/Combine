@@ -2,6 +2,7 @@
   "name": "web1-2-tenpaws-fe",
   "private": true,
   "version": "0.0.0",
+  "proxy": "http://15.164.103.160:8080",
   "type": "module",
   "scripts": {
     "dev": "vite",

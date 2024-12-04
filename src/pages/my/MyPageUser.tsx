@@ -14,6 +14,7 @@ import mainImage from '../../assets/image/mainimage.webp'
 
 // 유저 정보 타입 정의
 interface UserInfo {
+  id: string;
   email: string;
   username: string;
   birthdate: string;
@@ -22,7 +23,7 @@ interface UserInfo {
   preferredSize: string;
   preferredPersonality: string;
   preferredExerciseLevel: number;
-  password: string;
+  userRole: string;
 }
 
 interface PetInfo {
@@ -41,12 +42,17 @@ interface PetInfo {
   applyStatus: string;
 }
 
+interface UserId {
+  Id: string;
+}
+
 
 const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<UserInfo>({
+    id: "",
     email: "",
     username: "",
     birthdate: "",
@@ -55,7 +61,7 @@ const MyPageUser: React.FC = () => {
     preferredSize: "",
     preferredPersonality: "",
     preferredExerciseLevel: 0,
-    password: ""
+    userRole: ""
   });
 
   const [petInfo, setPetInfo] = useState<PetInfo>({
@@ -75,17 +81,25 @@ const MyPageUser: React.FC = () => {
   });
 
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
-  const [Id, setId] = useState<string>("")
-
+  const [userId, setUserId] = useState<UserId>({
+    Id: ""
+  })
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzE4Mzg1LCJleHAiOjE3MzM0MDQ3ODV9.xKq3ixNIOYKkXDufds-hcKOoR_OiIk_Kn6_zbAMyupw"
   
-  // const url = "http://15.164.103.160:8080"
+  const url = "http://15.164.103.160:8080"
+
+  const Id = userId.Id
 
   // ID 불러오기
   useEffect(() => {
     const userId = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/check-id`);
-        setId(response.data);
+        const response = await axios.get(`${url}/api/v1/features/check-id`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUserId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
       }
@@ -97,8 +111,13 @@ const MyPageUser: React.FC = () => {
   useEffect(() => {
     const userInfo = async () => {
       try {
-        const response = await axios.get<UserInfo>(`/api/v1/users/${Id}`);
+        const response = await axios.get<UserInfo>(`${url}/api/v1/users/${Id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setUserInfo(response.data);
+        console.log("유저 데이터 OK??", response)
       } catch (error) {
         console.error('유저 정보를 불러오는 중 오류 발생:', error);
       }
@@ -110,7 +129,11 @@ const MyPageUser: React.FC = () => {
   useEffect(() => {
     const petInfo = async () => {
       try {
-        const response = await axios.get<PetInfo>(`/api/v1/applypet/${Id}/list`);
+        const response = await axios.get<PetInfo>(`${url}/api/v1/applypet/${Id}/list`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setPetInfo(response.data);
       }catch(error) {
         console.error('동물 정보를 불러오는 중 오류 발생:', error);
@@ -121,7 +144,11 @@ const MyPageUser: React.FC = () => {
 
   const deleteApply = async() => {
     try{
-      await axios.post(`/api/v1/applypet/${petInfo.id}/cancel?userId=${Id}`);
+      await axios.post(`${url}/api/v1/applypet/${petInfo.id}/cancel?userId=${Id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
     }catch(error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
     }
@@ -173,7 +200,11 @@ const MyPageUser: React.FC = () => {
 
 
     try {
-      await axios.put(`/api/v1/users/${Id}`, userInfo);
+      await axios.put(`${url}/api/v1/users/${Id}`, userInfo , {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -185,7 +216,11 @@ const MyPageUser: React.FC = () => {
   // 회원 탈퇴 처리
   const DeleteAccount = async (): Promise<void> => {
     try {
-      await axios.delete(`/api/v1/users/${Id}`);
+      await axios.delete(`${url}/api/v1/users/${Id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       alert('회원탈퇴가 완료되었습니다.');
       setDeleteModalOpen(false);
     } catch (error) {
@@ -303,7 +338,7 @@ const MyPageUser: React.FC = () => {
                 className="block w-full p-2 border rounded"
               />
             </label>
-            <label>
+            {/* <label>
               비밀번호:
               <input
                 type="password"
@@ -315,7 +350,7 @@ const MyPageUser: React.FC = () => {
               {passwordError && (
                 <p className="text-sm text-red-500">{passwordError}</p>
               )}
-            </label>
+            </label> */}
             <label>
               생년월일:
               <input
