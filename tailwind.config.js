@@ -5,7 +5,7 @@ export default {
     extend: {
       colors: {
         mainColor: '#AB654B',
-        cancelColor: '#6366FF',
+        cancelColor: '#FF1212',
       },
     },
   },
