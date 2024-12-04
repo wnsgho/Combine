@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import FAQ from "../../components/FAQ";
+import Chat from "../../components/Chat";
 
 interface Announcement {
   id:number;
@@ -33,6 +34,7 @@ const Announcement = () => {
   return (
     <div className="flex flex-col justify-center items-center ">
       <FAQ/>
+      <Chat/>
       <div className="max-w-[1200px] mx-auto w-full">
         <div className=" relative">
             <div className="bg-slate-400"></div>
