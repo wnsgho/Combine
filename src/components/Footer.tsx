@@ -1,3 +1,4 @@
+3.
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance"; 
@@ -41,7 +42,7 @@ const Footer: React.FC = () => {
   const currentAnnouncement =
     announcements.length > 0 ? announcements[currentIndex] : null;
 
-  // 클릭 시 공지사항 상세 페이지로 이동
+  // 목록 클릭 시 공지사항 상세 페이지로 이동하기
   const handleAnnouncementClick = async () => {
     if (currentAnnouncement) {
       try {
@@ -52,7 +53,7 @@ const Footer: React.FC = () => {
         });
         navigate(`/announcement/${currentAnnouncement.id}`);
       } catch (error) {
-        console.error("공지사항 단건 조회에 실패했습니다.", error);
+        console.error("공지사항 목록을 조회하는데 실패했습니다.", error);
       }
     }
   };
@@ -66,7 +67,7 @@ const Footer: React.FC = () => {
         className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 mr-2 sm:mr-3 md:mr-4 lg:mr-5"
       />
 
-      {/* 공지사항 텍스트 및 제목 */}
+      {/* 공지사항 텍스트 및 목록 */}
       <div className="flex items-center">
         <span className="text-lg sm:text-xl md:text-xl lg:text-2xl font-bold mr-2 sm:mr-4 md:mr-6">
           공지사항
