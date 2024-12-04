@@ -7,20 +7,26 @@ import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
 const Announcementpostcreate = () => {
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("")
+  const [adminId, setAdminId] = useState<number>(1)
+  const [content, setContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("")
+  const [category, setCategory] = useState<string>("")
   const navigate = useNavigate()
 
+
+  //유저 아이디값 받아와야함 카테고리 값도 받아와야함
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('/api/announcements', {
+      const response = await axios.post('http://15.164.103.160:8080/api/v1/announcements', {
+        adminId,
+        category,
         title,
         content,
-        createdAt: new Date().toISOString(),
       });
       
       if (response.status === 201) {
         navigate("/guide/announcement");
+        alert("공지사항을 작성하였습니다!")
       }
     } catch (error) {
       console.error('공지사항 작성 실패:', error);
@@ -73,7 +79,8 @@ const Announcementpostcreate = () => {
         <GuideNavigation />
         <div className="max-w-[1000px] mx-auto">
           <div className="bg-[#AB654B]/90 p-8 rounded-lg">
-            <select className="mb-6 w-auto p-2 font-bold">
+            <select className="mb-6 w-auto p-2 font-bold"
+            onChange={(e) => setCategory(e.target.value)}>
               <option value="notice">공지</option>
               <option value="support">지원</option>
             </select>
