@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface UserInfo {
   preferSpecies: string;
@@ -21,14 +21,29 @@ const PreferPage: React.FC = () => {
     preferredExerciseLevel: 0,
   })
 
+  const [Id, setId] = useState("")
+
+  // ID 불러오기
+  useEffect(() => {
+    const shelterId = async () => {
+      try {
+        const response = await axios.get(`/api/v1/features/check-id`);
+        setId(response.data);
+      } catch(error) {
+        console.error("유저 ID를 불러오는 중 오류 발생:", error);
+      }
+    };
+    shelterId();
+  }, [])
+
   // 정보 수정 제출
 
-  const handleEditSubmit = async (): Promise<void> => {
+  const editSubmit = async (): Promise<void> => {
     if (!userInfo) return;
   
   
     try {
-      await axios.put(`/api/v1/users/{Id}`, userInfo);
+      await axios.put<UserInfo>(`/api/v1/users/${Id}`, userInfo);
       alert('정보가 수정되었습니다.');
     } catch (error) {
       console.error('정보 수정 중 오류 발생:', error);
@@ -37,7 +52,7 @@ const PreferPage: React.FC = () => {
   };
   
   // 취소 버튼 핸들러
-  const handleCancel = () => {
+  const cancel = () => {
     navigate(-1); // 이전 페이지로 이동
   };
 
@@ -90,8 +105,8 @@ const PreferPage: React.FC = () => {
           </div>
         </section>
         <section className="flex gap-24 mt-8">
-          <button className="px-4 py-2 text-lg text-mainColor" onClick={handleEditSubmit}>등록</button>
-          <button className="px-4 py-2 text-lg text-cancelColor" onClick={handleCancel}>취소</button>
+          <button className="px-4 py-2 text-lg text-mainColor" onClick={editSubmit}>등록</button>
+          <button className="px-4 py-2 text-lg text-cancelColor" onClick={cancel}>취소</button>
         </section>
       </form>
     </>

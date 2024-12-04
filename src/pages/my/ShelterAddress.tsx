@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -13,27 +14,56 @@ interface ShelterInfo {
   address: string;
 }
 
+
 const ShelterAddress: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate(); // useNavigate 훅 사용
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [Id, setId] = useState<string>("");
+  const [role, setRole] = useState<string>("")
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
     shelterName: "",
     address: "",
     phoneNumber: "",
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
+  // const url = "http://15.164.103.160:8080"
+
+
+  // ID, ROLE 불러오기
+  useEffect(() => {
+    const shelterId = async () => {
+      try {
+        const response = await axios.get(`/api/v1/features/check-id`);
+        setId(response.data.id);
+      } catch(error) {
+        console.error("보호소 ID를 불러오는 중 오류 발생:", error);
+      }
+    };
+    shelterId();
+    const shelterRole = async () => {
+      try {
+        const response = await axios.get(`/api/v1/features/role`);
+        setRole(response.data);
+      }catch(error) {
+        console.error("Role 불러오는 중 오류 발생:", error);
+      }
+    }
+    shelterRole();
+  }, [])
+
 
   // 보호소 정보 가져오기
   useEffect(() => {
-    const fetchShelterInfo = async () => {
+    const shelterInfo = async () => {
       try {
-        const response = await axios.get<ShelterInfo>("/api/v1/shelters/$Id");
+        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
         setShelterInfo(response.data);
       } catch (error) {
         console.error("보호소 정보를 불러오는 중 오류 발생:", error);
       }
     };
-    fetchShelterInfo();
+    shelterInfo();
   }, []);
 
   // 카카오 지도 API 연동
@@ -104,10 +134,30 @@ const ShelterAddress: React.FC = () => {
   const saveChanges = () => {
     setShelterInfo(tempShelterInfo);
     setIsModalOpen(false);
+    editSubmit();
+  };
+
+  // 정보 수정 제출
+  const editSubmit = async (): Promise<void> => {
+    if (!shelterInfo) return;
+
+    try {
+      await axios.put(`/api/v1/shelter/${Id}`, shelterInfo);
+      alert('정보가 수정되었습니다.');
+      setIsModalOpen(false)
+    } catch (error) {
+      console.error('정보 수정 중 오류 발생:', error);
+      alert('정보 수정에 실패했습니다.');
+    }
+  };
+
+  // 확인 버튼 클릭시 뒤로가기
+  const Cancel = () => {
+    navigate(-1); // 이전 페이지로 이동
   };
 
 
-  const shelter = true; // 임시 쉘터 설정
+  const shelter = role == "ROLE_SHELTER";
 
   return (
     <div>
@@ -132,7 +182,7 @@ const ShelterAddress: React.FC = () => {
           </div>
         </section>
         {shelter ? <section className="flex gap-24 my-8">
-          <button className="px-4 py-2 text-lg font-bold text-mainColor">확인</button>
+          <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>확인</button>
           <button
             className="px-4 py-2 text-lg text-cancelColor"
             onClick={openModal}
@@ -142,7 +192,7 @@ const ShelterAddress: React.FC = () => {
         </section> 
         :
         <section className="flex gap-24 my-8">
-          <button className="px-4 py-2 text-lg font-bold text-mainColor">확인</button>
+          <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>확인</button>
         </section> 
         }
 

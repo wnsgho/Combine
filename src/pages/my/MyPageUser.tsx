@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { GoChevronRight } from "react-icons/go";
 import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
@@ -9,7 +9,8 @@ import matching from '../../assets/image/matching.png';
 import check from '../../assets/image/check.png';
 import complete from '../../assets/image/complete.png';
 import bar from '../../assets/image/bar.png';
-import pu from '../../assets/image/pu.avif';
+import mainImage from '../../assets/image/mainimage.webp'
+
 
 // 유저 정보 타입 정의
 interface UserInfo {
@@ -24,25 +25,85 @@ interface UserInfo {
   password: string;
 }
 
+
+interface PetInfo {
+  petId: string;
+  species: string;
+  size: string;
+  age: string;
+  personality: string;
+  exerciseLevel: number;
+  imageUrls: string[]
+}
+
+
 const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    email: "",
+    username: "",
+    birthdate: "",
+    phoneNumber: "",
+    address: "",
+    preferredSize: "",
+    preferredPersonality: "",
+    preferredExerciseLevel: 0,
+    password: ""
+  });
+  const [petInfo, setPetInfo] = useState<PetInfo>({
+    petId: "",
+    species: "",
+    size: "",
+    age: "",
+    personality: "",
+    exerciseLevel: 0,
+    imageUrls: [],
+  });
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
+  const [Id, setId] = useState<string>("")
 
-  // 유저 정보 가져오기
+  
+  // const url = "http://15.164.103.160:8080"
+
+  // ID 불러오기
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const userId = async () => {
       try {
-        const response = await axios.get<UserInfo>(`/api/v1/users/{Id}`);
+        const response = await axios.get(`/api/v1/features/check-id`);
+        setId(response.data);
+      } catch(error) {
+        console.error("유저 ID를 불러오는 중 오류 발생:", error);
+      }
+    };
+    userId();
+  }, [])
+
+  // 유저, 펫 정보 가져오기
+  useEffect(() => {
+    const userInfo = async () => {
+      try {
+        const response = await axios.get<UserInfo>(`/api/v1/users/${Id}`);
         setUserInfo(response.data);
       } catch (error) {
         console.error('유저 정보를 불러오는 중 오류 발생:', error);
       }
     };
+    userInfo();
 
-    fetchUserInfo();
-  }, []);
+  }, [Id]);
+
+  useEffect(() => {
+    const petInfo = async () => {
+      try {
+        const response = await axios.get<PetInfo>(`/api/v1/applypet/${Id}/list`);
+        setPetInfo(response.data);
+      }catch(error) {
+        console.error('동물 정보를 불러오는 중 오류 발생:', error);
+      }
+    };
+    petInfo();
+  }, [Id])
 
 
   // 비밀번호 유효성 검증 함수
@@ -61,7 +122,7 @@ const MyPageUser: React.FC = () => {
   
 
   // 입력값 변경 처리
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const editChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
   
     if (userInfo) { // 먼저 userInfo가 null이 아닌지 확인
@@ -79,7 +140,7 @@ const MyPageUser: React.FC = () => {
 
   // 정보 수정 제출
 
-  const handleEditSubmit = async (): Promise<void> => {
+  const editSubmit = async (): Promise<void> => {
     if (!userInfo) return;
 
     // 비밀번호 검증
@@ -90,7 +151,7 @@ const MyPageUser: React.FC = () => {
 
 
     try {
-      await axios.put(`/api/v1/users/{Id}`, userInfo);
+      await axios.put(`/api/v1/users/${Id}`, userInfo);
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -100,9 +161,9 @@ const MyPageUser: React.FC = () => {
   };
 
   // 회원 탈퇴 처리
-  const handleDeleteAccount = async (): Promise<void> => {
+  const DeleteAccount = async (): Promise<void> => {
     try {
-      await axios.delete(`/api/v1/users/{Id}`);
+      await axios.delete(`/api/v1/users/${Id}`);
       alert('회원탈퇴가 완료되었습니다.');
       setDeleteModalOpen(false);
       // 필요시 리다이렉트 로직 추가
@@ -111,6 +172,9 @@ const MyPageUser: React.FC = () => {
       alert('회원탈퇴에 실패했습니다.');
     }
   };
+
+
+
 
   if (!userInfo) {
     return <div>로딩 중...</div>;
@@ -190,11 +254,13 @@ const MyPageUser: React.FC = () => {
         </section>
         <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
           <div>
-            <img src={pu} alt="" />
+          <img 
+            src={petInfo.imageUrls && petInfo.imageUrls.length > 0 ? petInfo.imageUrls[0] : mainImage} 
+            alt="동물 사진" 
+          />
           </div>
           <div className="flex flex-col items-center gap-3 my-5">
-            <h3 className="text-xl font-bold">댕구</h3>
-            <p>강아지 / 암컷 / 중성화(o) / 0 ~ 3살 / 갈색 / 얌전함</p>
+            <p>{petInfo.species} / {petInfo.size} / {petInfo.age} / {petInfo.personality} / {petInfo.exerciseLevel}</p>
           </div>
         </section>
 
@@ -208,7 +274,7 @@ const MyPageUser: React.FC = () => {
                 type="text"
                 name="username"
                 value={userInfo?.username || ''} // userInfo가 null이면 빈 문자열 사용
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
             </label>
@@ -218,7 +284,7 @@ const MyPageUser: React.FC = () => {
                 type="password"
                 name="password"
                 value={userInfo.password}
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
               {passwordError && (
@@ -231,7 +297,7 @@ const MyPageUser: React.FC = () => {
                 type="text"
                 name="birthdate"
                 value={userInfo.birthdate}
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
             </label>
@@ -241,7 +307,7 @@ const MyPageUser: React.FC = () => {
                 type="text"
                 name="phoneNumber"
                 value={userInfo.phoneNumber}
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
             </label>
@@ -251,7 +317,7 @@ const MyPageUser: React.FC = () => {
                 type="text"
                 name="address"
                 value={userInfo.address}
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
             </label>
@@ -266,7 +332,7 @@ const MyPageUser: React.FC = () => {
             </label>
           </div>
           <div className="flex justify-end gap-4 mt-6">
-            <button className="text-mainColor" onClick={handleEditSubmit}>
+            <button className="text-mainColor" onClick={editSubmit}>
               수정완료
             </button>
             <button className="text-cancelColor" onClick={() => setEditModalOpen(false)}>
@@ -278,7 +344,7 @@ const MyPageUser: React.FC = () => {
         <MyPageModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
           <h3 className="mb-4 text-lg font-bold">정말로 탈퇴하시겠습니까?</h3>
           <div className="flex justify-end gap-4 mt-6">
-            <button className="text-mainColor" onClick={handleDeleteAccount}>
+            <button className="text-mainColor" onClick={DeleteAccount}>
               네
             </button>
             <button className="text-cancelColor" onClick={() => setDeleteModalOpen(false)}>
