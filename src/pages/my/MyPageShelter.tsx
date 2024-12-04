@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { GoChevronRight } from "react-icons/go";
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MyPageModal from '../../components/MyPageModal';
-
 import Header from '../../components/Header';
-
-import mainImage from '../../assets/image/mainimage.webp'; //임시사진
-import pu from '../../assets/image/pu.avif'; //임시 사진
 import axios from 'axios';
+
+import mainImage from '../../assets/image/mainimage.webp';
 
 interface ShelterInfo {
   email: string;
@@ -17,24 +15,47 @@ interface ShelterInfo {
   password: string;
 }
 
-const MyPageShelter: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // URL에서 Id 추출
-  const Id: number = parseInt(id || '1', 10); // 기본값으로 1 설정
+interface Pet {
+  petId: string;
+  species: string;
+  size: string;
+  age: string;
+  personality: string;
+  exerciseLevel: number;
+  imageUrls: string[];
+}
 
+const MyPageShelter: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
-
-  const [shelterInfo, setShelterInfo] = useState({
+  const [Id, setId] = useState<string>("")
+  const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
     shelterName: '',
     address: '',
     email: '',
     phoneNumber: '',
+    password: ""
   });
 
-  // 유저 정보 가져오기
+  const [petLists, setPetLists] = useState<Pet[]>([]);
+
+  // 보호소 ID 불러오기
   useEffect(() => {
-    const fetchShelterInfo = async () => {
+    const shelterId = async () => {
+      try {
+        const response = await axios.get(`/api/v1/features/check-id`);
+        setId(response.data.id);
+      } catch(error) {
+        console.error("보호소 ID를 불러오는 중 오류 발생:", error);
+      }
+    };
+    shelterId();
+  }, [])
+
+  // 보호소 정보 가져오기
+  useEffect(() => {
+    const shelterInfo = async () => {
       try {
         const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
         setShelterInfo(response.data);
@@ -42,8 +63,21 @@ const MyPageShelter: React.FC = () => {
         console.error('보호소 정보를 불러오는 중 오류 발생:', error);
       }
     };
-    fetchShelterInfo();
+    shelterInfo();
   }, [Id]);
+
+  //보호소 등록 동물 리스트
+  useEffect(() => {
+    const petList = async () => {
+      try {
+        const response = await axios.get(`/api/v1/pets/${Id}/list`);
+        setPetLists(response.data)
+      }catch(error) {
+        console.error('동물리스트 정보를 불러오는 중 오류 발생:', error);
+      }
+    }
+    petList();
+  }, [Id])
 
   // 비밀번호 유효성 검증 함수
   const validatePassword = (password: string): string | null => {
@@ -62,7 +96,7 @@ const MyPageShelter: React.FC = () => {
 
 
   // 입력값 변경 처리
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const editChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
   
     if (shelterInfo) { // 먼저 userInfo가 null이 아닌지 확인
@@ -80,7 +114,7 @@ const MyPageShelter: React.FC = () => {
 
   // 정보 수정 제출
 
-  const handleEditSubmit = async (): Promise<void> => {
+  const editSubmit = async (): Promise<void> => {
     if (!shelterInfo) return;
 
     // 비밀번호 검증
@@ -91,7 +125,7 @@ const MyPageShelter: React.FC = () => {
 
 
     try {
-      await axios.put(`/api/v1/shelters/${Id}`, shelterInfo);
+      await axios.put(`/api/v1/shelters/{Id}`, shelterInfo);
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -101,9 +135,9 @@ const MyPageShelter: React.FC = () => {
   };
 
     // 회원 탈퇴 처리
-    const handleDeleteAccount = async (): Promise<void> => {
+    const deleteAccount = async (): Promise<void> => {
       try {
-        await axios.delete(`/api/v1/shelters/${Id}`);
+        await axios.delete(`/api/v1/shelters/{Id}`);
         alert('회원탈퇴가 완료되었습니다.');
         setDeleteModalOpen(false);
         // 필요시 리다이렉트 로직 추가
@@ -120,7 +154,7 @@ const MyPageShelter: React.FC = () => {
 
   return (
     <>
-      <div className="relative">
+      <div>
         {/* 헤더 */}
         <Header />
         <div className="flex flex-col items-center">
@@ -128,14 +162,14 @@ const MyPageShelter: React.FC = () => {
             <div className="flex justify-center">
               <h3 className='text-2xl font-bold'>마이페이지</h3>
             </div>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-10">
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">단체이름</p>
                 <p className='text-lg'>{shelterInfo.shelterName}</p>
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">주소</p>
-                <button className='flex items-center justify-center text-lg'>{shelterInfo.address}<GoChevronRight /></button>
+                <button className='flex items-center justify-center text-lg'>{shelterInfo.address}</button>
               </div>
               <div className="flex justify-between w-full">
                 <p className="text-xl font-bold text-mainColor">단체 메일</p>
@@ -174,34 +208,23 @@ const MyPageShelter: React.FC = () => {
           </section>
           <section className='flex items-center justify-center m-8'>
             <div className='flex flex-wrap justify-center gap-10'>
-              <div className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
-                <img src={mainImage} alt="#" className='w-full h-40 rounded-t-md'/>
-                <div className='m-3'>
-                  <h3 className='font-bold'>댕구</h3>
-                  <p className='mt-2'>개 / 암컷 / 중성화(o) /<br /> 2살 추정 / 갈색 #온순함</p>
-                </div>
-              </div>
-              <div className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
-                <img src={pu} alt="#" className='w-full h-40 rounded-t-md'/>
-                <div className='m-3'>
-                  <h3 className='font-bold'>엄지</h3>
-                  <p className='mt-2'>개 / 암컷 / 중성화(o) /<br /> 3살 추정 / 갈색 #사나움</p>
-                </div>
-              </div>
-              <div className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
-                <img src={mainImage} alt="#" className='w-full h-40 rounded-t-md'/>
-                <div className='m-3'>
-                  <h3 className='font-bold'>밍이</h3>
-                  <p className='mt-2'>개 / 암컷 / 중성화(o) /<br /> 1살 추정 / 갈색 #온순함</p>
-                </div>
-              </div>
-              <div className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
-                <img src={pu} alt="#" className='w-full h-40 rounded-t-md'/>
-                <div className='m-3'>
-                  <h3 className='font-bold'>루미</h3>
-                  <p className='mt-2'>개 / 수컷 / 중성화(o) /<br /> 4살 추정 / 흰색 #온순함</p>
-                </div>
-              </div>
+              {Array.isArray(petLists) && petLists.length > 0 ? (
+                petLists.map((pet) => (
+                  <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
+                    <img 
+                      src={(pet.imageUrls && pet.imageUrls.length > 0) ? pet.imageUrls[0] : mainImage} 
+                      alt="동물 사진" 
+                    />
+                    <div className='m-3'>
+                      <p>{pet.species} / {pet.size} / {pet.age} / <br />
+                        {pet.personality} / 활동량({pet.exerciseLevel})
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>등록된 동물이 없습니다.</p>
+              )}
             </div>
           </section>
         </div>
@@ -216,7 +239,7 @@ const MyPageShelter: React.FC = () => {
                 type="text"
                 name="name"
                 value={shelterInfo.shelterName}
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
             </label>
@@ -235,13 +258,26 @@ const MyPageShelter: React.FC = () => {
                 type="text"
                 name="phone"
                 value={shelterInfo.phoneNumber}
-                onChange={handleEditChange}
+                onChange={editChange}
                 className="block w-full p-2 border rounded"
               />
             </label>
+            <label>
+              비밀번호:
+              <input
+                type="password"
+                name="password"
+                value={shelterInfo.password}
+                onChange={editChange}
+                className="block w-full p-2 border rounded"
+              />
+              {passwordError && (
+                <p className="text-sm text-red-500">{passwordError}</p>
+              )}
+            </label>
           </div>
           <div className="flex justify-end gap-4 mt-6">
-            <button className="text-mainColor" onClick={handleEditSubmit}>
+            <button className="text-mainColor" onClick={editSubmit}>
               수정완료
             </button>
             <button className="text-cancelColor" onClick={() => setEditModalOpen(false)}>
@@ -249,13 +285,11 @@ const MyPageShelter: React.FC = () => {
             </button>
           </div>
         </MyPageModal>
-
-
         {/* 회원탈퇴 모달 */}
         <MyPageModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
           <h3 className="mb-4 text-lg font-bold">정말로 탈퇴하시겠습니까?</h3>
           <div className="flex justify-end gap-4 mt-6">
-            <button className="text-mainColor" onClick={handleDeleteAccount}>
+            <button className="text-mainColor" onClick={deleteAccount}>
               네
             </button>
             <button className="text-cancelColor" onClick={() => setDeleteModalOpen(false)}>
