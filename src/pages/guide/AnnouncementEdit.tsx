@@ -9,6 +9,7 @@ import axios from "axios";
 const AnnouncementEdit = () => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<string>("")
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -16,7 +17,7 @@ const AnnouncementEdit = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`/announcements/${id}`);
+        const response = await axios.get(`http://15.164.103.160:8080/api/v1/announcements/${id}`);
         setTitle(response.data.title);
         setContent(response.data.content);
       } catch (error) {
@@ -32,7 +33,8 @@ const AnnouncementEdit = () => {
   //수정 요청
   const handleSubmit = async () => {
     try {
-      await axios.put(`/announcements/${id}`, {
+      await axios.put(`http://15.164.103.160:8080/api/v1/announcements/${id}`, {
+        category,
         title,
         content
       });
@@ -89,7 +91,8 @@ const AnnouncementEdit = () => {
         <GuideNavigation />
         <div className="max-w-[1000px] mx-auto">
           <div className="bg-[#AB654B]/90 p-8 rounded-lg">
-            <select className="mb-6 w-auto p-2 font-bold">
+            <select className="mb-6 w-auto p-2 font-bold"
+            onChange={(e) => setCategory(e.target.value)}>
               <option value="notice">공지</option>
               <option value="support">지원</option>
             </select>

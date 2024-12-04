@@ -1,23 +1,27 @@
 import GuideNavigation from "../../components/GuideNavigation";
 import Walk from "../../../public/walk.png"
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import FAQ from "../../components/FAQ";
 
 interface Announcement {
   id:number;
   title:string;
   content:string;
+  category:string;
   createdAt:string;
 }
 
 const Announcement = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const navigate = useNavigate()
 
+  //게시글 목록 불러오기
   useEffect(()=>{
     const fetchAnnouncements = async() => {
       try{
-        const response = await axios.get("/announcements");
+        const response = await axios.get("http://15.164.103.160:8080/api/v1/announcements");
         setAnnouncements(response.data)
       }catch(error){
         console.error("조회를 실패했습니다.", error)
@@ -28,6 +32,7 @@ const Announcement = () => {
 
   return (
     <div className="flex flex-col justify-center items-center ">
+      <FAQ/>
       <div className="max-w-[1200px] mx-auto w-full">
         <div className=" relative">
             <div className="bg-slate-400"></div>
@@ -48,28 +53,28 @@ const Announcement = () => {
           </thead>
           <tbody>
             {/* {announcements.map((announcement)=>(
-              <tr className="text-[20px]" key={announcement.id}>
-              <th className="text-red-600">공지</th>
-              <NavLink to="/guide/announcement/{announcement.id}" className="float-left px-4 py-3 font-normal">{announcement.title}</NavLink>
+              <tr className="text-[20px] cursor-pointer" key={announcement.id}>
+              <th className="text-red-600">{announcement.category}</th>
+              <th onClick={()=> navigate(`/guide/announcement/announcement.id`)} className="float-left px-4 py-3 font-normal">{announcement.title}</th>
               <th className="font-normal">{announcement.createdAt}</th>
             </tr>
             ))} */}
-            <tr className="text-[20px]">
-              <th className="text-red-600">공지</th>
-              <NavLink to="/guide/announcement/postId" className="float-left px-7 py-3 font-normal">분양 서비스 시작</NavLink>
+            <tr className="text-[20px] cursor-pointer">
+              <th className="text-red-600 ">공지</th>
+              <th onClick={() => navigate("/guide/announcement/postId")} className="float-left px-7 py-3 font-normal">분양 서비스 시작</th>
               <th className="font-normal">2024-11-21</th>
             </tr>
             
             
           </tbody>
         </table>
-        <NavLink to="/guide/announcement/create">
-            <button
+            <div
               className="float-right mr-5 my-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]">
+              /90 p-4 text-white font-bold text-[20px] cursor-pointer"
+              onClick={() => navigate("/guide/announcement/create")}
+              >
               작성하기
-            </button>
-          </NavLink>
+            </div>
       </div>
     </div>
   );

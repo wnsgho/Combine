@@ -15,12 +15,13 @@ const Announcementpost = () => {
   const [announcementPost, setAnnouncementPost] = useState<AnnouncementPost[]>([]);
   const navigate = useNavigate();
   const { id } = useParams()
+  const [userId, setUserId] = useState<number | null>(null)
 
   //조회
   useEffect(() => {
     const fetchAnnouncementPost = async () => {
       try {
-        const response = await axios.get(`/announcements/${id}`);
+        const response = await axios.get(`http://15.164.103.160:8080/api/v1/announcements/{id}`);
         setAnnouncementPost(response.data);
       } catch (error) {
         console.error("불러오기 실패", error);
@@ -37,7 +38,7 @@ const Announcementpost = () => {
     if(!window.confirm("정말로 게시글을 삭제하시겠습니까?")) return;
     
     try{
-      await axios.delete(`/announcements/${id}`)
+      await axios.delete(`http://15.164.103.160:8080/api/v1/announcements/${id}?userId=${userId}`)
       alert("삭제되었습니다.")
       navigate("/guide/announcement")
     }catch(error){
