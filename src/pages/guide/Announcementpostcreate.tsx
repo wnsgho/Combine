@@ -14,7 +14,7 @@ const Announcementpostcreate = () => {
   const navigate = useNavigate()
 
 
-  //유저 아이디값 받아와야함 카테고리 값도 받아와야함
+  //작성 어드민 아이디값은 뭐지?
   const handleSubmit = async () => {
     try {
       const response = await axios.post('http://15.164.103.160:8080/api/v1/announcements', {

@@ -25,6 +25,7 @@ interface QnApost {
 }
 
 const QAandApost = () => {
+  const [userId, setUserId] = useState(7)
   const [qnapost, setQnapost] = useState<QnApost[]>([])
   const navigate = useNavigate()
   const { id } = useParams()
@@ -33,7 +34,7 @@ const QAandApost = () => {
   useEffect(()=>{
     const fetchQnapost = async() => {
       try{
-        const response = await axios.get(`/inquries/${id}`)
+        const response = await axios.get(`http://15.164.103.160:8080/api/v1/inquries/${id}`)
         setQnapost(response.data)
       }catch(error){
         console.error("불러오기 실패", error)
@@ -50,7 +51,7 @@ const QAandApost = () => {
     if(!window.confirm("정말로 게시글을 삭제하시겠습니까?")) return;
     
     try{
-      await axios.delete(`/inquries/${id}`)
+      await axios.delete(`http://15.164.103.160:8080/api/v1/inquries/${id}?userId=${userId}`)
       alert("삭제되었습니다.")
       navigate("/guide/qna")
     }catch(error){

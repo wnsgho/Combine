@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import FAQ from "../../components/FAQ";
-import Chat from "../../components/Chat";
 
 interface Announcement {
   id:number;
@@ -18,6 +17,7 @@ const Announcement = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const navigate = useNavigate()
 
+  //게시글 목록 불러오기
   useEffect(()=>{
     const fetchAnnouncements = async() => {
       try{
@@ -55,13 +55,13 @@ const Announcement = () => {
             {/* {announcements.map((announcement)=>(
               <tr className="text-[20px] cursor-pointer" key={announcement.id}>
               <th className="text-red-600">{announcement.category}</th>
-              <div onClick={()=> navigate(`/guide/announcement/announcement.id`)} className="float-left px-4 py-3 font-normal">{announcement.title}</div>
+              <th onClick={()=> navigate(`/guide/announcement/announcement.id`)} className="float-left px-4 py-3 font-normal">{announcement.title}</th>
               <th className="font-normal">{announcement.createdAt}</th>
             </tr>
             ))} */}
             <tr className="text-[20px] cursor-pointer">
               <th className="text-red-600 ">공지</th>
-              <div onClick={() => navigate("/guide/announcement/postId")} className="float-left px-7 py-3 font-normal">분양 서비스 시작</div>
+              <th onClick={() => navigate("/guide/announcement/postId")} className="float-left px-7 py-3 font-normal">분양 서비스 시작</th>
               <th className="font-normal">2024-11-21</th>
             </tr>
             
