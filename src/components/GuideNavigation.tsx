@@ -17,7 +17,7 @@ const GuideNavigation = () => {
               isActive ? "opacity-100" : "opacity-30 "
             }
           >
-            Q & A
+            문의
           </NavLink>
           <NavLink 
             to="/guide/facilities"
