@@ -170,7 +170,7 @@ const CreateUser2 = () => {
     if (validateInputs()) {
       try {
         const response = await axiosInstance.post("/api/v1/users/shelter/join", {
-          pw: inputValues.password,
+          password: inputValues.password,
           shelterName: inputValues.organizationName,
           address: inputValues.address,
           phoneNumber: inputValues.phoneNumber,
@@ -178,15 +178,17 @@ const CreateUser2 = () => {
           userRole: "ROLE_SHELTER",
         });
 
-        if (response.status === 200) {
+        if (response.status === 201) {
           alert("회원가입이 완료되었습니다!");
           navigate("/");
         }
       } catch (error) {
+        console.error(error); 
         alert("회원가입을 할 수 없습니다.");
       }
     }
   };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-[#CDC3BF]">
