@@ -154,6 +154,8 @@ const DetailReadPage = () => {
     return `/adoption-list/${petId}`; // 입양신청 리스트 페이지 URL 생성
   };
 
+  const linkMap = `/shelter-address/${petInfo.shelterId}`
+
   const shelter = role == "ROLE_SHELTER" && applyInfo.userId == petInfo.shelterId
 
   return (
@@ -247,7 +249,7 @@ const DetailReadPage = () => {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-xl font-bold text-mainColor">보호기관</p>
-            <Link to="/shelter-address">
+            <Link to={linkMap}>
               <button className="flex items-center gap-1 text-lg text-blue-500">
                 {petInfo.shelterName} <GoChevronRight />
               </button>
