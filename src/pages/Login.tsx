@@ -49,16 +49,18 @@ const Login = () => {
         },
       });
   
-      // 로그인 후 토큰 저장
-      localStorage.setItem("accessToken", response.data.accessToken);
+    const accessToken = response.headers.authorization;
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
       alert("로그인 되었습니다.");
       navigate("/");
-    } catch (error) {
-      console.error("로그인 실패:", error);
-      alert("로그인을 할 수 없습니다.");
-    } finally {
-      setLoading(false);
+    } else {
+      alert("토큰이 반환되지 않았습니다. 다시 시도해주세요.");
     }
+  } catch (error) {
+    console.error("로그인 실패:", error);
+    alert("로그인에 실패했습니다.");
+  }
   };
 
   // 카카오 로그인
