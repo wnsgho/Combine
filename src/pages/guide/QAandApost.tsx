@@ -18,48 +18,97 @@ import axios from "axios";
 //   }
 
 interface QnApost {
-  id:number;
-  title:string;
-  content:string;
-  createdAt:string;
+  id: number;
+  title: string;
+  content: string;
+  createdAt: string;
 }
 
 const QAandApost = () => {
-  const [userId, setUserId] = useState(7)
-  const [qnapost, setQnapost] = useState<QnApost[]>([])
-  const navigate = useNavigate()
-  const { id } = useParams()
+  const [userId, setUserId] = useState(7);
+  const [qnapost, setQnapost] = useState<QnApost[]>([]);
+  const navigate = useNavigate();
+  const { id, commentId } = useParams();
+  const [reply, setReply] = useState(false);
+  const [content, setContent] = useState("");
+  const [edit, setEdit] = useState(false)
+  const [editContent, setEditContent] = useState("")
 
   //조회
-  useEffect(()=>{
-    const fetchQnapost = async() => {
-      try{
-        const response = await axios.get(`http://15.164.103.160:8080/api/v1/inquries/${id}`)
-        setQnapost(response.data)
-      }catch(error){
-        console.error("불러오기 실패", error)
-        navigate("/guide/qna")
+  useEffect(() => {
+    const fetchQnapost = async () => {
+      try {
+        const response = await axios.get(`http://15.164.103.160:8080/api/v1/inquries/${id}`);
+        setQnapost(response.data);
+        setEditContent(response.data.conmments.content)
+      } catch (error) {
+        console.error("불러오기 실패", error);
+        navigate("/guide/qna");
       }
+    };
+    if (id) {
+      fetchQnapost();
     }
-    if(id){
-      fetchQnapost()
-    }
-  },[id])
+  }, [id]);
 
   //삭제
   const handleDelete = async () => {
-    if(!window.confirm("정말로 게시글을 삭제하시겠습니까?")) return;
-    
+    if (!window.confirm("정말로 게시글을 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`http://15.164.103.160:8080/api/v1/inquries/${id}?userId=${userId}`);
+      alert("삭제되었습니다.");
+      navigate("/guide/qna");
+    } catch (error) {
+      console.error("삭제 실패", error);
+      alert("삭제에 실패하였습니다.");
+    }
+  };
+
+  //답변 작성
+  const handleReply = async () => {
     try{
-      await axios.delete(`http://15.164.103.160:8080/api/v1/inquries/${id}?userId=${userId}`)
-      alert("삭제되었습니다.")
-      navigate("/guide/qna")
+      await axios.post(`http://15.164.103.160:8080/api/v1/inquries/${id}/comments`,{
+        adminId : 1,
+        title : "답변",
+        content,
+      })
     }catch(error){
-      console.error("삭제 실패", error)
+      console.error("답변 작성이 취소되었습니다.", error)
+      setContent("")
+      setReply(false)
+    }
+  }
+
+  //답변 삭제
+  const handleReplyDelete = async () => {
+    if (!window.confirm("정말로 답변을 삭제하시겠습니까?")) return;
+
+    try{
+      await axios.delete(`http://15.164.103.160:8080/api/v1/inquries/${id}/comments/${commentId}`)
+      alert("답변이 삭제되었습니다.")
+      setReply(false)
+    }catch(error){
+      console.error("삭제 실패",error)
       alert("삭제에 실패하였습니다.")
     }
   }
 
+  //답변 수정
+  const handleReplyEdit = async () => {
+    try{
+      await axios.put(`http://15.164.103.160:8080/api/v1/inquries/${id}/comments/${commentId}`,{
+        adminId : 1,
+        title : "답변",
+        content
+      })
+      alert("수정 되었습니다.")
+      setContent("")
+    }catch(error){  
+      console.error("수정 실패", error)
+      alert("수정을 실패하였습니다.")
+    }
+  }
 
   return (
     <div className="flex flex-col justify-center items-center ">
@@ -82,6 +131,24 @@ const QAandApost = () => {
           <div className="text-[20px] py-20">
             {post.content}
           </div>
+
+         //문의 답변 
+          {post.comments.length > 0 &&
+          <>
+          <hr className="border-black border-1 my-10 "/>
+            <div className="bg-gray-200 w-full h-auto p-5">
+              <div className="pb-10 font-bold">답변 문의</div>
+              <div>{post.comments.content}</div>
+              <div className="pt-10">{post.comments.createdAt}</div>
+              <div className="flex gap-5 justify-end">
+              <div>
+              <div className="bg-blue-400 px-5 py-3 rounded-md font-bold">수정</div>
+              <div className="bg-red-400 px-5 py-3 rounded-md font-bold">삭제</div>
+              </div>
+            </div>
+            </>
+            }
+
             <button
               className="float-right  mb-20 bg-[#AB654B]
               /90 p-4 text-white font-bold text-[20px]"
@@ -136,26 +203,85 @@ const QAandApost = () => {
             ducimus expedita laudantium. Consectetur minima at culpa distinctio non mollitia recusandae molestias
             assumenda cum dignissimos.
             <br />
-          </div>
-            <button
-              className="float-right  mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]"
-              onClick={() => navigate("/guide/qna")}>
-              목록으로
-            </button>
-          <button
-            className="float-right mr-8  mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]"
-              onClick={handleDelete}>
-            삭제하기
-          </button>
+            <hr className="border-black border-1 my-10" />
 
-          <button
+            {/* 관리자만 답변문의 */}
+            <div className="bg-gray-200 w-full h-auto p-5 rounded-lg">
+              <div className="pb-10 font-bold">답변 문의</div>
+              {edit ? (
+                <>
+                <textarea className="w-full h-80 p-3"
+                value={editContent}
+                onChange={(e)=>setContent(e.target.value)}/>
+                <div className="pt-10">2024-12-04</div>
+              <div className="flex gap-5 justify-end">
+              <div className="bg-red-400 px-5 py-3 rounded-md font-bold cursor-pointer" onClick={()=>setEdit(false)}>취소</div>
+              <div className="bg-blue-400 px-5 py-3 rounded-md font-bold cursor-pointer" onClick={handleReplyEdit}>수정</div>
+              </div>
+              </>
+              ) : (
+                <>
+                <div>해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.해당 건은 저희가 해결 할 수 없습니다.</div>
+                <div className="pt-10">2024-12-04</div>
+              <div className="flex gap-5 justify-end">
+              <div className="bg-red-400 px-5 py-3 rounded-md font-bold cursor-pointer" onClick={handleReplyDelete}>삭제</div>
+              <div className="bg-blue-400 px-5 py-3 rounded-md font-bold cursor-pointer" onClick={()=> setEdit(true)}>수정</div>
+              </div>
+              </>
+                )}
+            </div>
+
+           
+
+            {reply && (
+              <div className="bg-gray-200 w-full h-auto p-5 rounded-lg my-10">
+                <div className="pb-5 font-bold">답변 작성</div>
+                <div>
+                  <textarea
+                    className="w-full h-96 p-3"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-5 justify-end pt-5">
+                  <div
+                    className="bg-red-400 px-5 py-3 rounded-md font-bold cursor-pointer"
+                    onClick={() => setReply(false)}>
+                    취소
+                  </div>
+                  <div className="bg-blue-400 px-5 py-3 rounded-md font-bold cursor-pointer" onClick={handleReply}>작성</div>
+                </div>
+              </div>
+            )}
+
+          </div>
+          <div
+            className="float-right  mb-20 bg-[#AB654B]
+              /90 p-4 text-white font-bold text-[20px] cursor-pointer"
+            onClick={() => navigate("/guide/qna")}>
+            목록으로
+          </div>
+          <div
+            className="float-right mr-8  mb-20 bg-[#AB654B]
+              /90 p-4 text-white font-bold text-[20px] cursor-pointer"
+            onClick={handleDelete}>
+            삭제하기
+          </div>
+          <div
             className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]"
-              onClick={()=> navigate(`/guide/qna/edit`)}>
+              /90 p-4 text-white font-bold text-[20px] cursor-pointer"
+            onClick={() => navigate(`/guide/qna/edit`)}>
             수정하기
-          </button>
+          </div>
+          {/* 여기에 || post.comments.length > 0 이조건도 들어가야함 */}
+          {!reply && (
+            <div
+              className="float-right mr-8 mb-20 bg-[#AB654B]
+            /90 p-4 text-white font-bold text-[20px] cursor-pointer"
+              onClick={() => setReply(!reply)}>
+              답변하기
+            </div>
+          )}
         </div>
       </div>
     </div>

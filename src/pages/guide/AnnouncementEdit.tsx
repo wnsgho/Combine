@@ -17,7 +17,7 @@ const AnnouncementEdit = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://15.164.103.160:8080/api/v1/announcements/{id}`);
+        const response = await axios.get(`http://15.164.103.160:8080/api/v1/announcements/${id}`);
         setTitle(response.data.title);
         setContent(response.data.content);
       } catch (error) {
@@ -33,7 +33,7 @@ const AnnouncementEdit = () => {
   //수정 요청
   const handleSubmit = async () => {
     try {
-      await axios.put(`http://15.164.103.160:8080/api/v1/announcements/{id}`, {
+      await axios.put(`http://15.164.103.160:8080/api/v1/announcements/${id}`, {
         category,
         title,
         content
