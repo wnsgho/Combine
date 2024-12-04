@@ -1,3 +1,4 @@
+5.
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
@@ -9,31 +10,28 @@ const Alarm = () => {
   const userId = localStorage.getItem("userId");
   const accessToken = localStorage.getItem("accessToken");
 
-  // 상태 관리
   const [notifications, setNotifications] = useState<
     { id: number; content: string; type: string; isRead: boolean; createdAt: string }[]
   >([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0); // 읽지 않은 알림 수
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [error, setError] = useState<string | null>(null); // 오류 상태
+  const [unreadCount, setUnreadCount] = useState<number>(0); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState<string | null>(null); 
 
-  // 알림 목록 및 읽지 않은 알림 수 가져오기
   useEffect(() => {
     if (!accessToken || !userId) {
       alert("로그인이 필요합니다.");
-      navigate("/"); // 로그인하지 않은 경우 메인 페이지로 리다이렉트
+      navigate("/"); // 로그인하지 않은 경우 메인 페이지로 이동하도록 구현
       return;
     }
 
     const fetchNotifications = async () => {
       try {
-        // 알림 목록 가져오기
         const [notificationsResponse, unreadCountResponse] = await Promise.all([
           axiosInstance.get("/api/v1/notifications", {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-            params: { userId }, // userId 전달
+            params: { userId }, 
           }),
           axiosInstance.get("/api/v1/notifications/unread-count", {
             headers: {
@@ -55,7 +53,7 @@ const Alarm = () => {
     fetchNotifications();
   }, [accessToken, userId, navigate]);
 
-  // 알림 읽음 처리
+  // 백엔드 API 알림 읽음 처리 요청
   const markAsRead = async (id: number) => {
     try {
       await axiosInstance.patch(`/api/v1/notifications/${id}/read`, null, {
@@ -68,13 +66,13 @@ const Alarm = () => {
           notification.id === id ? { ...notification, isRead: true } : notification
         )
       );
-      setUnreadCount((prev) => Math.max(prev - 1, 0)); // 읽지 않은 알림 수 감소
+      setUnreadCount((prev) => Math.max(prev - 1, 0)); 
     } catch (error) {
-      console.error("알림 읽음 처리 실패:", error);
+      console.error("알림 읽음 실패:", error);
     }
   };
 
-  // 알림 삭제
+  // 백엔드 API로 알림 삭제 요청
   const deleteNotification = async (id: number) => {
     try {
       await axiosInstance.delete(`/api/v1/notifications/${id}`, {
@@ -105,17 +103,17 @@ const Alarm = () => {
         </div>
       </header>
 
-      {/* 본문 콘텐츠 */}
+      {/* 내용 */}
       <main className="flex-grow flex flex-col items-center bg-gray-100 py-6 px-4">
         {/* 읽지 않은 알림 */}
         <div className="w-full max-w-[80%] flex justify-between items-center mb-4">
           <span className="text-2xl font-bold">읽지 않은 알림: {unreadCount}</span>
         </div>
 
-        {/* 알림 리스트 */}
+        {/* 알림 목록 */}
         {loading ? (
           <div className="flex-grow flex items-center justify-center">
-            <h1 className="text-xl text-gray-500">알림을 불러오는 중...</h1>
+            <h1 className="text-xl text-gray-500">알림을 불러오는 중 입니다.</h1>
           </div>
         ) : error ? (
           <div className="flex-grow flex items-center justify-center">
@@ -140,7 +138,7 @@ const Alarm = () => {
                     alt="Delete"
                     className="w-5 h-5 cursor-pointer"
                     onClick={(e) => {
-                      e.stopPropagation(); // 부모 클릭 방지
+                      e.stopPropagation(); 
                       deleteNotification(notification.id);
                     }}
                   />
@@ -160,3 +158,4 @@ const Alarm = () => {
 };
 
 export default Alarm;
+
