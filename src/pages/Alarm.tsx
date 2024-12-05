@@ -1,4 +1,3 @@
-5.
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
@@ -6,59 +5,65 @@ import axiosInstance from "../utils/axiosInstance";
 const Alarm = () => {
   const navigate = useNavigate();
 
-  // 사용자 ID 및 토큰 가져오기
-  const userId = localStorage.getItem("userId");
-  const accessToken = localStorage.getItem("accessToken");
-
   const [notifications, setNotifications] = useState<
     { id: number; content: string; type: string; isRead: boolean; createdAt: string }[]
   >([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState<string | null>(null); 
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!accessToken || !userId) {
-      alert("로그인이 필요합니다.");
-      navigate("/"); // 로그인하지 않은 경우 메인 페이지로 이동하도록 구현
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      alert("로그인 되어 있지 않아 로그인 페이지로 이동합니다.");
+      navigate("/login");
       return;
     }
+
+    const authHeader = accessToken.startsWith("Bearer ")
+      ? accessToken
+      : `Bearer ${accessToken}`;
 
     const fetchNotifications = async () => {
       try {
         const [notificationsResponse, unreadCountResponse] = await Promise.all([
           axiosInstance.get("/api/v1/notifications", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            params: { userId }, 
+            headers: { Authorization: authHeader },
           }),
           axiosInstance.get("/api/v1/notifications/unread-count", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+            headers: { Authorization: authHeader },
           }),
         ]);
 
-        setNotifications(notificationsResponse.data.content); // 알림 목록
-        setUnreadCount(unreadCountResponse.data.count); // 읽지 않은 알림 수
-      } catch (error) {
-        setError("알림을 가져오는 데 실패했습니다.");
-        console.error("알림 API 호출 오류:", error);
+        setUnreadCount(unreadCountResponse.data.count || 0); 
+        setNotifications(notificationsResponse.data.content);
+      } catch {
+        setError("알림 목록을 가져오는 데 실패했습니다.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchNotifications();
-  }, [accessToken, userId, navigate]);
+  }, [navigate]);
 
-  // 백엔드 API 알림 읽음 처리 요청
   const markAsRead = async (id: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    const authHeader = accessToken.startsWith("Bearer ")
+      ? accessToken
+      : `Bearer ${accessToken}`;
+
     try {
       await axiosInstance.patch(`/api/v1/notifications/${id}/read`, null, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: authHeader,
         },
       });
       setNotifications((prev) =>
@@ -67,22 +72,32 @@ const Alarm = () => {
         )
       );
       setUnreadCount((prev) => Math.max(prev - 1, 0)); 
-    } catch (error) {
-      console.error("알림 읽음 실패:", error);
+    } catch {
+      console.error("알림 읽음 처리 중 오류 발생");
     }
   };
 
-  // 백엔드 API로 알림 삭제 요청
   const deleteNotification = async (id: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    const authHeader = accessToken.startsWith("Bearer ")
+      ? accessToken
+      : `Bearer ${accessToken}`;
+
     try {
       await axiosInstance.delete(`/api/v1/notifications/${id}`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: authHeader,
         },
       });
       setNotifications((prev) => prev.filter((notification) => notification.id !== id));
-    } catch (error) {
-      console.error("알림 삭제 실패:", error);
+    } catch {
+      console.error("알림 삭제 중 오류 발생");
     }
   };
 
@@ -107,7 +122,9 @@ const Alarm = () => {
       <main className="flex-grow flex flex-col items-center bg-gray-100 py-6 px-4">
         {/* 읽지 않은 알림 */}
         <div className="w-full max-w-[80%] flex justify-between items-center mb-4">
-          <span className="text-2xl font-bold">읽지 않은 알림: {unreadCount}</span>
+          <span className="text-2xl font-bold">
+            읽지 않은 알림: {error ? "정보 없음" : unreadCount}
+          </span>
         </div>
 
         {/* 알림 목록 */}
@@ -138,7 +155,7 @@ const Alarm = () => {
                     alt="Delete"
                     className="w-5 h-5 cursor-pointer"
                     onClick={(e) => {
-                      e.stopPropagation(); 
+                      e.stopPropagation();
                       deleteNotification(notification.id);
                     }}
                   />
@@ -158,4 +175,3 @@ const Alarm = () => {
 };
 
 export default Alarm;
-
