@@ -162,10 +162,6 @@ const MyPageShelter: React.FC = () => {
       }
     };
 
-    // 지도 페이지로 이동하는 링크 생성 함수
-    const ShelterAddressLink = (useId:number) => {
-      return `/shelter-address/${useId}`; // 지도 페이지 URL 생성
-    };
 
     // 입양신청 리스트 페이지로 이동하는 링크 생성 함수
     const applyListLink = (shelterId:number) => {
@@ -270,12 +266,13 @@ const MyPageShelter: React.FC = () => {
             </label>
             <label>
               주소:
-              <Link to={ShelterAddressLink(useId.Id)}>
-                <button className="flex items-center w-full p-2 bg-white border rounded;">
-                  {shelterInfo.address}
-                  <GoChevronRight />
-                </button>
-              </Link>
+              <input
+                type="text"
+                name="address"
+                value={shelterInfo.address}
+                onChange={editChange}
+                className="block w-full p-2 border rounded"
+              />
             </label>
             <label>
               전화번호:

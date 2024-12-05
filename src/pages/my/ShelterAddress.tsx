@@ -9,8 +9,8 @@ declare global {
 }
 
 interface ShelterInfo {
+  shelterId: number;
   shelterName: string;
-  phoneNumber: string;
   address: string;
 }
 
@@ -23,7 +23,7 @@ interface UseRole {
 }
 
 const ShelterAddress: React.FC = () => {
-  const { useId } = useParams();
+  const { petId } = useParams();
   const mapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate(); // useNavigate 훅 사용
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,9 +34,9 @@ const ShelterAddress: React.FC = () => {
     role: ""
   })
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
+    shelterId: 0,
     shelterName: "",
-    address: "",
-    phoneNumber: "",
+    address: ""
   });
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
 
@@ -48,12 +48,12 @@ const ShelterAddress: React.FC = () => {
 
   // ID, ROLE 불러오기
   useEffect(() => {
-    const shelterId = async () => {
+    const userId = async () => {
       try {
         const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
-        setUserId(response.data.id);
+        setUserId(response.data);
       } catch(error) {
-        console.error("보호소 ID를 불러오는 중 오류 발생:", error);
+        console.error("ID를 불러오는 중 오류 발생:", error);
       }
     };
 
@@ -66,23 +66,25 @@ const ShelterAddress: React.FC = () => {
       }
     }
     
-    shelterId();
+    userId();
     shelterRole();
   }, [])
 
 
-  // 보호소 정보 가져오기
+  // 보호소 정보 가져오기 (동물 상세 정보 이용)
   useEffect(() => {
-    const shelterInfo = async () => {
-      try {
-        const response = await axiosInstance.get<ShelterInfo>(`/api/v1/shelters/${useId}`, {headers});
-        setShelterInfo(response.data);
-      } catch (error) {
-        console.error("보호소 정보를 불러오는 중 오류 발생:", error);
-      }
-    };
-    shelterInfo();
-  }, []);
+    if(petId) {
+      const shelterInfo = async () => {
+        try {
+          const response = await axiosInstance.get<ShelterInfo>(`/api/v1/pets/${petId}`);
+          setShelterInfo(response.data);
+        } catch (error) {
+          console.error("보호소 정보를 불러오는 중 오류 발생:", error);
+        }
+      };
+      shelterInfo();
+    }
+  }, [petId]);
 
   // 카카오 지도 API 연동
   useEffect(() => {
@@ -175,7 +177,7 @@ const ShelterAddress: React.FC = () => {
   };
 
 
-  const shelter = useRole.role == "ROLE_SHELTER"
+  const shelter = useRole.role == "ROLE_SHELTER" && userId.Id == shelterInfo.shelterId
 
 
   return (
@@ -237,17 +239,6 @@ const ShelterAddress: React.FC = () => {
                 value={tempShelterInfo.address}
                 onChange={(e) =>
                   setTempShelterInfo((prev) => ({ ...prev, address: e.target.value }))
-                }
-                className="w-full px-3 py-2 border rounded"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 font-bold">전화번호</label>
-              <input
-                type="text"
-                value={tempShelterInfo.phoneNumber}
-                onChange={(e) =>
-                  setTempShelterInfo((prev) => ({ ...prev, phoneNumber: e.target.value }))
                 }
                 className="w-full px-3 py-2 border rounded"
               />

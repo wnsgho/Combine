@@ -48,20 +48,20 @@ const PreferPage: React.FC = () => {
     userId();
   }, [])
 
-    // select 값 변경 핸들러
-    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const { id, value } = e.target;
-      setUserInfo(prevState => ({
-        ...prevState,
-        [id]: id === 'preferredExerciseLevel' ? Number(value) : value
-      }));
-    };
+  // select 값 변경 핸들러
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setUserInfo(prevState => ({
+      ...prevState,
+      [id]: id === 'preferredExerciseLevel' ? Number(value) : value
+    }));
+  };
   
-    // 폼 제출 핸들러
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault(); // 페이지 새로고침 방지
-      await editSubmit();
-    };
+  // 폼 제출 핸들러
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // 페이지 새로고침 방지
+    await editSubmit();
+  };
   
 
   // 정보 수정 제출

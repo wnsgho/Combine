@@ -21,6 +21,8 @@ interface PetInfo {
   exerciseLevel: number;
   imageUrls: string[];
   shelterId: number;
+  shelterName: string;
+  address: string;
 }
 
 interface UseId {
@@ -51,7 +53,9 @@ const DetailReadPage = () => {
     personality: "",
     exerciseLevel: 0,
     imageUrls: [""],
-    shelterId: 0
+    shelterId: 0,
+    shelterName: "",
+    address: "",
   })
 
   const [applyInfo, setApplyInfo] = useState({
@@ -170,7 +174,7 @@ const DetailReadPage = () => {
     return `/adoption-list/${petId}`; // 입양신청 리스트 페이지 URL 생성
   };
 
-  const linkMap = `/shelter-address/${petInfo.shelterId}`
+  const linkMap = `/shelter-address/${petInfo.petId}`
 
   const shelter = role == "ROLE_SHELTER" && applyInfo.userId == petInfo.shelterId
 
@@ -261,6 +265,12 @@ const DetailReadPage = () => {
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">맡겨지기 전 가정환경</p>
               <p className="text-lg">{petInfo.preAdoption}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8">
+            <div className="flex justify-between w-full">
+              <p className="text-xl font-bold text-mainColor">보호 기관</p>
+              <p className="text-lg">{petInfo.shelterName}</p>
             </div>
           </div>
           <div className="flex items-center justify-between">

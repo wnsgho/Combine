@@ -327,16 +327,6 @@ const MyPageUser: React.FC = () => {
               )}
             </label> */}
             <label>
-              생년월일:
-              <input
-                type="text"
-                name="birthdate"
-                value={userInfo.birthDate}
-                onChange={editChange}
-                className="block w-full p-2 border rounded"
-              />
-            </label>
-            <label>
               전화번호:
               <input
                 type="text"
