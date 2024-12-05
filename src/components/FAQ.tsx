@@ -80,14 +80,14 @@ useEffect(() => {
   return (
     <div>
       <div
-        className="bg-green-500 m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[29px] cursor-pointer fixed bottom-2 right-2 hover:scale-105 transition-transform"
+        className="bg-green-500 m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[29px] cursor-pointer fixed bottom-0 right-2 hover:scale-105 transition-transform"
         onClick={handleClick}>
         {open ? "x" : "?"}
       </div>
       {open && (
         <>
           <div className="bg-white shadow-[0_0_15px_rgba(0,0,0,0.5)] w-96 h-[556px] fixed right-[90px] bottom-2 m-6 z-50 rounded-md">
-            <div className=" bg-green-500 font-bold text-xl px-3 py-2 flex  rounded-t-md content-center justify-between">
+            <div className=" bg-green-500 font-bold text-xl px-3 py- flex  rounded-t-md content-center justify-between">
               <div>FAQ</div>
               <div className="flex gap-2">
                 <div className="cursor-pointer float-end" onClick={handleEditClick}>

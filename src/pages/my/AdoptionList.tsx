@@ -1,8 +1,9 @@
-import axios from 'axios';
+import axiosInstance from "../../utils/axiosInstance"; 
 import React, { useEffect, useState } from 'react';
 import { GoChevronUp, GoChevronDown } from 'react-icons/go';
 import Header from "../../components/Header";
 import MyPageModal from '../../components/MyPageModal';
+import { useParams } from 'react-router-dom';
 
 // 데이터 타입 정의
 interface Pet {
@@ -39,8 +40,13 @@ interface UserInfo {
   phoneNumber: string;
   address: string;
 }
+interface UseId {
+  Id: number;
+}
 
 const AdoptionList: React.FC = () => {
+
+  const { shelterId } = useParams();
 
   // 여러 펫의 정보를 관리하는 상태
   const [pets, setPets] = useState<ProcessedPet[]>([]);
@@ -48,7 +54,9 @@ const AdoptionList: React.FC = () => {
   // 상태 정의: 각 펫의 상세 정보 표시 여부를 관리
   const [visibleDetails, setVisibleDetails] = useState<Record<number, boolean>>({});
 
-  const [Id, setId] = useState("")
+  const [useId, setUseId] = useState<UseId>({
+    Id: 0
+  })
   // 입양 승인 모달
   const [isApprovalModalOpen, setApprovalModalOpen] = useState<boolean>(false);
   
@@ -56,12 +64,19 @@ const AdoptionList: React.FC = () => {
   const [isRefusalModalOpen, setRefusalModalOpen] = useState<boolean>(false);
 
 
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
+
+
   // ID 불러오기
   useEffect(() => {
     const shelterId = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/check-id`);
-        setId(response.data);
+        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
+        setUseId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
       }
@@ -72,45 +87,46 @@ const AdoptionList: React.FC = () => {
 
   // 입양 신청 및 유저 정보 가져오기
   useEffect(() => {
-    const fetchApplyPets = async () => {
-      try {
-        // API 호출로 펫 신청 정보 가져오기
-        const response = await axios.get<ApplyPet[]>(`/api/v1/applypet/shelter/${Id}`);
-        const fetchedPets: ProcessedPet[] = response.data.map((applyPet) => ({
-          id: applyPet.id,
-          species: applyPet.pet.species,
-          age: applyPet.pet.age,
-          size: applyPet.pet.size,
-          personality: applyPet.pet.personality,
-          exerciseLevel: applyPet.pet.exerciseLevel,
-          applicantId: applyPet.userId,
-        }));
+    if(useId.Id !== 0) {
+      const fetchApplyPets = async () => {
+        try {
+          // API 호출로 펫 신청 정보 가져오기
+          const response = await axiosInstance.get<ApplyPet[]>(`/api/v1/applypet/shelter/${useId.Id}`, {headers});
+          const fetchedPets: ProcessedPet[] = response.data.map((applyPet) => ({
+            id: applyPet.id,
+            species: applyPet.pet.species,
+            age: applyPet.pet.age,
+            size: applyPet.pet.size,
+            personality: applyPet.pet.personality,
+            exerciseLevel: applyPet.pet.exerciseLevel,
+            applicantId: applyPet.userId,
+          }));
 
-        // 유저 정보 로드 및 병합
-        const updatedPets = await Promise.all(
-          fetchedPets.map(async (pet) => {
-            const userInfo = await fetchUserInfo(pet.applicantId);
-            return { ...pet, userInfo };
-          })
-        );
+          // 유저 정보 로드 및 병합
+          const updatedPets = await Promise.all(
+            fetchedPets.map(async (pet) => {
+              const userInfo = await fetchUserInfo(pet.applicantId);
+              return { ...pet, userInfo };
+            })
+          );
+          setPets(updatedPets);
+        } catch (error) {
+          console.error('데이터를 가져오는 중 오류 발생:', error);
+        }
+      };
 
-        setPets(updatedPets);
-      } catch (error) {
-        console.error('데이터를 가져오는 중 오류 발생:', error);
-      }
-    };
+      const fetchUserInfo = async (applicantId: number): Promise<UserInfo | null> => {
+        try {
+          const response = await axiosInstance.get<UserInfo>(`/api/v1/users/${applicantId}`, {headers});
+          return response.data;
+        } catch (error) {
+          console.error(`유저 정보를 불러오는 중 오류 발생 (ID: ${applicantId}):`, error);
+          return null;
+        }
+      };
 
-    const fetchUserInfo = async (applicantId: number): Promise<UserInfo | null> => {
-      try {
-        const response = await axios.get<UserInfo>(`/api/v1/users/${applicantId}`);
-        return response.data;
-      } catch (error) {
-        console.error(`유저 정보를 불러오는 중 오류 발생 (ID: ${applicantId}):`, error);
-        return null;
-      }
-    };
-
-    fetchApplyPets();
+      fetchApplyPets();
+    }
   }, []);
 
   // 토글 함수: 특정 펫 ID의 상태를 토글
@@ -124,7 +140,7 @@ const AdoptionList: React.FC = () => {
 // 동물 삭제
 const DeleteAccount = async (petId: number): Promise<void> => {
   try {
-    await axios.delete(`/api/v1/pets/${Id}/${petId}`);
+    await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`, {headers});
     alert('동물 삭제가 완료되었습니다.');
     setPets((prevPets) => prevPets.filter((pet) => pet.id !== petId)); // 삭제된 펫을 상태에서 제거
   } catch (error) {
