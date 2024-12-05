@@ -67,7 +67,7 @@ const Login = () => {
 
   // 네이버 로그인
   const handleNaverLogin = () => {
-    localStorage.setItem("isSocialLogin", "true");
+    localStorage.setItem("isSocialLogin", "true"); 
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/naver`;
   };
 

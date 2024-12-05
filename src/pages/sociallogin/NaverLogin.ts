@@ -12,7 +12,7 @@ export const naverLogin = async (
     return;
   }
 
-  const state = Math.random().toString(36).substr(2);
+  const state = Math.random().toString(36).substr(2); 
   const popupUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
     callbackUrl
   )}&state=${state}`;
@@ -50,7 +50,7 @@ export const naverLogin = async (
             : `Bearer ${accessToken}`;
 
           localStorage.setItem("accessToken", formattedToken);
-          localStorage.setItem("isSocialLogin", "true");
+          localStorage.setItem("isSocialLogin", "true"); 
           window.dispatchEvent(new Event("storage"));
           onSuccess(formattedToken);
         } catch (error) {
