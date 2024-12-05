@@ -1,3 +1,4 @@
+// /Users/chacha/Desktop/PAWS/src/components/Header.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
@@ -17,29 +18,32 @@ const Header = () => {
 
   const handleLogout = async () => {
     const accessToken = localStorage.getItem("accessToken");
-  
+
     if (!accessToken) {
       alert("이미 로그아웃 상태입니다.");
-      setIsLoggedIn(false); 
+      setIsLoggedIn(false);
+      localStorage.removeItem("isSocialLogin");
       navigate("/");
       return;
     }
-  
+
     try {
+      const authHeader = accessToken.startsWith("Bearer ")
+        ? accessToken
+        : `Bearer ${accessToken}`;
+
       const response = await axiosInstance.post(
         "/logout",
         {},
-        {
-          headers: {
-            Authorization: accessToken,
-          },
-        }
+        { headers: { Authorization: authHeader } }
       );
-  
+
       if (response.status === 200) {
         localStorage.removeItem("accessToken");
-        setIsLoggedIn(false); 
+        localStorage.removeItem("isSocialLogin");
+        setIsLoggedIn(false);
         alert("로그아웃 되었습니다.");
+        window.dispatchEvent(new Event("storage"));
         navigate("/");
       }
     } catch (error) {
@@ -47,35 +51,46 @@ const Header = () => {
       alert("로그아웃에 실패했습니다.");
     }
   };
-  
+
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!accessToken);
+    const updateLoginState = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!accessToken);
 
-    if (!accessToken) {
-      setUserRole(null);
-      return;
-    }
+      if (accessToken) {
+        try {
+          const authHeader = accessToken.startsWith("Bearer ")
+            ? accessToken
+            : `Bearer ${accessToken}`;
 
-    const authHeader = accessToken.startsWith("Bearer ")
-      ? accessToken
-      : `Bearer ${accessToken}`;
+          const response = await axiosInstance.get("/api/v1/features/role", {
+            headers: { Authorization: authHeader },
+          });
 
-    axiosInstance
-      .get("/api/v1/features/role", {
-        headers: {
-          Authorization: authHeader,
-        },
-      })
-      .then((response) => {
-        setUserRole(response.data.role || null);
-      })
-      .catch(() => {
+          setUserRole(response.data.role || null);
+        } catch (error) {
+          console.error("사용자 역할 가져오기 실패:", error);
+          setIsLoggedIn(false);
+          setUserRole(null);
+        }
+      } else {
         setUserRole(null);
-      });
-  }, [isLoggedIn]);
-  
-  
+      }
+    };
+
+    updateLoginState();
+
+    const handleStorageChange = () => {
+      updateLoginState();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   const getUserInfoLink = () => {
     return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/my-info";
   };

@@ -4,18 +4,18 @@ export const naverLogin = async (
   onSuccess: (token: string) => void,
   onError: (message: string) => void
 ) => {
-  const clientId = import.meta.env.VITE_NAVER_CLIENT_ID; 
-  const callbackUrl = import.meta.env.VITE_NAVER_CALLBACK_URL; 
+  const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
+  const callbackUrl = import.meta.env.VITE_NAVER_CALLBACK_URL;
 
   if (!clientId || !callbackUrl) {
-    onError("네이버 로그인을 할 수 없습니다.");
+    onError("네이버 로그인 설정이 올바르지 않습니다.");
     return;
   }
 
-  const state: string = Math.random().toString(36).substr(2); 
+  const state = Math.random().toString(36).substr(2);
   const popupUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
     callbackUrl
-  )}&state=${state}&auth_type=reauthenticate`;
+  )}&state=${state}`;
 
   const popup = window.open(popupUrl, "NaverLogin", "width=500,height=700");
 
@@ -28,12 +28,13 @@ export const naverLogin = async (
     try {
       if (popup.location.href.includes("code=")) {
         const query = new URLSearchParams(popup.location.search);
-        const authCode: string | null = query.get("code");
+        const authCode = query.get("code");
+        const returnedState = query.get("state");
         popup.close();
         clearInterval(popupInterval);
 
-        if (!authCode) {
-          onError("네이버 로그인을 할 수 없습니다.");
+        if (!authCode || state !== returnedState) {
+          onError("인증 코드 또는 상태가 올바르지 않습니다.");
           return;
         }
 
@@ -43,19 +44,22 @@ export const naverLogin = async (
             state,
           });
 
-          if (response.status !== 200) {
-            throw new Error("백엔드와의 통신 오류");
-          }
+          const { accessToken } = response.data;
+          const formattedToken = accessToken.startsWith("Bearer ")
+            ? accessToken
+            : `Bearer ${accessToken}`;
 
-          const data = response.data;
-          onSuccess(data.accessToken);
+          localStorage.setItem("accessToken", formattedToken);
+          localStorage.setItem("isSocialLogin", "true");
+          window.dispatchEvent(new Event("storage"));
+          onSuccess(formattedToken);
         } catch (error) {
-          console.error("네이버 로그인 중 백엔드 오류:", error);
-          onError("네이버 로그인을 할 수 없습니다.");
+          console.error("네이버 로그인 중 서버 오류:", error);
+          onError("로그인 중 오류가 발생했습니다.");
         }
       }
     } catch (error) {
-      console.error("팝업 인증 코드 추출 오류:", error);
+      console.error("팝업 상태 확인 중 오류:", error);
     }
 
     if (popup.closed) {
