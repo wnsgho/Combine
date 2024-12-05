@@ -8,23 +8,36 @@ const Alarm = () => {
   const [notifications, setNotifications] = useState<
     { id: number; content: string; type: string; isRead: boolean; createdAt: string }[]
   >([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number | string>("정보 없음");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 알림 목록 시간 지정
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}.${month}.${day} ${hour}시 ${minute}분`;
+  };
+
+  // 알림 목록 및 읽지 않은 알림 수 가져오기
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-
+  
     if (!accessToken) {
       alert("로그인 되어 있지 않아 로그인 페이지로 이동합니다.");
       navigate("/login");
       return;
     }
-
+  
     const authHeader = accessToken.startsWith("Bearer ")
       ? accessToken
       : `Bearer ${accessToken}`;
-
+  
     const fetchNotifications = async () => {
       try {
         const [notificationsResponse, unreadCountResponse] = await Promise.all([
@@ -35,48 +48,64 @@ const Alarm = () => {
             headers: { Authorization: authHeader },
           }),
         ]);
-
-        setUnreadCount(unreadCountResponse.data.count || 0); 
-        setNotifications(notificationsResponse.data.content);
+  
+        console.log("Unread Count Response:", unreadCountResponse.data); 
+        setUnreadCount(unreadCountResponse.data ?? "정보 없음"); 
+        setNotifications(notificationsResponse.data.content || []);
       } catch {
+        setUnreadCount("정보 없음");
         setError("알림 목록을 가져오는 데 실패했습니다.");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchNotifications();
   }, [navigate]);
+  
 
   const markAsRead = async (id: number) => {
+    console.log("Marking as read ID:", id);
     const accessToken = localStorage.getItem("accessToken");
-
+  
     if (!accessToken) {
       alert("로그인이 필요합니다.");
       return;
     }
-
+  
     const authHeader = accessToken.startsWith("Bearer ")
       ? accessToken
       : `Bearer ${accessToken}`;
-
+      
+    console.log("Sending PATCH request to mark as read:", `/api/v1/notifications/${id}/read`);
+    console.log("Authorization Header:", authHeader);
+  
     try {
-      await axiosInstance.patch(`/api/v1/notifications/${id}/read`, null, {
-        headers: {
-          Authorization: authHeader,
-        },
-      });
+      const response = await axiosInstance.patch(
+        `/api/v1/notifications/${id}/read`,
+        null,
+        {
+          headers: {
+            Authorization: authHeader,
+          },
+        }
+      );
+      console.log("Mark as read response:", response.data); 
       setNotifications((prev) =>
         prev.map((notification) =>
           notification.id === id ? { ...notification, isRead: true } : notification
         )
       );
-      setUnreadCount((prev) => Math.max(prev - 1, 0)); 
-    } catch {
-      console.error("알림 읽음 처리 중 오류 발생");
+      setUnreadCount((prev) =>
+        typeof prev === "number" ? Math.max(prev - 1, 0) : prev
+      );
+    } catch (error) {
+      console.error("알림 읽음 처리 중 오류 발생:", error);
     }
   };
+  
 
+  // 알림 삭제 처리
   const deleteNotification = async (id: number) => {
     const accessToken = localStorage.getItem("accessToken");
 
@@ -123,7 +152,7 @@ const Alarm = () => {
         {/* 읽지 않은 알림 */}
         <div className="w-full max-w-[80%] flex justify-between items-center mb-4">
           <span className="text-2xl font-bold">
-            읽지 않은 알림: {error ? "정보 없음" : unreadCount}
+            읽지 않은 알림: {unreadCount}
           </span>
         </div>
 
@@ -138,18 +167,16 @@ const Alarm = () => {
           </div>
         ) : notifications.length > 0 ? (
           <div className="w-full max-w-[80%] space-y-4">
-            {notifications.map((notification) => (
+            {notifications.map((notification, index) => (
               <div
-                key={notification.id}
+                key={`${notification.id}-${index}`}
                 className={`shadow-md rounded-xl p-5 relative ${
                   notification.isRead ? "bg-gray-200" : "bg-white hover:bg-[#f0efef]"
                 }`}
                 onClick={() => markAsRead(notification.id)}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-500">
-                    {new Date(notification.createdAt).toLocaleDateString()}
-                  </span>
+                  <span className="text-gray-500">{formatDate(notification.createdAt)}</span>
                   <img
                     src="/src/assets/x2.svg"
                     alt="Delete"
