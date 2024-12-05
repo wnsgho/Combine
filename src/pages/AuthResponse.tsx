@@ -6,31 +6,22 @@ const AuthResponse = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const processToken = () => {
-      if (token) {
-        const formattedToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-        localStorage.setItem("accessToken", formattedToken);
-        localStorage.setItem("isSocialLogin", "true");
+    if (!token) {
+      alert("로그인을 할 수 없습니다. 다시 로그인해주세요.");
+      navigate("/login");
+      return;
+    }
 
-        console.log("저장된 accessToken 확인: ", localStorage.getItem("accessToken"));
-        console.log("저장된 isSocialLogin 확인: ", localStorage.getItem("isSocialLogin"));
+    try {
+      const formattedToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+      localStorage.setItem("accessToken", formattedToken);
+      localStorage.setItem("isSocialLogin", "true");
 
-        setTimeout(() => {
-          const headerUpdateEvent = new CustomEvent("updateHeader", {
-            detail: { accessToken: formattedToken },
-          });
-          console.log("CustomEvent 트리거: ", headerUpdateEvent.detail);
-          window.dispatchEvent(headerUpdateEvent);
-
-          navigate("/");
-        }, 200);
-      } else {
-        alert("토큰이 없습니다. 다시 로그인해주세요.");
-        navigate("/login");
-      }
-    };
-
-    processToken();
+      navigate("/");
+    } catch (error) {
+      console.error("토큰 처리 중 오류 발생:", error);
+      alert("로그인을 할 수 없습니다. 다시 시도해주세요.");
+    }
   }, [token, navigate]);
 
   return null;

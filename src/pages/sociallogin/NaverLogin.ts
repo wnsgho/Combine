@@ -12,10 +12,18 @@ export const naverLogin = async (
     return;
   }
 
-  const state = Math.random().toString(36).substr(2); 
+  const state = Math.random().toString(36).substr(2);
   const popupUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
     callbackUrl
   )}&state=${state}`;
+
+  try {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("isSocialLogin");
+    console.log("네이버 세션이 초기화 되었습니다.");
+  } catch (error) {
+    console.error("네이버 세션 초기화 실패:", error);
+  }
 
   const popup = window.open(popupUrl, "NaverLogin", "width=500,height=700");
 
@@ -50,11 +58,13 @@ export const naverLogin = async (
             : `Bearer ${accessToken}`;
 
           localStorage.setItem("accessToken", formattedToken);
-          localStorage.setItem("isSocialLogin", "true"); 
+          localStorage.setItem("isSocialLogin", "true");
+
           window.dispatchEvent(new Event("storage"));
+
           onSuccess(formattedToken);
         } catch (error) {
-          console.error("네이버 로그인 중 서버 오류:", error);
+          console.error("네이버 로그인 서버 오류:", error);
           onError("로그인 중 오류가 발생했습니다.");
         }
       }

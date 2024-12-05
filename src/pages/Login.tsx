@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../utils/axiosInstance"; 
+import axiosInstance from "../utils/axiosInstance";
 import HeaderLogin from "../components/HeaderLogin";
 
 const Login = () => {
@@ -16,14 +16,24 @@ const Login = () => {
 
   // 일반 로그인 메세지 + 백엔드 요청
   const handleLogin = async () => {
-    if (!email || !password) {
+    if (!email && !password) {
       alert("이메일과 비밀번호를 입력해주세요.");
       return;
     }
-
+  
+    if (!email) {
+      alert("이메일을 입력해주세요.");
+      return;
+    }
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("유효한 이메일 형식이 아닙니다.");
+      return;
+    }
+  
+    if (!password) {
+      alert("비밀번호를 입력해주세요.");
       return;
     }
 
@@ -45,7 +55,7 @@ const Login = () => {
           ? accessToken
           : `Bearer ${accessToken}`;
         localStorage.setItem("accessToken", formattedToken);
-        localStorage.removeItem("isSocialLogin"); 
+        localStorage.removeItem("isSocialLogin");
         alert("로그인 되었습니다.");
         navigate("/");
       } else {
@@ -53,21 +63,41 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error("로그인 실패:", error);
-      alert(error.response?.data?.message || "로그인에 실패했습니다.");
+      alert(error.response?.data?.message || "로그인을 할 수 없습니다.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   // 카카오 로그인
   const handleKakaoLogin = () => {
-    localStorage.setItem("isSocialLogin", "true"); 
+    try {
+      if (window.Kakao) {
+        if (!window.Kakao.isInitialized()) {
+          window.Kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
+        }
+        window.Kakao.Auth.logout(() => {
+          console.log("기존 카카오 세션 초기화 완료");
+        });
+      }
+      localStorage.removeItem("accessToken");
+      localStorage.setItem("isSocialLogin", "true");
+    } catch (error) {
+      console.error("카카오 초기화 중 오류 발생:", error);
+    }
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/kakao`;
   };
 
   // 네이버 로그인
   const handleNaverLogin = () => {
-    localStorage.setItem("isSocialLogin", "true"); 
+    try {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("isSocialLogin");
+      console.log("기존 네이버 세션 초기화 완료");
+      localStorage.setItem("isSocialLogin", "true");
+    } catch (error) {
+      console.error("네이버 초기화 중 오류 발생:", error);
+    }
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/naver`;
   };
 
@@ -97,7 +127,7 @@ const Login = () => {
             </div>
 
             {/* 회원가입하기 */}
-            <div className="text-sm md:text-2xl lg:text-2xl xl:text-3xl text-gray-600 flex items-center gap-1">
+            <div className="text-sm md:text-2xl lg:text-2xl xl:text-3xl text-gray-600 flex items-center gap-3">
               <p>회원이 아니신가요?</p>
               <p
                 className="font-bold cursor-pointer transition-transform transform hover:scale-105 pl-"

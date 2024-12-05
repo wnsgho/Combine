@@ -35,15 +35,10 @@ import AuthResponse from "./pages/AuthResponse";
 function App() {
 
   const errorCode = 404;
-
-  useEffect(() => {
-    localStorage.removeItem("accessToken");
-  }, []);
   
   return (
     <Router>
       <Routes>
-        <Route path="/auth/oauth-response/:token/:expiresIn" element={<AuthResponse />} />
         <Route path="/" element={<Main />} /> {/* 메인 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
         <Route path="/signup" element={<Signup />} /> {/* 회원가입 페이지 */}
@@ -77,6 +72,7 @@ function App() {
         <Route path="/shelter-address" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
         <Route path="/adoption-list" element={<AdoptionList />} /> {/* 입양리스트 페이지 */}
         <Route path="/errorpage" element={<Error errorCode={errorCode}/>} /> {/* 에러페이지 (임시로 이곳에 위치) */}
+        <Route path="/auth/oauth-response/:token/:expiresIn" element={<AuthResponse />} /> {/* 소셜 로그인 */}
       </Routes>
     </Router>
 

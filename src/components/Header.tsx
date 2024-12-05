@@ -1,4 +1,3 @@
-// /Users/chacha/Desktop/PAWS/src/components/Header.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
@@ -20,7 +19,7 @@ const Header = () => {
     const accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken) {
-      alert("이미 로그아웃 상태입니다.");
+      alert("이미 로그아웃 되어 있는 상태입니다.");
       setIsLoggedIn(false);
       localStorage.removeItem("isSocialLogin");
       navigate("/");
@@ -47,49 +46,52 @@ const Header = () => {
         navigate("/");
       }
     } catch (error) {
+      alert("로그아웃을 할 수 없습니다.");
       console.error("로그아웃 실패:", error);
-      alert("로그아웃에 실패했습니다.");
     }
   };
 
   useEffect(() => {
-    const updateLoginState = async () => {
+    const updateLoginState = () => {
       const accessToken = localStorage.getItem("accessToken");
+  
       setIsLoggedIn(!!accessToken);
-
+  
       if (accessToken) {
-        try {
-          const authHeader = accessToken.startsWith("Bearer ")
-            ? accessToken
-            : `Bearer ${accessToken}`;
-
-          const response = await axiosInstance.get("/api/v1/features/role", {
+        const authHeader = accessToken.startsWith("Bearer ")
+          ? accessToken
+          : `Bearer ${accessToken}`;
+  
+        axiosInstance
+          .get("/api/v1/features/role", {
             headers: { Authorization: authHeader },
+          })
+          .then((response) => {
+            setUserRole(response.data.role || null);
+          })
+          .catch((error) => {
+            setIsLoggedIn(false);
+            setUserRole(null);
+            console.error("사용자 역할 가져오기 실패:", error);
           });
-
-          setUserRole(response.data.role || null);
-        } catch (error) {
-          console.error("사용자 역할 가져오기 실패:", error);
-          setIsLoggedIn(false);
-          setUserRole(null);
-        }
       } else {
         setUserRole(null);
       }
     };
-
+  
     updateLoginState();
-
+  
     const handleStorageChange = () => {
       updateLoginState();
     };
-
+  
     window.addEventListener("storage", handleStorageChange);
-
+  
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
+  
 
   const getUserInfoLink = () => {
     return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/my-info";
