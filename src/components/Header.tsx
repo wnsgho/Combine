@@ -17,56 +17,65 @@ const Header = () => {
 
   const handleLogout = async () => {
     const accessToken = localStorage.getItem("accessToken");
-
+  
     if (!accessToken) {
-      alert("이미 로그아웃이 되어 있습니다.");
+      alert("이미 로그아웃 상태입니다.");
+      setIsLoggedIn(false); 
       navigate("/");
       return;
     }
-
+  
     try {
-      await axiosInstance.post(
+      const response = await axiosInstance.post(
         "/logout",
         {},
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: accessToken,
           },
         }
       );
-
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("userId");
-      setIsLoggedIn(false);
-      alert("로그아웃 되었습니다.");
-      navigate("/");
+  
+      if (response.status === 200) {
+        localStorage.removeItem("accessToken");
+        setIsLoggedIn(false); 
+        alert("로그아웃 되었습니다.");
+        navigate("/");
+      }
     } catch (error) {
       console.error("로그아웃 실패:", error);
-      alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+      alert("로그아웃에 실패했습니다.");
     }
   };
-
+  
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     setIsLoggedIn(!!accessToken);
 
-    if (accessToken) {
-      axiosInstance
-        .get("/api/v1/features/role", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
-        .then((response) => {
-          setUserRole(response.data.role); 
-        })
-        .catch((error) => {
-          console.error("유저의 역할을 가져오는 데 실패했습니다:", error);
-          setUserRole(null);
-        });
+    if (!accessToken) {
+      setUserRole(null);
+      return;
     }
-  }, []);
 
+    const authHeader = accessToken.startsWith("Bearer ")
+      ? accessToken
+      : `Bearer ${accessToken}`;
+
+    axiosInstance
+      .get("/api/v1/features/role", {
+        headers: {
+          Authorization: authHeader,
+        },
+      })
+      .then((response) => {
+        setUserRole(response.data.role || null);
+      })
+      .catch(() => {
+        setUserRole(null);
+      });
+  }, [isLoggedIn]);
+  
+  
   const getUserInfoLink = () => {
     return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/mypage-user";
   };
