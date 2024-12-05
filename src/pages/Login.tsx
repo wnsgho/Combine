@@ -14,7 +14,7 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // 일반 로그인
+  // 일반 로그인 메세지 + 백엔드 요청
   const handleLogin = async () => {
     if (!email && !password) {
       alert("이메일과 비밀번호를 입력해주세요.");
@@ -39,20 +39,28 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const response = await axiosInstance.post("/login", {
-        username: email,
-        password,
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+  
+      const response = await axiosInstance.post("/login", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", 
+        },
       });
-
-      localStorage.setItem("accessToken", response.data.accessToken);
+  
+    const accessToken = response.headers.authorization;
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
       alert("로그인 되었습니다.");
       navigate("/");
-    } catch (error) {
-      console.error("로그인 실패:", error);
-      alert("로그인을 할 수 없습니다.");
-    } finally {
-      setLoading(false);
+    } else {
+      alert("토큰이 반환되지 않았습니다. 다시 시도해주세요.");
     }
+  } catch (error) {
+    console.error("로그인 실패:", error);
+    alert("로그인에 실패했습니다.");
+  }
   };
 
   // 카카오 로그인
