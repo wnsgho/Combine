@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import Header from "../../components/Header";
 
 // userID가 뭔지 알고 전역으로 설정해 놔야할듯
 const QAandAEdit = () => {
@@ -79,6 +80,8 @@ const QAandAEdit = () => {
     ];
 
   return (
+    <div>
+      <Header/>
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto ">
         <div className=" relative">
@@ -129,6 +132,7 @@ const QAandAEdit = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

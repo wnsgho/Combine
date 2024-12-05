@@ -3,13 +3,15 @@ import Walk from "../../../public/walk.png";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Header from "../../components/Header";
 
 interface QnA {
   id:number;
   title:string;
   content:string;
-  userName:string;
-  createdAt:string;
+  writerName:string;
+  viewCount:number;
+  created_at:string;
 }
 
 const QAndA = () => {
@@ -19,8 +21,10 @@ const QAndA = () => {
   useEffect(() => {
     const fetchQnA = async () => {
       try{
-        const response = await axios.get("http://15.164.103.160:8080/api/v1/inquries")
-        setQnA(response.data)
+        const response = await axios.get("http://15.164.103.160:8080/api/v1/inquiries")
+        if (response.data && response.data.content) {
+          setQnA(response.data.content);
+        }
       }catch(error){
         console.error("호출 실패", error)
       }
@@ -29,6 +33,8 @@ const QAndA = () => {
   },[])
 
   return (
+    <div>
+      <Header/>
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto ">
         <div className=" relative">
@@ -44,44 +50,27 @@ const QAndA = () => {
           <thead>
             <tr className="text-[28px] ">
               <th className="px-8 pb-5  text-center">번호</th>
-              <th className="w-[752px] px-4 pb-5">제목</th>
+              <th className="w-[588px] px-4 pb-5">제목</th>
+              <th className="px-10 pb-5  text-center">조회수</th>
               <th className="px-10 pb-5  text-center">작성자</th>
               <th className="px-10 pb-5  text-center">작성일</th>
             </tr>
           </thead>
           <tbody>
-            {/* {QnA.map((QnA) => (
-              <tr className="text-[20px] cursor-pointer " key={QnA.id}>
+            {QnA.map((QnA) => (
+              <tr className="text-[20px] " key={QnA.id}
+              >  
               <td className=" text-center">{QnA.id}</td>
-              <td className="text-left px-4 py-5 font-normal max-w-[588px] whitespace-nowrap overflow-hidden truncate">
-              <td className="font-norma text-center">{QnA.userName}</td>
-                <NavLink to="/guide/qna/{QnA.id}">
+              <td className="text-left px-4 py-5 font-normal max-w-[508px] whitespace-nowrap overflow-hidden truncate cursor-pointer "
+             onClick={()=> navigate(`/guide/qna/${QnA.id}`)}>
                   {QnA.title}
-                </NavLink>
-              </td>
-              <td className="font-normal text-center">{QnA.createdAt}</td>
-            </tr>
-            ))} */}
-            <tr className="text-[20px] cursor-pointer">
-              <td className=" text-center">2</td>
-              <td className="text-left px-4 py-5 font-normal max-w-[588px] whitespace-nowrap overflow-hidden truncate">
-                <td onClick={() => navigate("/guide/qna/postId")}>
-                  분양은 어떻게 진행되나요?분양은 어떻게 진행되나요?분양은 어떻게 진행되나요?분양은 어떻게 진행되나요?
                 </td>
-              </td>
-              <td className="font-norma text-center">김*시</td>
-              <td className="font-normal text-center">2024-11-21</td>
+              <td className="font-norma text-center">{QnA.viewCount}</td>
+              <td className="font-norma text-center">{QnA.writerName}</td>
+              
+              <td className="font-normal text-center">{QnA.created_at}</td>
             </tr>
-            <tr className="text-[20px] cursor-pointer">
-              <td className=" text-center">1</td>
-              <td
-                onClick={() => navigate("/guide/qna/postId")}
-                className="text-left px-4 py-3 font-normal max-w-[588px] whitespace-nowrap overflow-hidden truncate">
-                분양은 어떻게 진행되나요?
-              </td>
-              <td className="font-norma text-center">김*시</td>
-              <td className="font-normal text-center">2024-11-20</td>
-            </tr>
+            ))}
           </tbody>
         </table>
             <div
@@ -92,6 +81,7 @@ const QAndA = () => {
             </div>
           
       </div>
+    </div>
     </div>
   );
 };

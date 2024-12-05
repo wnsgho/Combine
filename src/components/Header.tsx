@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import useUserStore from "../store/store";
 
 const Header = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -9,6 +10,9 @@ const Header = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
 
+  // Zustand 사용자 역할 가져오기
+  const setRoleSave = useUserStore((state) => state.setRole); 
+  
   const navigate = useNavigate();
 
   const showDropdown = () => setIsDropdownVisible(true);
@@ -69,9 +73,11 @@ const Header = () => {
       })
       .then((response) => {
         setUserRole(response.data.role || null);
+        setRoleSave(response.data.role || null); // zustand 상태 저장
       })
       .catch(() => {
         setUserRole(null);
+        setRoleSave(null) // zustand 상태 저장
       });
   }, [isLoggedIn]);
   
