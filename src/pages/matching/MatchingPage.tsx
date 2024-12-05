@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import mainImage from '../../assets/image/mainimage.webp'; //임시사진
 import { GoChevronRight } from "react-icons/go";
-import axios from 'axios';
-
+import axiosInstance from "../../utils/axiosInstance";
 
 interface ProcessedPet {
   petId: number;
@@ -16,11 +15,16 @@ interface ProcessedPet {
   imageUrls: string[];
 }
 
+interface UseRole {
+  role: string;
+}
 
 const MatchingPage = () => {
   const [pets, setPets] = useState<ProcessedPet[]>([]); // 동물 데이터 저장 상태
 
-  const [ifshelter, setIfShelter] = useState("");
+  const [useRole, setUseRole] = useState({
+    role: ""
+  });
 
   const [filters, setFilters] = useState({
     species: "",
@@ -28,14 +32,22 @@ const MatchingPage = () => {
     size: ""
   });
 
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
+
+
 
   useEffect(() => {
     const fetchPetList = async () => {
       try {
-        const response = await axios.get('/api/v1/pets'); // API 호출
+        const response = await axiosInstance.get('/api/v1/pets'); // API 호출
         setPets(response.data); // API에서 받은 데이터를 상태에 저장
-        const userRole = await axios.get(`/api/v1/features/role`); // 현재 로그인 유저 role 확인 API 호출
-        setIfShelter(userRole.data)
+        const userRole = await axiosInstance.get(`/api/v1/features/role`, {headers}); // 현재 로그인 유저 role 확인 API 호출
+        setUseRole(userRole.data)
       } catch (error) {
         console.error("동물 리스트를 불러오는 중 오류 발생:", error);
       }
@@ -44,7 +56,7 @@ const MatchingPage = () => {
     fetchPetList(); // 데이터 가져오기 함수 실행
   }, []); 
 
-  const shelter = ifshelter == "ROLE_SHELTER"
+  const shelter = useRole.role == "ROLE_SHELTER"
 
   // 필터 변경 시 호출되는 핸들러
   const filterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -87,20 +99,20 @@ const detailLink = (petId:number) => {
           <form className="flex flex-wrap max-w-xl gap-20 mx-10">
             <select id="species" className="text-3xl border-2 border-mainColor" onChange={filterChange}>
               <option value="">종류</option>
-              <option value="dog">강아지</option>
-              <option value="cat">고양이</option>
+              <option value="강아지">강아지</option>
+              <option value="고양이">고양이</option>
             </select>
             <select id="age" className="text-3xl border-2 border-mainColor" onChange={filterChange}>
               <option value="">연령</option>
-              <option value="young">0~3살</option>
-              <option value="middleAge">4~6살</option>
-              <option value="oldAge">7~10살</option>
+              <option value="0~3살">0~3살</option>
+              <option value="4~6살">4~6살</option>
+              <option value="7~8살">7~10살</option>
             </select>
             <select id="size" className="text-3xl border-2 border-mainColor" onChange={filterChange}>
               <option value="">크기</option>
-              <option value="small">소형</option>
-              <option value="medium">중형</option>
-              <option value="large">대형</option>
+              <option value="소형">소형</option>
+              <option value="중형">중형</option>
+              <option value="대형">대형</option>
             </select>
           </form>     
           <button 

@@ -1,53 +1,69 @@
 import React, { useEffect, useState } from "react";
 import { GoX } from "react-icons/go";
 import Header from "../../components/Header";
+import axiosInstance from "../../utils/axiosInstance"; 
 import axios from "axios";
 
 interface PetAdd {
+  petName: string;
   species: string;
-  name: string;
+  size: string;
   age: string;
   gender: string;
-  reason: string;
-  inoculation: string;
   neutering: string;
+  reason: string;
+  preAdoption: string;
+  vaccinated: string;
+  extra?: string;
   personality: string;
   exerciseLevel: number;
-  size: string;
-  home: string;
-  shelterName: string;
-  add: string;
   shelterId: number;
+  imageUrls: File[]
 }
 
 interface ShelterName {
   shelterName: string;
 }
 
+interface UseId {
+  Id: number;
+}
+
 
 const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
-  const [Id, setId] = useState(0);
+  const [useId, setUseId] = useState<UseId>({
+    Id: 0
+  });
+
   const [shelterInfo, setShelterInfo] = useState({
     shelterName: ""
   });
+
   const [addPet, setAddPet] = useState<PetAdd>({
+    petName: "",
     species: "",
-    name: "",
+    size: "",
     age: "",
     gender: "",
-    reason: "",
-    inoculation: "", 
     neutering: "",
+    reason: "",
+    preAdoption: "", 
+    vaccinated: "",
+    extra: "",
     personality: "",
     exerciseLevel: 0,
-    size: "",
-    home: "",
-    shelterName: "",
-    add: "",
-    shelterId: Id 
+    shelterId: useId.Id,
+    imageUrls: postImg
   });
+
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
 
 
 
@@ -55,8 +71,8 @@ const DetailPage = () => {
   useEffect(() => {
     const shelterId = async () => {
       try {
-        const response = await axios.get<number>(`/api/v1/features/check-id`);
-        setId(response.data);
+        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
+        setUseId(response.data);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
       }
@@ -65,16 +81,19 @@ const DetailPage = () => {
   }, [])
 
   useEffect(() => {
-    const shelterInfo = async () => {
-      try {
-        const response = await axios.get<ShelterName>(`/api/v1/shelters/${Id}`);
-        setShelterInfo(response.data);
-      } catch(error) {
-        console.error("보호소 정보를 불러오는 중 오류 발생:", error);
-      }
-    };
-    shelterInfo();
-  }, [Id])
+    if(useId.Id !== 0){
+      console.log(useId.Id)
+      const shelterInfo = async () => {
+        try {
+          const response = await axiosInstance.get<ShelterName>(`/api/v1/shelters/${useId.Id}`);
+          setShelterInfo(response.data);
+        } catch(error) {
+          console.error("보호소 정보를 불러오는 중 오류 발생:", error);
+        }
+      };
+      shelterInfo();
+    }
+  }, [useId.Id])
 
 
 
@@ -113,7 +132,7 @@ const DetailPage = () => {
     const { id, value } = e.target;
     setAddPet((prev) => ({
       ...prev,
-      [id]: value,
+      [id]: id === 'exerciseLevel' ? parseInt(value, 10) : value,
     }));
   };
 
@@ -133,13 +152,19 @@ const DetailPage = () => {
     // Add shelterName explicitly
     formData.append("shelterName", shelterInfo.shelterName);
   
-    // Add images
-    postImg.forEach((file) => {
-      formData.append("imageUrls", file);
-    });
+    // Convert images to URLs and add them
+    const imageUrls = await Promise.all(postImg.map(async (file) => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+    }));
+  
+    formData.append("imageUrls", JSON.stringify(imageUrls));
   
     try {
-      await axios.post(`/api/v1/pets/${Id}`, formData, {
+      await axios.post(`/api/v1/pets/${useId.Id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -216,8 +241,8 @@ const DetailPage = () => {
               </select>
             </div>
             <div className="flex items-center justify-between">
-              <label htmlFor="name" className="text-xl">이름</label>
-              <input type="text" id="name" placeholder="예) 코코, 흰둥이" className="pl-3 w-36" onChange={InputChange}/>
+              <label htmlFor="petName" className="text-xl">이름</label>
+              <input type="text" id="petName" placeholder="예) 코코, 흰둥이" className="pl-3 w-36" onChange={InputChange}/>
             </div>
             <div className="flex items-center justify-between">
               <label htmlFor="age" className="text-xl">연령</label>
@@ -241,8 +266,8 @@ const DetailPage = () => {
               <input type="text" id="reason" placeholder="예) 유기, 보호자 병환" className="pl-2 w-36" onChange={InputChange}/>
             </div>
             <div className="flex items-center justify-between">
-              <label htmlFor="inoculation" className="text-xl">접종 유무</label>
-              <select id="inoculation" className="pl-2 text-xs border bg-gray-50 border-mainColor" onChange={InputChange}>
+              <label htmlFor="vaccinated" className="text-xl">접종 유무</label>
+              <select id="vaccinated" className="pl-2 text-xs border bg-gray-50 border-mainColor" onChange={InputChange}>
                 <option selected>접종유무</option>
                 <option value="1">1차</option>
                 <option value="2">2차</option>
@@ -291,21 +316,12 @@ const DetailPage = () => {
               </select>
             </div>
             <div className="flex items-center justify-between">
-              <label htmlFor="home" className="text-xl">맡겨지기 전 가정환경</label>
-              <input type="text" id="home" placeholder="예) 임시보호, 사육장" className="pl-2 w-36" onChange={InputChange}/>
+              <label htmlFor="preAdoption" className="text-xl">맡겨지기 전 가정환경</label>
+              <input type="text" id="preAdoption" placeholder="예) 임시보호, 사육장" className="pl-2 w-36" onChange={InputChange}/>
             </div>
             <div className="flex items-center justify-between">
-              <label htmlFor="shelterName" className="text-xl">보호기관</label>
-              <input
-                id="shelterName"
-                className="pl-2 bg-gray-100 cursor-not-allowed w-36" // 읽기 전용 스타일 추가
-                value={shelterInfo.shelterName} // 보호소 이름
-                readOnly // 읽기 전용으로 설정
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="add" className="text-xl">추가 정보(선택사항)</label>
-              <input type="text" id="add" placeholder="동물 추가정보 작성" className="pl-2 w-36" onChange={InputChange}/>
+              <label htmlFor="extra" className="text-xl">추가 정보(선택사항)</label>
+              <input type="text" id="extra" placeholder="동물 추가정보 작성" className="pl-2 w-36" onChange={InputChange}/>
             </div>
           </div>
         </section>

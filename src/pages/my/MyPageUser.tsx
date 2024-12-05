@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from "../../utils/axiosInstance"; 
 import { Link } from 'react-router-dom';
 import { GoChevronRight } from "react-icons/go";
 import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
 
-import matching from '../../assets/image/matching.png';
-import check from '../../assets/image/check.png';
-import complete from '../../assets/image/complete.png';
-import bar from '../../assets/image/bar.png';
 import mainImage from '../../assets/image/mainimage.webp'
 
 
@@ -17,7 +13,7 @@ interface UserInfo {
   id: string;
   email: string;
   username: string;
-  birthdate: string;
+  birthDate: string;
   phoneNumber: string;
   address: string;
   preferredSize: string;
@@ -42,8 +38,8 @@ interface PetInfo {
   applyStatus: string;
 }
 
-interface UserId {
-  Id: string;
+interface UseId {
+  Id: number;
 }
 
 
@@ -55,7 +51,7 @@ const MyPageUser: React.FC = () => {
     id: "",
     email: "",
     username: "",
-    birthdate: "",
+    birthDate: "",
     phoneNumber: "",
     address: "",
     preferredSize: "",
@@ -81,25 +77,23 @@ const MyPageUser: React.FC = () => {
   });
 
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
-  const [userId, setUserId] = useState<UserId>({
-    Id: ""
+  const [useId, setUseId] = useState<UseId>({
+    Id: 0
   })
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzE4Mzg1LCJleHAiOjE3MzM0MDQ3ODV9.xKq3ixNIOYKkXDufds-hcKOoR_OiIk_Kn6_zbAMyupw"
-  
-  const url = "http://15.164.103.160:8080"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzU4MTgzLCJleHAiOjE3MzM0NDQ1ODN9.yhrBc95Ii_bLZeNNpEI1hCfoW49uKUturPGfYJmSTkU"
 
-  const Id = userId.Id
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
+
 
   // ID 불러오기
   useEffect(() => {
     const userId = async () => {
       try {
-        const response = await axios.get(`${url}/api/v1/features/check-id`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setUserId(response.data);
+        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
+        setUseId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
       }
@@ -109,46 +103,35 @@ const MyPageUser: React.FC = () => {
 
   // 유저, 펫 정보 가져오기
   useEffect(() => {
-    const userInfo = async () => {
-      try {
-        const response = await axios.get<UserInfo>(`${url}/api/v1/users/${Id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setUserInfo(response.data);
-        console.log("유저 데이터 OK??", response)
-      } catch (error) {
-        console.error('유저 정보를 불러오는 중 오류 발생:', error);
-      }
-    };
-    userInfo();
+    if(useId.Id !== 0){
+      const userInfo = async () => {
+        try {
+          const response = await axiosInstance.get<UserInfo>(`/api/v1/users/${useId.Id}`, {headers});
+          setUserInfo(response.data);
+        } catch (error) {
+          console.error('유저 정보를 불러오는 중 오류 발생:', error);
+        }
+      };
 
-  }, [Id]);
+      const petInfo = async () => {
+        try {
+          const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
+          setPetInfo(response.data);
+        }catch(error) {
+          console.error('동물 정보를 불러오는 중 오류 발생:', error);
+        }
+      };
 
-  useEffect(() => {
-    const petInfo = async () => {
-      try {
-        const response = await axios.get<PetInfo>(`${url}/api/v1/applypet/${Id}/list`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setPetInfo(response.data);
-      }catch(error) {
-        console.error('동물 정보를 불러오는 중 오류 발생:', error);
-      }
-    };
-    petInfo();
-  }, [Id])
+      userInfo();
+      petInfo();
+    }
+  }, [useId.Id]);
+
+
 
   const deleteApply = async() => {
     try{
-      await axios.post(`${url}/api/v1/applypet/${petInfo.id}/cancel?userId=${Id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await axiosInstance.post(`/api/v1/applypet/${petInfo.id}/cancel?userId=${useId.Id}`, {headers});
     }catch(error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
     }
@@ -200,11 +183,7 @@ const MyPageUser: React.FC = () => {
 
 
     try {
-      await axios.put(`${url}/api/v1/users/${Id}`, userInfo , {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await axiosInstance.put(`/api/v1/users/${useId.Id}`, userInfo , {headers});
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -216,11 +195,7 @@ const MyPageUser: React.FC = () => {
   // 회원 탈퇴 처리
   const DeleteAccount = async (): Promise<void> => {
     try {
-      await axios.delete(`${url}/api/v1/users/${Id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await axiosInstance.delete(`/api/v1/users/${useId.Id}`, {headers});
       alert('회원탈퇴가 완료되었습니다.');
       setDeleteModalOpen(false);
     } catch (error) {
@@ -259,7 +234,7 @@ const MyPageUser: React.FC = () => {
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">생년월일</p>
-              <p className='text-lg'>{userInfo.birthdate}</p>
+              <p className='text-lg'>{userInfo.birthDate}</p>
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">전화번호</p>
@@ -356,7 +331,7 @@ const MyPageUser: React.FC = () => {
               <input
                 type="text"
                 name="birthdate"
-                value={userInfo.birthdate}
+                value={userInfo.birthDate}
                 onChange={editChange}
                 className="block w-full p-2 border rounded"
               />

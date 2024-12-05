@@ -2,27 +2,29 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import Header from "../../components/Header";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance"; 
 import MyPageModal from "../../components/MyPageModal";
 
-
-
 interface PetInfo {
+  petId: number;
+  petName: string;
   species: string;
-  name: string;
-  age: string;
+  size: string;
+  age: number;
   gender: string;
-  reason: string;
-  inoculation: string;
   neutering: string;
+  reason: string;
+  preAdoption: string;
+  vaccinated: string;
+  extra: string;
   personality: string;
   exerciseLevel: number;
-  size: string;
-  home: string;
-  shelterName: string;
-  add: string;
-  imageUrls: [];
+  imageUrls: string[];
   shelterId: number;
+}
+
+interface UseId {
+  Id: number;
 }
 
 
@@ -35,20 +37,20 @@ const DetailReadPage = () => {
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
 
   const [petInfo, setPetInfo] = useState({
-    species: '',
-    name: '',
-    age: '',
-    gender: '',
-    reason: '',
-    inoculation: '',
-    neutering: '',
-    personality: '',
-    exerciseLevel: 0,  
-    size: '',
-    home: '',
-    shelterName: '',
-    add: '',
-    imageUrls: [],
+    petId: 0,
+    petName: "",
+    species: "",
+    size: "",
+    age: 0,
+    gender: "",
+    neutering: "",
+    reason: "",
+    preAdoption: "",
+    vaccinated: "",
+    extra: "",
+    personality: "",
+    exerciseLevel: 0,
+    imageUrls: [""],
     shelterId: 0
   })
 
@@ -57,13 +59,20 @@ const DetailReadPage = () => {
     userId: 0
   })
 
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzU4MTgzLCJleHAiOjE3MzM0NDQ1ODN9.yhrBc95Ii_bLZeNNpEI1hCfoW49uKUturPGfYJmSTkU"
+
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
+
 
 
   // 동물 상세정보 불러오기
   useEffect(() => {
     const pets = async () => {
       try{
-        const response = await axios.get<PetInfo>(`/api/v1/pets/${petId}`);
+        const response = await axiosInstance.get<PetInfo>(`/api/v1/pets/${petId}`);
         setPetInfo(response.data);
       }catch(error) {
         console.error("동물 상세정보 불러오는 중 오류 발생", error)
@@ -76,7 +85,7 @@ const DetailReadPage = () => {
   useEffect(() => {
     const userId = async () => {
       try{
-        const response = await axios.get(`/api/v1/features/user-id`);
+        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
         setApplyInfo(response.data);
       }catch(error) {
         console.error("유저 ID 불러오는 중 오류 발생", error)
@@ -99,7 +108,7 @@ const DetailReadPage = () => {
   useEffect(() => {
     const roles = async () => {
       try{
-        const response = await axios.get(`/api/v1/features/role`);
+        const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
         setRole(response.data);
       }catch(error) {
         console.error("유저 Role 불러오는 중 오류 발생", error)
@@ -111,21 +120,28 @@ const DetailReadPage = () => {
   // 입양 신청 
   const applypet = async () => {
     try {
-      await axios.post(`/api/v1/applypet`, applyInfo, {
+      await axiosInstance.post(`/api/v1/applypet`, null, {
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
+        },
+        params: {
+          petId: petId,
+          userId: applyInfo.userId
         }
       });
     } catch (error) {
       console.error("입양 신청 보내는 중 오류 발생", error);
     }
   };
+  
+  
 
 
   // 보호소 동물 삭제
   const deletePet = async () => {
     try {
-      await axios.delete(`/api/v1/pets/${applyInfo.userId}/${petId}`);
+      await axiosInstance.delete(`/api/v1/pets/${applyInfo.userId}/${petId}`);
     } catch (error) {
       console.error("동물 삭제 중 오류 발생", error);
     }
@@ -199,7 +215,7 @@ const DetailReadPage = () => {
 
         <section className="flex flex-col w-full max-w-lg gap-8 mt-8">
           <div className="flex justify-center">
-            <h3 className="text-2xl font-bold text-mainColor">{petInfo.name}</h3>
+            <h3 className="text-2xl font-bold text-mainColor">{petInfo.petName}</h3>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
@@ -218,7 +234,7 @@ const DetailReadPage = () => {
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">접종 유무</p>
-              <p className="text-lg">{petInfo.inoculation}</p>
+              <p className="text-lg">{petInfo.vaccinated}</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
@@ -244,20 +260,12 @@ const DetailReadPage = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">맡겨지기 전 가정환경</p>
-              <p className="text-lg">{petInfo.home}</p>
+              <p className="text-lg">{petInfo.preAdoption}</p>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-xl font-bold text-mainColor">보호기관</p>
-            <Link to={linkMap}>
-              <button className="flex items-center gap-1 text-lg text-blue-500">
-                {petInfo.shelterName} <GoChevronRight />
-              </button>
-            </Link>
-          </div>
-          <div className="flex items-center justify-between">
             <p className="text-xl font-bold text-mainColor">추가정보</p>
-            <p className="text-lg">{petInfo.add}</p>
+            <p className="text-lg">{petInfo.extra}</p>
           </div>
         </section>
         {shelter ?  <section className="flex gap-24 my-8">

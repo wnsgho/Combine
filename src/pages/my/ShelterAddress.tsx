@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance"; 
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -14,42 +14,59 @@ interface ShelterInfo {
   address: string;
 }
 
+interface UserId {
+  Id: number;
+}
+
+interface UseRole {
+  role: string;
+}
 
 const ShelterAddress: React.FC = () => {
-  const { shelterId } = useParams();
+  const { useId } = useParams();
   const mapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate(); // useNavigate 훅 사용
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userId, setUserId] = useState<string>("");
-  const [role, setRole] = useState<string>("")
+  const [userId, setUserId] = useState<UserId>({
+    Id: 0
+  });
+  const [useRole, setUseRole] = useState<UseRole>({
+    role: ""
+  })
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
     shelterName: "",
     address: "",
     phoneNumber: "",
   });
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
-  // const url = "http://15.164.103.160:8080"
 
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
 
   // ID, ROLE 불러오기
   useEffect(() => {
     const shelterId = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/check-id`);
+        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
         setUserId(response.data.id);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
       }
     };
-    shelterId();
+
     const shelterRole = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/role`);
-        setRole(response.data);
+        const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
+        setUseRole(response.data);
       }catch(error) {
         console.error("Role 불러오는 중 오류 발생:", error);
       }
     }
+    
+    shelterId();
     shelterRole();
   }, [])
 
@@ -58,7 +75,7 @@ const ShelterAddress: React.FC = () => {
   useEffect(() => {
     const shelterInfo = async () => {
       try {
-        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${shelterId}`);
+        const response = await axiosInstance.get<ShelterInfo>(`/api/v1/shelters/${useId}`, {headers});
         setShelterInfo(response.data);
       } catch (error) {
         console.error("보호소 정보를 불러오는 중 오류 발생:", error);
@@ -143,7 +160,7 @@ const ShelterAddress: React.FC = () => {
     if (!shelterInfo) return;
 
     try {
-      await axios.put(`/api/v1/shelter/${userId}`, shelterInfo);
+      await axiosInstance.put(`/api/v1/shelter/${userId}`, shelterInfo);
       alert('정보가 수정되었습니다.');
       setIsModalOpen(false)
     } catch (error) {
@@ -158,7 +175,7 @@ const ShelterAddress: React.FC = () => {
   };
 
 
-  const shelter = role == "ROLE_SHELTER" && userId == shelterId;
+  const shelter = useRole.role == "ROLE_SHELTER"
 
 
   return (
@@ -176,10 +193,6 @@ const ShelterAddress: React.FC = () => {
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">주소</p>
               <p className="text-lg">{shelterInfo.address}</p>
-            </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">전화번호</p>
-              <p className="text-lg">{shelterInfo.phoneNumber}</p>
             </div>
           </div>
         </section>

@@ -76,14 +76,13 @@ const DetailCorrect = () => {
       try{
         const response = await axios.get(`/api/v1/features/user-id`);
         setUserId(response.data);
+        
       }catch(error) {
         console.error("유저 아이디를 불러오는 중 에러 발생", error);
       }
     }
     userId();
   }, [])
-
-
 
   const petInfos = async () => {
     try {
