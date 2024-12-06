@@ -100,7 +100,7 @@ const Login = () => {
             <div className="text-sm md:text-2xl lg:text-2xl xl:text-3xl text-gray-600 flex items-center gap-1">
               <p>회원이 아니신가요?</p>
               <p
-                className="font-bold cursor-pointer transition-transform transform hover:scale-105 pl-"
+                className="font-bold cursor-pointer transition-transform transform hover:scale-105 pl-3"
                 onClick={() => navigate("/signup")}
               >
                 회원가입하기

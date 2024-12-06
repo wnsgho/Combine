@@ -17,67 +17,84 @@ const HeaderLogin = () => {
 
   const handleLogout = async () => {
     const accessToken = localStorage.getItem("accessToken");
-  
+
     if (!accessToken) {
-      alert("이미 로그아웃 상태입니다.");
-      setIsLoggedIn(false); 
+      alert("이미 로그아웃 되어 있는 상태입니다.");
+      setIsLoggedIn(false);
+      localStorage.removeItem("isSocialLogin");
       navigate("/");
       return;
     }
-  
+
     try {
+      const authHeader = accessToken.startsWith("Bearer ")
+        ? accessToken
+        : `Bearer ${accessToken}`;
+
       const response = await axiosInstance.post(
         "/logout",
         {},
-        {
-          headers: {
-            Authorization: accessToken,
-          },
-        }
+        { headers: { Authorization: authHeader } }
       );
-  
+
       if (response.status === 200) {
         localStorage.removeItem("accessToken");
-        setIsLoggedIn(false); 
+        localStorage.removeItem("isSocialLogin");
+        setIsLoggedIn(false);
         alert("로그아웃 되었습니다.");
+        window.dispatchEvent(new Event("storage"));
         navigate("/");
       }
     } catch (error) {
+      alert("로그아웃을 할 수 없습니다.");
       console.error("로그아웃 실패:", error);
-      alert("로그아웃에 실패했습니다.");
     }
   };
-  
+
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!accessToken);
-
-    if (!accessToken) {
-      setUserRole(null);
-      return;
-    }
-
-    const authHeader = accessToken.startsWith("Bearer ")
-      ? accessToken
-      : `Bearer ${accessToken}`;
-
-    axiosInstance
-      .get("/api/v1/features/role", {
-        headers: {
-          Authorization: authHeader,
-        },
-      })
-      .then((response) => {
-        setUserRole(response.data.role || null);
-      })
-      .catch(() => {
+    const updateLoginState = () => {
+      const accessToken = localStorage.getItem("accessToken");
+  
+      setIsLoggedIn(!!accessToken);
+  
+      if (accessToken) {
+        const authHeader = accessToken.startsWith("Bearer ")
+          ? accessToken
+          : `Bearer ${accessToken}`;
+  
+        axiosInstance
+          .get("/api/v1/features/role", {
+            headers: { Authorization: authHeader },
+          })
+          .then((response) => {
+            setUserRole(response.data.role || null);
+          })
+          .catch((error) => {
+            setIsLoggedIn(false);
+            setUserRole(null);
+            console.error("사용자 역할 가져오기 실패:", error);
+          });
+      } else {
         setUserRole(null);
-      });
-  }, [isLoggedIn]);
+      }
+    };
   
+    updateLoginState();
   
+    const handleStorageChange = () => {
+      updateLoginState();
+    };
+  
+    window.addEventListener("storage", handleStorageChange);
+  
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+  
+
   const getUserInfoLink = () => {
-    return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/my-info";
+    return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/mypage-user";
   };
 
   return (

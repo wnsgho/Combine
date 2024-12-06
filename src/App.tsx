@@ -8,7 +8,6 @@ import Main from "./pages/Main";
 import Facilities from "./pages/guide/Facilities";
 import WalkingCourse from "./pages/guide/WalkingCourse";
 import MyWalkingCourse from "./pages/MyWalkingCourse";
-import MyInfo from "./pages/MyInfo";
 import MatchingPage from "./pages/matching/MatchingPage";
 import DetailPage from "./pages/matching/DetailPage";
 import DetailReadPage from "./pages/matching/DetailReadPage";
@@ -35,15 +34,10 @@ import AuthResponse from "./pages/AuthResponse";
 function App() {
 
   const errorCode = 404;
-
-  useEffect(() => {
-    localStorage.removeItem("accessToken");
-  }, []);
   
   return (
     <Router>
       <Routes>
-        <Route path="/auth/oauth-response/:token/:expiresIn" element={<AuthResponse />} />
         <Route path="/" element={<Main />} /> {/* 메인 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
         <Route path="/signup" element={<Signup />} /> {/* 회원가입 페이지 */}
@@ -65,18 +59,17 @@ function App() {
         <Route path="/guide/facilities" element={<Facilities />} /> {/* 반려동물 관련 시설 페이지 */}
         <Route path="/guide/walking-course" element={<WalkingCourse />} /> {/* 산책 코스 페이지 */}
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}
-        <Route path="/my-info" element={<MyInfo />} /> {/* 내정보 페이지 */}
         <Route path="/prefer" element={<PreferPage />} /> {/* 선호동물 입력 및 수정 페이지 */}
         <Route path="/matching" element={<MatchingPage />} /> {/* 반려동물 매칭 페이지 */}
         <Route path="/detailadd" element={<DetailPage />} /> {/* 반려동물 상세정보 작성 페이지 (보호소) */}
-        <Route path="/detail/:petId" element={<DetailReadPage />} /> {/* 반려동물 상세정보 페이지 */}
-        <Route path="/detail-correct/:petId" element={<DetailCorrect />} /> {/* 반려동물 상세정보 수정 페이지 (보호소) */}
+        <Route path="/detail" element={<DetailReadPage />} /> {/* 반려동물 상세정보 페이지 */}
+        <Route path="/detail-correct" element={<DetailCorrect />} /> {/* 반려동물 상세정보 수정 페이지 (보호소) */}
         <Route path="/mypage-user" element={<MyPageUser />} /> {/* 마이페이지 (유저) */}
         <Route path="/mypage-shelter" element={<MyPageShelter />} /> {/* 마이페이지 (보호소) */}
-        <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
-        <Route path="/shelter-address/:useId" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
-        <Route path="/adoption-list/:shelterId" element={<AdoptionList />} /> {/* 입양리스트 페이지 */}
+        <Route path="/shelter-address" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
+        <Route path="/adoption-list" element={<AdoptionList />} /> {/* 입양리스트 페이지 */}
         <Route path="/errorpage" element={<Error errorCode={errorCode}/>} /> {/* 에러페이지 (임시로 이곳에 위치) */}
+        <Route path="/auth/oauth-response/:token/:expiresIn" element={<AuthResponse />} /> {/* 소셜 로그인 */}
       </Routes>
     </Router>
 
@@ -84,4 +77,3 @@ function App() {
 }
 
 export default App;
-
