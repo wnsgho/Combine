@@ -178,8 +178,8 @@ const CreateUser1 = () => {
       alert("전화번호를 입력해주세요.");
       return false;
     } else if (!phoneNumberRegex.test(phoneNumber)) {
-      setPhoneNumberError("유효한 전화번호 형식이 아닙니다.");
-      alert("유효한 전화번호 형식이 아닙니다.");
+      setPhoneNumberError("유효한 전화번호 형식이 아닙니다.(예: 010-0000-0000)");
+      alert("유효한 전화번호 형식이 아닙니다.(예: 010-0000-0000)");
       return false;
     }
 
@@ -189,14 +189,13 @@ const CreateUser1 = () => {
       return false;
     }
 
-    if (preferredExerciseLevel !== null) {
-      const exerciseLevel = Number(preferredExerciseLevel);
-      if (exerciseLevel < 1 || exerciseLevel > 5 || isNaN(exerciseLevel)) {
-        setExerciseLevelError("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
-        alert("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
-        return false;
-      }
+    const exerciseLevel = Number(preferredExerciseLevel);
+    if (exerciseLevel < 1 || exerciseLevel > 5 || isNaN(exerciseLevel)) {
+      setExerciseLevelError("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
+      alert("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
+      return false;
     }
+
 
     return true;
   };
