@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -30,14 +30,20 @@ import Error from "./pages/Error";
 import Worldcup from "./pages/worldcup/Worldcup";
 import AnnouncementEdit from "./pages/guide/AnnouncementEdit";
 import QAandAEdit from "./pages/guide/QAndAEdit";
+import AuthResponse from "./pages/AuthResponse";
 
 function App() {
 
-  const errorCode = 404; 
+  const errorCode = 404;
+
+  useEffect(() => {
+    localStorage.removeItem("accessToken");
+  }, []);
   
   return (
     <Router>
       <Routes>
+        <Route path="/auth/oauth-response/:token/:expiresIn" element={<AuthResponse />} />
         <Route path="/" element={<Main />} /> {/* 메인 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
         <Route path="/signup" element={<Signup />} /> {/* 회원가입 페이지 */}
