@@ -4,6 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../components/Header";
+import useUserStore from "../../store/store";
+
+interface Comment {
+  id: number;
+  content: string;
+  adminName: string;
+  created_at: string;
+}
 
 interface QnA {
   id:number;
@@ -12,6 +20,7 @@ interface QnA {
   writerName:string;
   viewCount:number;
   created_at:string;
+  comments: Comment[];
 }
 
 const QAndA = () => {
@@ -57,18 +66,18 @@ const QAndA = () => {
             </tr>
           </thead>
           <tbody>
-            {QnA.map((QnA) => (
-              <tr className="text-[20px] " key={QnA.id}
+            {QnA.map((item, num) => (
+              <tr className="text-[20px] " key={item.id}
               >  
-              <td className=" text-center">{QnA.id}</td>
+              <td className=" text-center">{QnA.length - num}</td>
               <td className="text-left px-4 py-5 font-normal max-w-[508px] whitespace-nowrap overflow-hidden truncate cursor-pointer "
-             onClick={()=> navigate(`/guide/qna/${QnA.id}`)}>
-                  {QnA.title}
+             onClick={()=> navigate(`/guide/qna/${item.id}`)}>
+                  {item.title}
                 </td>
-              <td className="font-norma text-center">{QnA.viewCount}</td>
-              <td className="font-norma text-center">{QnA.writerName}</td>
+              <td className="font-norma text-center">{item.viewCount}</td>
+              <td className="font-norma text-center">{item.writerName}</td>
               
-              <td className="font-normal text-center">{QnA.created_at}</td>
+              <td className="font-normal text-center">{item.created_at}</td>
             </tr>
             ))}
           </tbody>

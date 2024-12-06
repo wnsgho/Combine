@@ -25,7 +25,12 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
     try {
       await axios.post("http://15.164.103.160:8080/api/v1/faqs", {
         content
-      });
+      },
+    {
+      headers:{
+        Authorization : localStorage.getItem("accessToken")
+      }
+    });
       setContent("");
       alert("작성이 완료 되었습니다.");
     } catch (error) {
@@ -34,7 +39,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
     }
   };
 
-  //질문 불러오기
+  //모든 질문 불러오기
   useEffect(() => {
     const fetchTopFAQ = async () => {
       try {
@@ -53,6 +58,11 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
       await axios.post("http://15.164.103.160:8080/api/v1/faqs", {
         content,
         parentId: selectedTopId
+      },
+      {
+        headers:{
+          Authorization : localStorage.getItem("accessToken")
+        }
       });
       setContent("");
       alert("작성이 완료 되었습니다.");
@@ -67,6 +77,11 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
     try {
       await axios.put(`http://15.164.103.160:8080/api/v1/faqs/${selectedTopId}`, {
         content
+      },
+      {
+        headers:{
+          Authorization : localStorage.getItem("accessToken")
+        }
       });
       alert("수정되었습니다.");
       const response = await axios.get("http://15.164.103.160:8080/api/v1/faqs");
@@ -82,7 +97,12 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
     if (!window.confirm("해당 질문을 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`http://15.164.103.160:8080/api/v1/faqs/${selectedTopId}`);
+      await axios.delete(`http://15.164.103.160:8080/api/v1/faqs/${selectedTopId}`,
+        {
+          headers:{
+            Authorization : localStorage.getItem("accessToken")
+          }
+        });
       alert("삭제되었습니다.");
       const response = await axios.get("http://15.164.103.160:8080/api/v1/faqs");
       setTopContent(response.data);
@@ -98,7 +118,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
   return (
     <div className="bg-white shadow-[0_0_15px_rgba(0,0,0,0.5)] w-96 h-[556px] fixed right-[490px] bottom-2 m-6 z-50 rounded-md">
       {/* 헤더 */}
-      <div className=" bg-green-500 font-bold text-xl px-3 py-2 flex  rounded-t-md content-center justify-between">
+      <div className=" bg-green-500 font-bold text-xl p-3 flex  rounded-t-md content-center justify-between">
         <div>FAQ</div>
         <div className="flex gap-2">
           <div className="cursor-pointer float-end" onClick={() => setEdit(false)}>
@@ -108,7 +128,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
             수정
           </div>
           <div className="cursor-pointer" onClick={Close}>
-            x
+          ✖️
           </div>
         </div>
       </div>
@@ -121,9 +141,13 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
             {/* 최상위 질문 가져오기 */}
           <select
             className="m-4 p-2 border-2 border-black w-[350px]"
-            onChange={(e) => setSelectedTopId(Number(e.target.value))}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              console.log(value)
+              setSelectedTopId(value);
+            }}
             value={selectedTopId || ""}>
-            <option value="">선택하세요</option>
+              <option value="">선택하세요</option>
             {topContent.map((faq) => (
               <option value={faq.faqId} key={faq.faqId}>
                 {faq.content}
@@ -184,10 +208,14 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
           {/* 질문 가져오기 */}
           <select
             className="m-4 p-2 border-2 border-black w-[350px]"
-            onChange={(e) => setSelectedTopId(Number(e.target.value))}
+             onChange={(e) => {
+              const value = Number(e.target.value);
+              console.log(value)
+              setSelectedTopId(value);
+            }}
             value={selectedTopId || ""}>
-            <option value="">선택하세요</option>
-            {topContent.map((faq) => (
+              <option value="">선택하세요</option>
+            {topContent.map((faq) => ( 
               <option value={faq.faqId} key={faq.faqId}>
                 {faq.content}
               </option>

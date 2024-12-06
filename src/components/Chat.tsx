@@ -1,5 +1,6 @@
 import { useState } from "react";
 import logo from "../assets/logo.png";
+import useUserStore from "../store/store";
 
 const Chat = () => {
   const [makeChatRoom, setMakeChatRoom] = useState(false);
