@@ -1,6 +1,7 @@
 import axiosInstance from "../../utils/axiosInstance"; 
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
+import Error from "../Error";
 
 declare global {
   interface Window {
@@ -25,7 +26,8 @@ interface UseRole {
 const ShelterAddress: React.FC = () => {
   const { petId } = useParams();
   const mapRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState<UserId>({
     Id: 0
@@ -40,7 +42,7 @@ const ShelterAddress: React.FC = () => {
   });
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
 
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -54,6 +56,7 @@ const ShelterAddress: React.FC = () => {
         setUserId(response.data);
       } catch(error) {
         console.error("ID를 불러오는 중 오류 발생:", error);
+        handleError(error);
       }
     };
 
@@ -63,6 +66,7 @@ const ShelterAddress: React.FC = () => {
         setUseRole(response.data);
       }catch(error) {
         console.error("Role 불러오는 중 오류 발생:", error);
+        handleError(error);
       }
     }
     
@@ -80,6 +84,7 @@ const ShelterAddress: React.FC = () => {
           setShelterInfo(response.data);
         } catch (error) {
           console.error("보호소 정보를 불러오는 중 오류 발생:", error);
+          handleError(error);
         }
       };
       shelterInfo();
@@ -176,6 +181,16 @@ const ShelterAddress: React.FC = () => {
     navigate(-1); // 이전 페이지로 이동
   };
 
+  // 에러 핸들링 함수
+  const handleError = (error: any) => {
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
+    navigate("/errorpage", { state: { status, message } }); // state로 에러 정보 전달
+  };
+  
+  if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링 방지
+  
+
 
   const shelter = useRole.role == "ROLE_SHELTER" && userId.Id == shelterInfo.shelterId
 
@@ -214,7 +229,10 @@ const ShelterAddress: React.FC = () => {
         }
 
       </div>
-      <div ref={mapRef} className="w-full h-[700px] rounded-lg"></div>
+      <div className="flex justify-center mb-20">
+        <div ref={mapRef} className="w-[600px] h-[300px] rounded-lg border border-black"></div>  
+      </div>
+
 
       {/* 모달 */}
       {isModalOpen && (

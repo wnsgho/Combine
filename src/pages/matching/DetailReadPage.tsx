@@ -4,6 +4,7 @@ import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import Header from "../../components/Header";
 import axiosInstance from "../../utils/axiosInstance"; 
 import MyPageModal from "../../components/MyPageModal";
+import axios from "axios";
 
 interface PetInfo {
   petId: number;
@@ -60,10 +61,13 @@ const DetailReadPage = () => {
 
   const [applyInfo, setApplyInfo] = useState({
     petId: "",
-    userId: 0
   })
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzU4MTgzLCJleHAiOjE3MzM0NDQ1ODN9.yhrBc95Ii_bLZeNNpEI1hCfoW49uKUturPGfYJmSTkU"
+  const [useId, setUseId] = useState({
+    Id: 0
+  })
+
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQwMDkzNiwiZXhwIjoxNzMzNDg3MzM2fQ.tkMnS-erUE_oveQ4Hqj_S6L9SRcdR8bu_RBtCPDHDS4"
 
 
   const headers = {
@@ -90,7 +94,7 @@ const DetailReadPage = () => {
     const userId = async () => {
       try{
         const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
-        setApplyInfo(response.data);
+        setUseId(response.data);
       }catch(error) {
         console.error("유저 ID 불러오는 중 오류 발생", error)
       }
@@ -108,6 +112,7 @@ const DetailReadPage = () => {
     }
   }, [petId]);
 
+
   // 유저 role 불러오기
   useEffect(() => {
     const roles = async () => {
@@ -121,17 +126,19 @@ const DetailReadPage = () => {
     roles();
   }, [])
 
+
+
   // 입양 신청 
   const applypet = async () => {
     try {
-      await axiosInstance.post(`/api/v1/applypet`, null, {
+      await axios.post(`http://15.164.103.160:8080/api/v1/applypet`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         params: {
           petId: petId,
-          userId: applyInfo.userId
+          userId: useId.Id
         }
       });
     } catch (error) {
@@ -145,7 +152,7 @@ const DetailReadPage = () => {
   // 보호소 동물 삭제
   const deletePet = async () => {
     try {
-      await axiosInstance.delete(`/api/v1/pets/${applyInfo.userId}/${petId}`);
+      await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`);
     } catch (error) {
       console.error("동물 삭제 중 오류 발생", error);
     }
@@ -174,9 +181,11 @@ const DetailReadPage = () => {
     return `/adoption-list/${petId}`; // 입양신청 리스트 페이지 URL 생성
   };
 
-  const linkMap = `/shelter-address/${petInfo.petId}`
+  const mapLink = (petId:any) => {
+    return `/shelter-address/${petId}`; // 지도 페이지 URL 생성
+  };
 
-  const shelter = role == "ROLE_SHELTER" && applyInfo.userId == petInfo.shelterId
+  const shelter = role == "ROLE_SHELTER" && useId.Id == petInfo.shelterId
 
   return (
     <>
@@ -270,7 +279,9 @@ const DetailReadPage = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호 기관</p>
-              <p className="text-lg">{petInfo.shelterName}</p>
+              <Link to={mapLink(petId)}>
+                <p className="text-lg">{petInfo.shelterName}</p>
+              </Link>
             </div>
           </div>
           <div className="flex items-center justify-between">

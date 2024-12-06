@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { GoChevronUp, GoChevronDown } from 'react-icons/go';
 import Header from "../../components/Header";
 import MyPageModal from '../../components/MyPageModal';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 // 데이터 타입 정의
 interface Pet {
@@ -54,6 +54,9 @@ const AdoptionList: React.FC = () => {
   // 상태 정의: 각 펫의 상세 정보 표시 여부를 관리
   const [visibleDetails, setVisibleDetails] = useState<Record<number, boolean>>({});
 
+  const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const navigate = useNavigate();
+
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
@@ -64,7 +67,7 @@ const AdoptionList: React.FC = () => {
   const [isRefusalModalOpen, setRefusalModalOpen] = useState<boolean>(false);
 
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
 
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -79,6 +82,7 @@ const AdoptionList: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
+        handleError(error);
       }
     };
     shelterId();
@@ -112,6 +116,7 @@ const AdoptionList: React.FC = () => {
           setPets(updatedPets);
         } catch (error) {
           console.error('데이터를 가져오는 중 오류 발생:', error);
+          handleError(error);
         }
       };
 
@@ -121,6 +126,7 @@ const AdoptionList: React.FC = () => {
           return response.data;
         } catch (error) {
           console.error(`유저 정보를 불러오는 중 오류 발생 (ID: ${applicantId}):`, error);
+          handleError(error);
           return null;
         }
       };
@@ -137,17 +143,26 @@ const AdoptionList: React.FC = () => {
     }));
   };
 
-// 동물 삭제
-const DeleteAccount = async (petId: number): Promise<void> => {
-  try {
-    await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`, {headers});
-    alert('동물 삭제가 완료되었습니다.');
-    setPets((prevPets) => prevPets.filter((pet) => pet.id !== petId)); // 삭제된 펫을 상태에서 제거
-  } catch (error) {
-    console.error('동물 삭제 중 오류 발생:', error);
-    alert('동물 삭제에 실패했습니다.');
-  }
-};
+  // 동물 삭제
+  const DeleteAccount = async (petId: number): Promise<void> => {
+    try {
+      await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`, {headers});
+      alert('동물 삭제가 완료되었습니다.');
+      setPets((prevPets) => prevPets.filter((pet) => pet.id !== petId)); // 삭제된 펫을 상태에서 제거
+    } catch (error) {
+      console.error('동물 삭제 중 오류 발생:', error);
+      alert('동물 삭제에 실패했습니다.');
+    }
+  };
+
+  // 에러 핸들링 함수
+  const handleError = (error: any) => {
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
+    navigate("/errorpage", { state: { status, message } }); // state로 에러 정보 전달
+  };
+      
+  if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링 방지
 
   return (
     <div>

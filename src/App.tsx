@@ -33,7 +33,6 @@ import QAandAEdit from "./pages/guide/QAndAEdit";
 
 function App() {
 
-  const errorCode = 404; 
   
   return (
     <Router>
@@ -68,9 +67,9 @@ function App() {
         <Route path="/mypage-user" element={<MyPageUser />} /> {/* 마이페이지 (유저) */}
         <Route path="/mypage-shelter" element={<MyPageShelter />} /> {/* 마이페이지 (보호소) */}
         <Route path="/myinfo" element={<MyInfo />} /> {/* 내정보 페이지 */}
-        <Route path="/shelter-address/:useId" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
+        <Route path="/shelter-address/:petId" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}
         <Route path="/adoption-list/:shelterId" element={<AdoptionList />} /> {/* 입양리스트 페이지 */}
-        <Route path="/errorpage" element={<Error errorCode={errorCode}/>} /> {/* 에러페이지 (임시로 이곳에 위치) */}
+        <Route path="/errorpage" element={<Error />} /> {/* 에러페이지 (임시로 이곳에 위치) */}
       </Routes>
     </Router>
 

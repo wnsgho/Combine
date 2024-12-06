@@ -15,7 +15,8 @@ interface UseId {
 }
 
 const PreferPage: React.FC = () => {
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
+  const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
@@ -27,7 +28,7 @@ const PreferPage: React.FC = () => {
     preferredExerciseLevel: 0
   })
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzU4MTgzLCJleHAiOjE3MzM0NDQ1ODN9.yhrBc95Ii_bLZeNNpEI1hCfoW49uKUturPGfYJmSTkU"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQwMDkzNiwiZXhwIjoxNzMzNDg3MzM2fQ.tkMnS-erUE_oveQ4Hqj_S6L9SRcdR8bu_RBtCPDHDS4"
 
 
   const headers = {
@@ -43,6 +44,7 @@ const PreferPage: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
+        handleError(error);
       }
     };
     userId();
@@ -73,6 +75,7 @@ const PreferPage: React.FC = () => {
     try {
       await axiosInstance.put(`/api/v1/users/${useId.Id}`, userInfo, {headers});
       alert('정보가 수정되었습니다.');
+      cancel()
     } catch (error) {
       console.error('정보 수정 중 오류 발생:', error);
       alert('정보 수정에 실패했습니다.');
@@ -84,7 +87,14 @@ const PreferPage: React.FC = () => {
     navigate(-1); // 이전 페이지로 이동
   };
 
-  console.log(userInfo)
+  // 에러 핸들링 함수
+  const handleError = (error: any) => {
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
+    navigate("/errorpage", { state: { status, message } }); // state로 에러 정보 전달
+  };
+        
+  if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링 방지
 
   return (
     <>

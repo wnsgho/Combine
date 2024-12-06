@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from "../../utils/axiosInstance"; 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoChevronRight } from "react-icons/go";
 import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
@@ -20,6 +20,7 @@ interface UserInfo {
   preferredPersonality: string;
   preferredExerciseLevel: number;
   userRole: string;
+  password: string;
 }
 
 interface PetInfo {
@@ -47,8 +48,11 @@ const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo>({
     id: "",
+    password: "",
     email: "",
     username: "",
     birthDate: "",
@@ -80,7 +84,7 @@ const MyPageUser: React.FC = () => {
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiaGFoYWhvaG9oaWhpQGVuYXZlci5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMzMzU4MTgzLCJleHAiOjE3MzM0NDQ1ODN9.yhrBc95Ii_bLZeNNpEI1hCfoW49uKUturPGfYJmSTkU"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQwMDkzNiwiZXhwIjoxNzMzNDg3MzM2fQ.tkMnS-erUE_oveQ4Hqj_S6L9SRcdR8bu_RBtCPDHDS4"
 
 
   const headers = {
@@ -94,8 +98,9 @@ const MyPageUser: React.FC = () => {
       try {
         const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
         setUseId(response.data);
-      } catch(error) {
+      } catch(error: any) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
+        handleError(error);
       }
     };
     userId();
@@ -108,8 +113,9 @@ const MyPageUser: React.FC = () => {
         try {
           const response = await axiosInstance.get<UserInfo>(`/api/v1/users/${useId.Id}`, {headers});
           setUserInfo(response.data);
-        } catch (error) {
+        } catch (error: any) {
           console.error('유저 정보를 불러오는 중 오류 발생:', error);
+          handleError(error);
         }
       };
 
@@ -117,8 +123,9 @@ const MyPageUser: React.FC = () => {
         try {
           const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
           setPetInfo(response.data);
-        }catch(error) {
+        }catch(error: any) {
           console.error('동물 정보를 불러오는 중 오류 발생:', error);
+          handleError(error);
         }
       };
 
@@ -204,6 +211,14 @@ const MyPageUser: React.FC = () => {
     }
   };
 
+  // 에러 핸들링 함수
+  const handleError = (error: any) => {
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
+    navigate("/errorpage", { state: { status, message } }); // state로 에러 정보 전달
+  };
+
+if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링 방지
 
 
 
@@ -313,7 +328,7 @@ const MyPageUser: React.FC = () => {
                 className="block w-full p-2 border rounded"
               />
             </label>
-            {/* <label>
+            <label>
               비밀번호:
               <input
                 type="password"
@@ -325,7 +340,7 @@ const MyPageUser: React.FC = () => {
               {passwordError && (
                 <p className="text-sm text-red-500">{passwordError}</p>
               )}
-            </label> */}
+            </label>
             <label>
               전화번호:
               <input

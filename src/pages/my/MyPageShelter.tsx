@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { GoChevronRight } from "react-icons/go";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
 import axiosInstance from "../../utils/axiosInstance"; 
@@ -33,6 +33,9 @@ interface UseId {
 const MyPageShelter: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const navigate = useNavigate();
+
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
   const [useId, setUseId] = useState<UseId>({
     Id: 0
@@ -48,7 +51,7 @@ const MyPageShelter: React.FC = () => {
   const [petLists, setPetLists] = useState<Pet[]>([]);
 
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
 
 
   const headers = {
@@ -64,6 +67,7 @@ const MyPageShelter: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
+        handleError(error);
       }
     };
     shelterId();
@@ -74,20 +78,23 @@ const MyPageShelter: React.FC = () => {
     if(useId.Id !== 0) {
       const shelterInfo = async () => {
         try {
-          const response = await axiosInstance.get<ShelterInfo>(`/api/v1/shelters/${useId.Id}`);
+          const response = await axiosInstance.get<ShelterInfo>(`/api/v1/shelters/${useId.Id}`, {headers});
           setShelterInfo(response.data);
         } catch (error) {
           console.error('보호소 정보를 불러오는 중 오류 발생:', error);
+          handleError(error);
         }
       };
       const petList = async () => {
         try {
-          const response = await axiosInstance.get(`/api/v1/pets/${useId.Id}/list`);
-          setPetLists(response.data)
-        }catch(error) {
+          const response = await axiosInstance.get(`/api/v1/pets/${useId.Id}/list`, {headers});
+          console.log('서버 응답:', response.data); // 응답 데이터 로깅
+          setPetLists(response.data);
+        } catch(error) {
           console.error('동물리스트 정보를 불러오는 중 오류 발생:', error);
+          // handleError(error);
         }
-      }
+      };      
       shelterInfo();
       petList();
     }
@@ -127,6 +134,7 @@ const MyPageShelter: React.FC = () => {
     }
   };
   
+  console.log(petLists[0].imageUrls[0])
 
   // 정보 수정 제출
 
@@ -140,7 +148,7 @@ const MyPageShelter: React.FC = () => {
     }
 
     try {
-      await axiosInstance.put(`/api/v1/shelters/${useId.Id}`, shelterInfo);
+      await axiosInstance.put(`/api/v1/shelters/${useId.Id}`, shelterInfo , {headers});
       alert('정보가 수정되었습니다.');
       setEditModalOpen(false);
     } catch (error) {
@@ -149,28 +157,37 @@ const MyPageShelter: React.FC = () => {
     }
   };
 
-    // 회원 탈퇴 처리
-    const deleteAccount = async (): Promise<void> => {
-      try {
-        await axiosInstance.delete(`/api/v1/shelters/${useId.Id}`);
-        alert('회원탈퇴가 완료되었습니다.');
-        setDeleteModalOpen(false);
-        // 필요시 리다이렉트 로직 추가
-      } catch (error) {
-        console.error('회원탈퇴 중 오류 발생:', error);
-        alert('회원탈퇴에 실패했습니다.');
-      }
-    };
-
-
-    // 입양신청 리스트 페이지로 이동하는 링크 생성 함수
-    const applyListLink = (shelterId:number) => {
-      return `/adoption-list/${shelterId}`; // 입양신청 리스트 페이지 URL 생성
-    };
-      
-    if (!shelterInfo) {
-      return <div>로딩 중...</div>;
+  // 회원 탈퇴 처리
+  const deleteAccount = async (): Promise<void> => {
+    try {
+      await axiosInstance.delete(`/api/v1/shelters/${useId.Id}`, {headers});
+      alert('회원탈퇴가 완료되었습니다.');
+      setDeleteModalOpen(false);
+      // 필요시 리다이렉트 로직 추가
+    } catch (error) {
+      console.error('회원탈퇴 중 오류 발생:', error);
+      alert('회원탈퇴에 실패했습니다.');
     }
+  };
+
+
+  // 입양신청 리스트 페이지로 이동하는 링크 생성 함수
+  const applyListLink = (shelterId:number) => {
+    return `/adoption-list/${shelterId}`; // 입양신청 리스트 페이지 URL 생성
+  };
+      
+  if (!shelterInfo) {
+    return <div>로딩 중...</div>;
+  }
+
+  // 에러 핸들링 함수
+  const handleError = (error: any) => {
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
+    navigate("/errorpage", { state: { status, message } }); // state로 에러 정보 전달
+  };
+    
+  if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링 방지
   
 
   return (
@@ -233,8 +250,12 @@ const MyPageShelter: React.FC = () => {
                 petLists.map((pet) => (
                   <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
                     <img 
-                      src={(pet.imageUrls && pet.imageUrls.length > 0) ? pet.imageUrls[0] : mainImage} 
-                      alt="동물 사진" 
+                      src={pet.imageUrls && pet.imageUrls.length > 0 ? pet.imageUrls[0] : mainImage} 
+                      alt="동물 사진"
+                      onError={(e) => {
+                        e.currentTarget.src = mainImage;
+                        e.currentTarget.onerror = null;
+                      }}
                     />
                     <div className='m-3'>
                       <p>{pet.species} / {pet.size} / {pet.age} / <br />
@@ -278,7 +299,7 @@ const MyPageShelter: React.FC = () => {
               전화번호:
               <input
                 type="text"
-                name="phone"
+                name="phoneNumber"
                 value={shelterInfo.phoneNumber}
                 onChange={editChange}
                 className="block w-full p-2 border rounded"

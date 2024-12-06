@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GoX } from "react-icons/go";
+import { RxDividerHorizontal } from "react-icons/rx";
 import Header from "../../components/Header";
 import axiosInstance from "../../utils/axiosInstance"; 
 import axios from "axios";
@@ -17,12 +18,13 @@ interface PetAdd {
   extra?: string;
   personality: string;
   exerciseLevel: number;
+  shelterId: number;
   shelterName: string;
   address: string;
   imageUrls: File[];
 }
 
-interface ShelterName {
+interface Shelters {
   shelterName: string;
   address: string;
 }
@@ -39,7 +41,7 @@ const DetailPage = () => {
     Id: 0
   });
 
-  const [shelterInfo, setShelterInfo] = useState<ShelterName>({
+  const [shelterInfo, setShelterInfo] = useState<Shelters>({
     shelterName: "",
     address: ""
   });
@@ -57,12 +59,13 @@ const DetailPage = () => {
     extra: "",
     personality: "",
     exerciseLevel: 0,
+    shelterId: useId.Id,
     shelterName: shelterInfo.shelterName,
     address: shelterInfo.address,
     imageUrls: postImg
   });
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
 
 
   const headers = {
@@ -87,18 +90,26 @@ const DetailPage = () => {
   //보호소 정보 불러오기
   useEffect(() => {
     if(useId.Id !== 0){
-      const shelterInfo = async () => {
+      const shelterInfos = async () => {
         try {
-          const response = await axiosInstance.get<ShelterName>(`/api/v1/shelters/${useId.Id}`);
+          const response = await axiosInstance.get(`/api/v1/shelters/${useId.Id}`, {headers});
           setShelterInfo(response.data);
         } catch(error) {
           console.error("보호소 정보를 불러오는 중 오류 발생:", error);
         }
       };
-      shelterInfo();
+      shelterInfos();
     }
   }, [useId.Id])
 
+  useEffect(() => {
+    setAddPet((prevState) => ({
+      ...prevState,
+      shelterId: useId.Id,
+      shelterName: shelterInfo.shelterName,
+      address: shelterInfo.address,
+    }));
+  }, [useId.Id, shelterInfo]);
 
 
   const saveImgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,46 +157,53 @@ const DetailPage = () => {
   };
 
   const addPetInfo = async (): Promise<void> => {
-    const formData = new FormData();
+    const petData = new FormData();
+  
+    // addPet 객체의 키-값 쌍을 순회하면서 FormData에 추가
+    // 'imageUrls' 키는 제외 (이미 파일로 처리되기 때문)
     Object.entries(addPet).forEach(([key, value]) => {
       if (key !== 'imageUrls') {
-        formData.append(key, value.toString());
+        petData.append(key, value.toString()); // value를 문자열로 변환하여 추가
       }
     });
-
-    postImg.forEach((file, index) => {
-      formData.append(`image${index}`, file);
-    });
   
-    // Add shelterName explicitly
-    formData.append("shelterName", shelterInfo.shelterName);
-    formData.append("address", shelterInfo.address);
-  
-    // Add images directly
+    // postImg 배열에 있는 파일들을 FormData에 추가
     postImg.forEach((file) => {
-      formData.append(`images`, file);
+      petData.append('images', file); // 'images'라는 키로 파일 첨부
     });
-    
-    if(useId.Id){
-      try {
-        const response = await axios.post(`http://15.164.103.160:8080/api/v1/pets/${useId.Id}`, formData, {
+
+    // FormData 내용 디버깅 출력
+    console.log("FormData Debugging:");
+    petData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+  
+    try {
+      // 서버로 POST 요청 보내기
+      const response = await axios.post(
+        `http://15.164.103.160:8080/api/v1/pets/${useId.Id}`, // API 엔드포인트
+        petData, // FormData 객체 전송
+        {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
+            'Authorization': `Bearer ${token}`, // 인증 토큰 추가
+            'Content-Type': 'multipart/form-data', // 멀티파트 형식 명시
           },
-        });
-        alert("동물 등록이 완료되었습니다.");
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("동물 등록 중 오류 발생:", error.response?.data);
-          alert(`동물 등록에 실패했습니다. 오류: ${error.response?.data?.message || error.message}`);
-        } else {
-          console.error("알 수 없는 오류 발생:", error);
-          alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다.");
         }
+      );
+      alert("동물 등록이 완료되었습니다."); // 성공 시 사용자에게 알림
+    } catch (error) {
+      // 오류 처리
+      if (axios.isAxiosError(error)) {
+        console.error("동물 등록 중 오류 발생:", error.response?.data); // 디버깅용 콘솔 출력
+        alert(`동물 등록에 실패했습니다. 오류: ${error.response?.data?.message || error.message}`); // 사용자에게 오류 메시지 표시
+      } else {
+        console.error("알 수 없는 오류 발생:", error); // 알 수 없는 오류 처리
+        alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다."); // 사용자에게 알림
       }
     }
   };
+  
+  
   
 
   return (
@@ -241,44 +259,44 @@ const DetailPage = () => {
             className="hidden"
           />
         </section>
-        <section className="mt-20">
-          <div className="flex flex-col flex-wrap gap-6">
-            <div className="flex items-center justify-between gap-72">
+        <section className="mt-10">
+          <div className="flex flex-col flex-wrap gap-5">
+            <div className="flex items-center justify-between p-2 px-10 border gap-52">
               <label htmlFor="species" className="text-xl">종류</label>
-              <select id="species" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.species} onChange={InputChange}>
+              <select id="species" className="pl-2 text-xs font-bold"  value={addPet.species} onChange={InputChange}>
                 <option value="">종류</option>
                 <option value="강아지">강아지</option>
                 <option value="고양이">고양이</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="petName" className="text-xl">이름</label>
-              <input type="text" id="petName" placeholder="예) 코코, 흰둥이" className="pl-3 w-36" value={addPet.petName} onChange={InputChange}/>
+              <input type="text" id="petName" placeholder="예) 코코, 흰둥이" className="w-32 pl-3" value={addPet.petName} onChange={InputChange}/>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="age" className="text-xl">연령</label>
-              <select id="age" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.age} onChange={InputChange}>
+              <select id="age" className="pl-2 text-xs font-bold" value={addPet.age} onChange={InputChange}>
                 <option value="">연령</option>
                 <option value="0~3살">0~3살</option>
                 <option value="4~6살">4~6살</option>
                 <option value="7~10살">7~10살</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="gender" className="text-xl">성별</label>
-              <select id="gender" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.gender} onChange={InputChange}>
+              <select id="gender" className="pl-2 text-xs font-bold" value={addPet.gender} onChange={InputChange}>
                 <option value="">성별</option>
                 <option value="수컷">수컷</option>
                 <option value="암컷">암컷</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="reason" className="text-xl">보호소로 오게 된 이유</label>
               <input type="text" id="reason" placeholder="예) 유기, 보호자 병환" className="pl-2 w-36" value={addPet.reason} onChange={InputChange}/>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="vaccinated" className="text-xl">접종 유무</label>
-              <select id="vaccinated" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.vaccinated} onChange={InputChange}>
+              <select id="vaccinated" className="pl-2 text-xs font-bold" value={addPet.vaccinated} onChange={InputChange}>
                 <option value="">접종유무</option>
                 <option value="1">1차</option>
                 <option value="2">2차</option>
@@ -289,26 +307,26 @@ const DetailPage = () => {
                 <option value="no">미접종</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="neutering" className="text-xl">중성화 유무</label>
-              <select id="neutering" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.neutering} onChange={InputChange}>
+              <select id="neutering" className="pl-2 text-xs font-bold" value={addPet.neutering} onChange={InputChange}>
                 <option value="">중성화유무</option>
                 <option value="완료">완료</option>
                 <option value="미완료">미완료</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="personality" className="text-xl">성격</label>
-              <select id="personality" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.personality} onChange={InputChange}>
+              <select id="personality" className="pl-2 text-xs font-bold" value={addPet.personality} onChange={InputChange}>
                 <option value="">성격</option>
                 <option value="얌전함">얌전함</option>
                 <option value="활발함">활발함</option>
                 <option value="사나움">사나움</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="exerciseLevel" className="text-xl">활동량</label>
-              <select id="exerciseLevel" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.exerciseLevel} onChange={InputChange}>
+              <select id="exerciseLevel" className="pl-2 text-xs font-bold" value={addPet.exerciseLevel} onChange={InputChange}>
                 <option value="">적음 1 ~ 많음 5</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -317,20 +335,20 @@ const DetailPage = () => {
                 <option value="5">5</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="size" className="text-xl">크기</label>
-              <select id="size" className="pl-2 text-xs border bg-gray-50 border-mainColor" value={addPet.size} onChange={InputChange}>
+              <select id="size" className="pl-2 text-xs font-bold" value={addPet.size} onChange={InputChange}>
                 <option value="">크기</option>
                 <option value="소형">소형</option>
                 <option value="중형">중형</option>
                 <option value="대형">대형</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="preAdoption" className="text-xl">맡겨지기 전 가정환경</label>
               <input type="text" id="preAdoption" placeholder="예) 임시보호, 사육장" className="pl-2 w-36" value={addPet.preAdoption} onChange={InputChange}/>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2 px-10 border">
               <label htmlFor="extra" className="text-xl">추가 정보(선택사항)</label>
               <input type="text" id="extra" placeholder="동물 추가정보 작성" className="pl-2 w-36" value={addPet.extra} onChange={InputChange}/>
             </div>
@@ -346,4 +364,3 @@ const DetailPage = () => {
 };
 
 export default DetailPage;
-
