@@ -243,7 +243,7 @@ const Header = () => {
         <div className="hidden md:block text-2xl font-medium">
           {!isLoggedIn ? (
             <Link to="/login" className="hover:text-gray-700">
-              로그인
+              <span style={{ visibility: "hidden" }}>%</span>로그인
             </Link>
           ) : (
             <div className="flex items-center">
