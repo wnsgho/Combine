@@ -189,13 +189,12 @@ const CreateUser1 = () => {
       return false;
     }
 
-    const exerciseLevel = Number(preferredExerciseLevel);
-    if (exerciseLevel < 1 || exerciseLevel > 5 || isNaN(exerciseLevel)) {
-      setExerciseLevelError("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
-      alert("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
-      return false;
-    }
-
+    // const exerciseLevel = Number(preferredExerciseLevel);
+    // if (exerciseLevel < 1 || exerciseLevel > 5 || isNaN(exerciseLevel)) {
+    //   setExerciseLevelError("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
+    //   alert("운동량은 1에서 5 사이의 숫자를 입력해주세요.");
+    //   return false;
+    // }
 
     return true;
   };
