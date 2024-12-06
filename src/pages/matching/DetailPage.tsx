@@ -60,7 +60,7 @@ const DetailPage = () => {
     imageUrls: postImg
   });
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
+  const token = localStorage.getItem("access_token");
 
 
   const headers = {
@@ -180,11 +180,11 @@ const DetailPage = () => {
         alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다.");
       }
     }
-       // FormData 내용 디버깅 출력
-       console.log("FormData Debugging:");
-       petData.forEach((value, key) => {
-         console.log(`${key}:`, value);
-       });
+    // FormData 내용 디버깅 출력
+    console.log("FormData Debugging:");
+    petData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
   };
 
 
