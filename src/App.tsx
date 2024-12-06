@@ -47,15 +47,15 @@ function App() {
         <Route path="/alarm" element={<Alarm />} /> {/* 알람 페이지 */}
         <Route path="/guide" element={<Announcement />} /> {/* 안내 페이지*/}
         <Route path="/guide/announcement" element={<Announcement />} /> {/* 공지사항 페이지*/}
-        <Route path="/guide/announcement/postId" element={<Announcementpost />} /> {/* 공지사항 포스트 페이지*/}
+        <Route path="/guide/announcement/:id" element={<Announcementpost />} /> {/* 공지사항 포스트 페이지*/}
         <Route path="/guide/announcement/create" element={<Announcementpostcreate />} /> {/* 공지사항 작성 페이지*/}
-        <Route path="/guide/announcement/Edit" element={<AnnouncementEdit />} /> {/* 공지사항 수정 페이지*/}
+        <Route path="/guide/announcement/Edit/:id" element={<AnnouncementEdit />} /> {/* 공지사항 수정 페이지*/}
         {/* 이상형 월드컵 페이지 */}
         <Route path="/worldcup" element={<Worldcup />} />
         <Route path="/guide/qna" element={<QAndA />} /> {/* 질의응답 페이지 */}
-        <Route path="/guide/qna/postId" element={<QAandApost />} /> {/* 질의응답 포스트 페이지 */}
+        <Route path="/guide/qna/:id" element={<QAandApost />} /> {/* 질의응답 포스트 페이지 */}
         <Route path="/guide/qna/create" element={<QAandApostcreate />} /> {/* 질의응답 작성 페이지 */}
-        <Route path="/guide/qna/Edit" element={<QAandAEdit />} /> {/* 질의응답 수정 페이지 */}
+        <Route path="/guide/qna/Edit/:id" element={<QAandAEdit />} /> {/* 질의응답 수정 페이지 */}
         <Route path="/guide/facilities" element={<Facilities />} /> {/* 반려동물 관련 시설 페이지 */}
         <Route path="/guide/walking-course" element={<WalkingCourse />} /> {/* 산책 코스 페이지 */}
         <Route path="/my-walking-course" element={<MyWalkingCourse />} /> {/* 나의 산책 코스 페이지 */}
