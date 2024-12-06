@@ -9,6 +9,10 @@ import { Client } from "@stomp/stompjs";
 //gyutest2@gmail.com (보호소)
 //gyutest123
 
+//gyutest3@gmail.com (일반)
+//gyutest123
+
+
 interface userChatRoom {
   chatRoomId: number;
   unReadCount: number;
@@ -320,17 +324,19 @@ const Chat = () => {
       {/* 채팅방 내부  */}
       {chatRoomOpen && (
         <div className="fixed bottom-[30px] right-[114px] z-50">
-          <div className="bg-yellow-500 w-[384px] h-[590px] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] ">
+          <div className="bg-yellow-500 w-[384px] h-[590px] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
             {/* 헤더 */}
-            {userChatRoom.map((item) => (
-              <div className="bg-white p-3 rounded-t-lg flex justify-between " key={item.chatRoomId}>
-                <div className="font-bold">{item.oppositeName}</div>
-                <div className="cursor-pointer flex gap-3">
-                  <div onClick={handleChatDelete}>🗑️</div>
-                  <div onClick={() => setChatRoomOpen(false)}>✖️</div>
+            {userChatRoom
+              .filter(item => item.chatRoomId === chatRoomId)
+              .map((item) => (
+                <div className="bg-white p-3 rounded-t-lg flex justify-between" key={item.chatRoomId}>
+                  <div className="font-bold">{item.oppositeName}</div>
+                  <div className="cursor-pointer flex gap-3">
+                    <div onClick={handleChatDelete}>🗑️</div>
+                    <div onClick={() => setChatRoomOpen(false)}>✖️</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             <div className="bg-white mx-3 mt-3 w-76 h-[477px] rounded-t-lg overflow-y-auto max-h-[500px] scrollbar-hide">
               {chatMessage.map((message, index) =>
@@ -340,6 +346,9 @@ const Chat = () => {
                     <div className="flex flex-col items-end">
                       <div className="text-sm pb-1.5 pr-1">{message.senderName}</div>
                       <div className="flex items-end gap-1">
+                        <span className="text-xs text-gray-500 mb-1">
+                          {message.unRead > 0 ? "1" : ""}
+                        </span>
                         <div className="p-2 rounded-xl bg-gray-300 break-words">{message.message}</div>
                       </div>
                     </div>
@@ -357,6 +366,9 @@ const Chat = () => {
                       <div className="ml-2 pb-1.5 text-sm">{message.senderName}</div>
                       <div className="flex items-end gap-1">
                         <div className="ml-2 p-2 rounded-xl bg-gray-300 break-words">{message.message}</div>
+                        <span className="text-xs text-gray-500 mb-1">
+                          {message.unRead > 0 ? "1" : ""}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -367,21 +379,21 @@ const Chat = () => {
             </div>
 
             <div className="bg-white mx-3 w-76 h-10 rounded-b-lg border-t-2 border-black flex justify-between">
-    <input 
-      type="text" 
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-      className="w-80 focus:outline-none p-2 text-sm"
-      placeholder="메시지를 입력하세요"
-    />
-    <div 
-      onClick={sendMessage}
-      className="text-3xl px-1 cursor-pointer hover:scale-105 transition-transform duration-300"
-    >
-      ➤
-    </div>
-  </div>
+              <input 
+                type="text" 
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                className="w-80 focus:outline-none p-2 text-sm"
+                placeholder="메시지를 입력하세요"
+              />
+              <div 
+                onClick={sendMessage}
+                className="text-3xl px-1 cursor-pointer hover:scale-105 transition-transform duration-300"
+              >
+                ➤
+              </div>
+            </div>
           </div>
         </div>
       )}
