@@ -7,7 +7,6 @@ import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
 const Announcementpostcreate = () => {
-  const [adminId, setAdminId] = useState<number>(1)
   const [content, setContent] = useState<string>("");
   const [title, setTitle] = useState<string>("")
   const [category, setCategory] = useState<string>("")
@@ -18,7 +17,6 @@ const Announcementpostcreate = () => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post('http://15.164.103.160:8080/api/v1/announcements', {
-        adminId,
         category,
         title,
         content,

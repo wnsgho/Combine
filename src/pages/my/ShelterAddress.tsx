@@ -1,6 +1,6 @@
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance"; 
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -9,62 +9,82 @@ declare global {
 }
 
 interface ShelterInfo {
+  shelterId: number;
   shelterName: string;
-  phoneNumber: string;
   address: string;
 }
 
+interface UserId {
+  Id: number;
+}
+
+interface UseRole {
+  role: string;
+}
 
 const ShelterAddress: React.FC = () => {
+  const { petId } = useParams();
   const mapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate(); // useNavigate 훅 사용
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [Id, setId] = useState<string>("");
-  const [role, setRole] = useState<string>("")
+  const [userId, setUserId] = useState<UserId>({
+    Id: 0
+  });
+  const [useRole, setUseRole] = useState<UseRole>({
+    role: ""
+  })
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
+    shelterId: 0,
     shelterName: "",
-    address: "",
-    phoneNumber: "",
+    address: ""
   });
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
-  // const url = "http://15.164.103.160:8080"
 
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcmhhaGFoYUBlbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzM1OTY0MywiZXhwIjoxNzMzNDQ2MDQzfQ.3q-mFjsqd-Mq53A6dlkeBs4UvQQ38-9LrlLGvye646Q"
+
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
 
   // ID, ROLE 불러오기
   useEffect(() => {
-    const shelterId = async () => {
+    const userId = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/check-id`);
-        setId(response.data.id);
+        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
+        setUserId(response.data);
       } catch(error) {
-        console.error("보호소 ID를 불러오는 중 오류 발생:", error);
+        console.error("ID를 불러오는 중 오류 발생:", error);
       }
     };
-    shelterId();
+
     const shelterRole = async () => {
       try {
-        const response = await axios.get(`/api/v1/features/role`);
-        setRole(response.data);
+        const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
+        setUseRole(response.data);
       }catch(error) {
         console.error("Role 불러오는 중 오류 발생:", error);
       }
     }
+    
+    userId();
     shelterRole();
   }, [])
 
 
-  // 보호소 정보 가져오기
+  // 보호소 정보 가져오기 (동물 상세 정보 이용)
   useEffect(() => {
-    const shelterInfo = async () => {
-      try {
-        const response = await axios.get<ShelterInfo>(`/api/v1/shelters/${Id}`);
-        setShelterInfo(response.data);
-      } catch (error) {
-        console.error("보호소 정보를 불러오는 중 오류 발생:", error);
-      }
-    };
-    shelterInfo();
-  }, []);
+    if(petId) {
+      const shelterInfo = async () => {
+        try {
+          const response = await axiosInstance.get<ShelterInfo>(`/api/v1/pets/${petId}`);
+          setShelterInfo(response.data);
+        } catch (error) {
+          console.error("보호소 정보를 불러오는 중 오류 발생:", error);
+        }
+      };
+      shelterInfo();
+    }
+  }, [petId]);
 
   // 카카오 지도 API 연동
   useEffect(() => {
@@ -142,7 +162,7 @@ const ShelterAddress: React.FC = () => {
     if (!shelterInfo) return;
 
     try {
-      await axios.put(`/api/v1/shelter/${Id}`, shelterInfo);
+      await axiosInstance.put(`/api/v1/shelter/${userId}`, shelterInfo);
       alert('정보가 수정되었습니다.');
       setIsModalOpen(false)
     } catch (error) {
@@ -157,7 +177,8 @@ const ShelterAddress: React.FC = () => {
   };
 
 
-  const shelter = role == "ROLE_SHELTER";
+  const shelter = useRole.role == "ROLE_SHELTER" && userId.Id == shelterInfo.shelterId
+
 
   return (
     <div>
@@ -174,10 +195,6 @@ const ShelterAddress: React.FC = () => {
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">주소</p>
               <p className="text-lg">{shelterInfo.address}</p>
-            </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">전화번호</p>
-              <p className="text-lg">{shelterInfo.phoneNumber}</p>
             </div>
           </div>
         </section>
@@ -222,17 +239,6 @@ const ShelterAddress: React.FC = () => {
                 value={tempShelterInfo.address}
                 onChange={(e) =>
                   setTempShelterInfo((prev) => ({ ...prev, address: e.target.value }))
-                }
-                className="w-full px-3 py-2 border rounded"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 font-bold">전화번호</label>
-              <input
-                type="text"
-                value={tempShelterInfo.phoneNumber}
-                onChange={(e) =>
-                  setTempShelterInfo((prev) => ({ ...prev, phoneNumber: e.target.value }))
                 }
                 className="w-full px-3 py-2 border rounded"
               />

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { GoX, GoChevronRight } from "react-icons/go";
 import Header from '../../components/Header';
 import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 
 interface PetAdd {
   species: string;
@@ -21,10 +22,25 @@ interface PetAdd {
 
 
 const DetailCorrect = () => {
-
+  const { petId } = useParams();
+  const [userId, setUserId] = useState<number>(0);
+  const navigate = useNavigate(); // useNavigate 훅 사용
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
-
+  const [petInfo, setPetInfo] = useState({
+    species: "",
+    name: "",
+    age: "",
+    gender: "",
+    reason: "",
+    inoculation: "", 
+    neutering: "",
+    personality: "",
+    exerciseLevel: 0,
+    size: "",
+    home: "",
+    add: "",
+  })
   const saveImgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileArr = e.target.files;
 
@@ -55,31 +71,33 @@ const DetailCorrect = () => {
     }
   };
 
-  const [petInfo, setPetInfo] = useState({
-    species: "",
-    name: "",
-    age: "",
-    gender: "",
-    reason: "",
-    inoculation: "", 
-    neutering: "",
-    personality: "",
-    exerciseLevel: 0,
-    size: "",
-    home: "",
-    add: "",
-  })
-
   useEffect(() => {
-    const petInfo = async () => {
-      try {
-        const response = await axios.get(`/api/v1/pets/{shelterId}/{petId}`);
-        setPetInfo(response.data)
-      } catch(error) {
-        console.error('동물 정보 불러오는 중 오류 발생:', error);
+    const userId = async () => {
+      try{
+        const response = await axios.get(`/api/v1/features/user-id`);
+        setUserId(response.data);
+        
+      }catch(error) {
+        console.error("유저 아이디를 불러오는 중 에러 발생", error);
       }
     }
-  })
+    userId();
+  }, [])
+
+  const petInfos = async () => {
+    try {
+      const response = await axios.put(`/api/v1/pets/${userId}/${petId}`);
+      setPetInfo(response.data)
+    } catch(error) {
+      console.error('동물 정보 불러오는 중 오류 발생:', error);
+    }
+  }
+
+  const Cancel = () => {
+    navigate(-1); // 이전 페이지로 이동
+  };
+  
+
 
   return (
     <>
@@ -224,8 +242,8 @@ const DetailCorrect = () => {
           </div>
         </section>
         <section className="flex gap-24 my-8">
-          <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor">취소</button>
-          <button className="px-4 py-2 text-lg hover:bg-blue-600 text-mainColor">완료</button>
+          <button className="px-4 py-2 text-lg hover:bg-gray-500 text-cancelColor" onClick={Cancel}>취소</button>
+          <button className="px-4 py-2 text-lg hover:bg-blue-600 text-mainColor" onClick={petInfos}>완료</button>
         </section>
       </div>
     </>
