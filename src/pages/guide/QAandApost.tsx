@@ -20,6 +20,7 @@ interface QnApost {
   viewCount: number;
   writerName: string;
   comments : Comment[]
+  email:string
   created_at: string;
 }
 
