@@ -33,9 +33,9 @@ interface UseId {
 const MyPageShelter: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
-
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
   const [useId, setUseId] = useState<UseId>({
     Id: 0
@@ -47,17 +47,22 @@ const MyPageShelter: React.FC = () => {
     phoneNumber: '',
     password: ""
   });
-
   const [petLists, setPetLists] = useState<Pet[]>([]);
 
 
-  const token = localStorage.getItem("access_token");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
 
   // ID 불러오기
   useEffect(() => {
@@ -67,11 +72,11 @@ const MyPageShelter: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
     shelterId();
-  }, [])
+  }, [token])
 
   // 보호소 정보 가져오기 / 보호소 등록 동물 리스트
   useEffect(() => {
@@ -80,11 +85,18 @@ const MyPageShelter: React.FC = () => {
         try {
           const response = await axiosInstance.get<ShelterInfo>(`/api/v1/shelters/${useId.Id}`, {headers});
           setShelterInfo(response.data);
-        } catch (error) {
+        } catch(error) {
           console.error('보호소 정보를 불러오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
-      };
+      };     
+      shelterInfo();
+
+    }
+  }, [useId.Id]);
+
+  useEffect(() => {
+    if(useId.Id !== 0) {
       const petList = async () => {
         try {
           const response = await axiosInstance.get(`/api/v1/pets/${useId.Id}/list`, {headers});
@@ -95,7 +107,6 @@ const MyPageShelter: React.FC = () => {
           // handleError(error);
         }
       };      
-      shelterInfo();
       petList();
     }
   }, [useId.Id]);
@@ -249,7 +260,7 @@ const MyPageShelter: React.FC = () => {
                 petLists.map((pet) => (
                   <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
                     <img 
-                      src={pet.imageUrls && pet.imageUrls.length > 0 ? pet.imageUrls[0] : mainImage} 
+                      src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://http://15.164.103.160:8080`+pet.imageUrls[0] : mainImage} 
                       alt="동물 사진"
                       onError={(e) => {
                         e.currentTarget.src = mainImage;

@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GoChevronRight } from "react-icons/go";
 import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
-
 import mainImage from '../../assets/image/mainimage.webp'
 import axios from 'axios';
 
@@ -49,6 +48,7 @@ const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -86,12 +86,20 @@ const MyPageUser: React.FC = () => {
     Id: 0
   })
   
-  const token = localStorage.getItem("access_token");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
+
 
 
   // ID 불러오기
@@ -102,11 +110,11 @@ const MyPageUser: React.FC = () => {
         setUseId(response.data);
       } catch(error: any) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
     userId();
-  }, [])
+  }, [token])
 
   // 유저, 펫 정보 가져오기
   useEffect(() => {
@@ -117,7 +125,7 @@ const MyPageUser: React.FC = () => {
           setUserInfo(response.data);
         } catch (error: any) {
           console.error('유저 정보를 불러오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
       };
 
@@ -127,7 +135,7 @@ const MyPageUser: React.FC = () => {
           setPetInfo(response.data[0]);
         }catch(error: any) {
           console.error('동물 정보를 불러오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
       };
 
@@ -142,7 +150,7 @@ const MyPageUser: React.FC = () => {
     try{
       await axios.post(`http://15.164.103.160:8080/api/v1/applypet/${petInfo.id}/cancel?userId=${useId.Id}`, null, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': token,
           'Content-Type': 'application/json'
         },
         params: {
@@ -167,6 +175,7 @@ const MyPageUser: React.FC = () => {
         applyStatus: "",
       });
       setApplyModalOpen(false);
+      window.location.reload();
     }catch(error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
     }
@@ -316,7 +325,7 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
               <img 
                 src={petInfo.pet.imageUrls && petInfo.pet.imageUrls.length > 0 
                   ? petInfo.pet.imageUrls[0] 
-                  : mainImage} 
+                  : undefined} 
                 alt="동물 사진" 
               />
             </div>

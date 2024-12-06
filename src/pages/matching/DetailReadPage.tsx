@@ -51,8 +51,9 @@ const DetailReadPage = () => {
   const { petId } = useParams();
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate(); // useNavigate 훅 사용
-  const [role, setRole] = useState("");
+  const [roles, setRoles] = useState({role:""});
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
 
   const [petApplyInfo, setPetApplyInfo] = useState<PetApplyInfo>({
@@ -99,10 +100,18 @@ const DetailReadPage = () => {
     Id: 0
   })
 
-  const token = localStorage.getItem("access_token");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
+
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
 
 
@@ -118,7 +127,7 @@ const DetailReadPage = () => {
       }
     }
     pets();
-  }, [])
+  }, [token])
 
   // 유저 Id 불러오기
   useEffect(() => {
@@ -131,7 +140,7 @@ const DetailReadPage = () => {
       }
     }
     userId();
-  }, [])
+  }, [token])
 
   // petId 추가하기
   useEffect(() => {
@@ -148,20 +157,20 @@ const DetailReadPage = () => {
     const roles = async () => {
       try{
         const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
-        setRole(response.data);
+        setRoles(response.data);
       }catch(error) {
         console.error("유저 Role 불러오는 중 오류 발생", error)
       }
     }
     roles();
-  }, [])
+  }, [token])
 
   useEffect(() => {
     if(useId.Id !== 0){
       const petApplyInfo = async () => {
         try {
-          const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
-          setPetApplyInfo(response.data[0]);
+          const response = await axiosInstance.get(`/api/v1/applypet/${useId.Id}/list`, {headers});
+          setPetApplyInfo(response.data);
         }catch(error: any) {
           console.error('동물 정보를 불러오는 중 오류 발생:', error);
         }
@@ -176,7 +185,7 @@ const DetailReadPage = () => {
     try {
       await axios.post(`http://15.164.103.160:8080/api/v1/applypet`, null, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': token,
           'Content-Type': 'application/json'
         },
         params: {
@@ -197,7 +206,9 @@ const DetailReadPage = () => {
   // 보호소 동물 삭제
   const deletePet = async () => {
     try {
-      await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`);
+      await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`, {headers});
+      alert('삭제가 완료되었습니다.');
+      setDeleteModalOpen(false);
     } catch (error) {
       console.error("동물 삭제 중 오류 발생", error);
     }
@@ -230,7 +241,8 @@ const DetailReadPage = () => {
     return `/shelter-address/${petId}`; // 지도 페이지 URL 생성
   };
 
-  const shelter = role == "ROLE_SHELTER" && useId.Id == petInfo.shelterId
+  const shelter = roles.role == "ROLE_SHELTER" && useId.Id == petInfo.shelterId
+
 
   return (
     <>
@@ -246,7 +258,7 @@ const DetailReadPage = () => {
             </button>
             <div className="flex items-center justify-center w-full h-64">
               <img
-                src={petInfo.imageUrls[currentIndex]}
+                src={`http://http://15.164.103.160:8080`+petInfo.imageUrls[currentIndex]}
                 alt={`Slide ${currentIndex + 1}`}
                 className="object-contain w-full h-full"
               />
@@ -324,9 +336,9 @@ const DetailReadPage = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호 기관</p>
-              <Link to={mapLink(petId)}>
-                <p className="text-lg">{petInfo.shelterName}</p>
-              </Link>
+                <Link to={mapLink(petId)}>
+                  <p className="flex items-center text-lg">{petInfo.shelterName}<GoChevronRight /></p>
+                </Link>
             </div>
           </div>
           <div className="flex items-center justify-between">

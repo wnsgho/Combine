@@ -37,6 +37,7 @@ const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
   const [useId, setUseId] = useState<UseId>({Id: 0});
+  const [token, setToken] = useState<string | null>(null);
   const [shelterInfo, setShelterInfo] = useState<Shelters>({
     shelterName: "",
     address: ""
@@ -60,13 +61,19 @@ const DetailPage = () => {
     imageUrls: postImg
   });
 
-  const token = localStorage.getItem("access_token");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
 
 
   // 사용자 ID 가져오기
@@ -80,7 +87,7 @@ const DetailPage = () => {
       }
     };
     shelterId();
-  }, [])
+  }, [token])
 
   //보호소 정보 불러오기
   useEffect(() => {
@@ -97,6 +104,7 @@ const DetailPage = () => {
     }
   }, [useId.Id])
 
+  
   useEffect(() => {
     setAddPet((prevState) => ({
       ...prevState,
@@ -106,6 +114,7 @@ const DetailPage = () => {
     }));
   }, [useId.Id, shelterInfo]);
 
+  console.log(token)
 
   const saveImgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileArr = e.target.files;

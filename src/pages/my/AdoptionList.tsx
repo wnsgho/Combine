@@ -42,18 +42,14 @@ interface UseId {
 }
 
 const AdoptionList: React.FC = () => {
-  
   const { shelterId } = useParams();
-
   // 여러 펫의 정보를 관리하는 상태
   const [pets, setPets] = useState<ProcessedPet[]>([]);
-
   // 상태 정의: 각 펫의 상세 정보 표시 여부를 관리
   const [visibleDetails, setVisibleDetails] = useState<Record<number, boolean>>({});
-
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
-
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
@@ -63,15 +59,19 @@ const AdoptionList: React.FC = () => {
   // 입양 거절 모달
   const [isRefusalModalOpen, setRefusalModalOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
-  const token = localStorage.getItem("access_token");
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
-  console.log(visibleDetails)
-
 
   // ID 불러오기
   useEffect(() => {
@@ -81,11 +81,11 @@ const AdoptionList: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
     shelterId();
-  }, [])
+  }, [token])
 
 
   // 입양 신청 정보 가져오기
@@ -109,7 +109,7 @@ const AdoptionList: React.FC = () => {
           setPets(fetchedPets);
         } catch (error) {
           console.error('데이터를 가져오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
       };
       fetchApplyPets();
@@ -129,7 +129,7 @@ const AdoptionList: React.FC = () => {
     try {
       await axiosInstance.put(`/api/v1/applypet/${useId.Id}/status`, null, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': token,
           'Content-Type': 'application/json'
         },
         params: {
@@ -142,6 +142,27 @@ const AdoptionList: React.FC = () => {
     } catch (error) {
       console.error('입양 거절 처리 중 오류 발생:', error);
       alert('입양 거절 처리에 실패했습니다.');
+    }
+  };
+
+  // 입양 승인
+  const completed = async (applyId: number) => {
+    try {
+      await axiosInstance.put(`/api/v1/applypet/${useId.Id}/status`, null, {
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          applyId: applyId,
+          status: "COMPLETED"
+        }
+      });
+      alert('입양 신청이 승인되었습니다.');
+      setPets(prevPets => prevPets.filter(pet => pet.id !== applyId));
+    } catch (error) {
+      console.error('입양 승인 처리 중 오류 발생:', error);
+      alert('입양 승인 처리에 실패했습니다.');
     }
   };
 
@@ -170,46 +191,56 @@ const AdoptionList: React.FC = () => {
         <section className="mt-20">
           <div>
             <ul className="flex flex-col gap-10">
-              {/* 여러 펫 항목 렌더링 */}
-              {pets.map((pet) => (
-                <li key={pet.id} className="flex flex-col justify-between pb-4 mb-4 border-b">
-                  <div className="flex items-center justify-between">
-                    <span>신청 ID: {pet.petId}</span>
-                    <button
-                      onClick={() => toggleDetails(pet.id)}
-                      className="ml-32 text-blue-500 underline"
-                    >
-                      {visibleDetails[pet.id] ? <GoChevronUp /> : <GoChevronDown />}
-                    </button>
-                  </div>
+              {/* "PENDING" 상태의 펫만 렌더링 */}
+              {pets
+                .filter((pet) => pet.applyStatus === "PENDING")
+                .map((pet) => (
+                  <li key={pet.id} className="flex flex-col justify-between pb-4 mb-4 border-b">
+                    <div className="flex items-center justify-between">
+                      <span>신청 ID: {pet.petId}</span>
+                      <button
+                        onClick={() => toggleDetails(pet.id)}
+                        className="ml-32 text-blue-500 underline"
+                      >
+                        {visibleDetails[pet.id] ? <GoChevronUp /> : <GoChevronDown />}
+                      </button>
+                    </div>
 
-                  {visibleDetails[pet.id] && (
-                    <div className="p-2 mt-2 bg-gray-100 rounded">
-                      <h3 className="text-lg font-semibold">펫 정보</h3>
-                      <p>펫 ID: {pet.petId}</p>
-                      <p>종류: {pet.species}</p>
-                      <p>크기: {pet.size}</p>
-                      <p>나이: {pet.age}</p>
-                      <p>성격: {pet.personality}</p>
-                      <p>활동량: {pet.exerciseLevel}</p>
-                      <p>신청자 ID: {pet.userId}</p>
-                      {/* 승인/거절 버튼 */}
-                      <div className="flex gap-2 mt-2">
-                        <button className="px-4 py-2 text-white bg-green-500 rounded"
-                          onClick={() => setApprovalModalOpen(true)}>
-                          입양 승인
-                        </button>
-                        <button
-                          className="px-4 py-2 text-white bg-red-500 rounded"
-                          onClick={() => setRefusalModalOpen(true)}
-                        >
-                          입양 거절
-                        </button>
+                    {visibleDetails[pet.id] && (
+                      <div className="p-2 mt-2 bg-gray-100 rounded">
+                        <h3 className="text-lg font-semibold">펫 정보</h3>
+                        <p>펫 ID: {pet.petId}</p>
+                        <p>종류: {pet.species}</p>
+                        <p>크기: {pet.size}</p>
+                        <p>나이: {pet.age}</p>
+                        <p>성격: {pet.personality}</p>
+                        <p>활동량: {pet.exerciseLevel}</p>
+                        <p>신청자 ID: {pet.userId}</p>
+                        {/* 승인/거절 버튼 */}
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            className="px-4 py-2 text-white bg-green-500 rounded"
+                            onClick={() => setApprovalModalOpen(true)}
+                          >
+                            입양 승인
+                          </button>
+                          <button
+                            className="px-4 py-2 text-white bg-red-500 rounded"
+                            onClick={() => setRefusalModalOpen(true)}
+                          >
+                            입양 거절
+                          </button>
                         {/* 입양 승인 모달 (승인 및 거절 시 알람 기능 미구현)*/}
                         <MyPageModal isOpen={isApprovalModalOpen} onClose={() => setApprovalModalOpen(false)}>
                           <h3 className="mb-4 text-lg font-bold">정말로 승인하시겠습니까?</h3>
                           <div className="flex justify-end gap-4 mt-6">
-                            <button className="text-mainColor" > 
+                            <button 
+                              className="text-mainColor" 
+                              onClick={() => {
+                              completed(pet.id);
+                              setApprovalModalOpen(false);
+                              }} 
+                            > 
                               네
                             </button>
                             <button className="text-cancelColor" onClick={() => setApprovalModalOpen(false)}>

@@ -17,6 +17,7 @@ interface UseId {
 const PreferPage: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
@@ -28,13 +29,19 @@ const PreferPage: React.FC = () => {
     preferredExerciseLevel: 0
   })
 
-  const token = localStorage.getItem("access_token");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
 
   // ID 불러오기
   useEffect(() => {
@@ -44,7 +51,7 @@ const PreferPage: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
     userId();

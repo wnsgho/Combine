@@ -22,23 +22,28 @@ interface UseRole {
 const MatchingPage = () => {
   const [pets, setPets] = useState<ProcessedPet[]>([]); // 동물 데이터 저장 상태
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const navigate = useNavigate();
-  const [useRole, setUseRole] = useState({
-    role: ""
-  });
+  const [useRole, setUseRole] = useState({role: ""});
   const [filters, setFilters] = useState({
     species: "",
     age: "",
     size: ""
   });
 
-  const token = localStorage.getItem("access_token");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
 
 
   useEffect(() => {
@@ -50,12 +55,12 @@ const MatchingPage = () => {
         setUseRole(userRole.data)
       } catch (error) {
         console.error("동물 리스트를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
 
     fetchPetList(); // 데이터 가져오기 함수 실행
-  }, []); 
+  }, [token]); 
 
   const shelter = useRole.role == "ROLE_SHELTER"
   // const shelter = true // 임시 테스트용
@@ -98,15 +103,9 @@ const MatchingPage = () => {
     <>
       <div className='max-w-screen'>
         <Header />
-        <section className='flex justify-center mt-20'>
-          <div className='flex items-center gap-40'>
-            <p className='text-3xl text-mainColor'>선택 옵션</p>
-            <Link to="/detailadd">
-            {shelter ? <button className='text-2xl text-cancelColor'>등록</button> : null}
-            </Link>
-          </div>
-        </section>
+
         <section className='flex flex-wrap items-center justify-center gap-10 p-10 mt-10'>
+          <p className='text-3xl text-mainColor'>선택 옵션</p>
           <form className="flex flex-wrap max-w-xl mx-10 ">
             <select id="species" className="text-3xl px-7 " onChange={filterChange}>
               <option value="">종류</option>
@@ -132,11 +131,13 @@ const MatchingPage = () => {
               <option value="대형">대형</option>
             </select>
           </form>     
-          <button 
-            onClick={() => setFilters(filters)} // 검색 버튼 클릭 시 필터링 적용
-            className='w-32 px-3 text-3xl text-white rounded-md bg-mainColor'>
-            조회
-          </button>
+        </section>
+        <section className='flex justify-center mt-6'>
+          <div>
+            <Link to="/detailadd">
+            {shelter ? <button className='text-2xl text-cancelColor'>등록</button> : null}
+            </Link>
+          </div>
         </section>
         <section className='mt-16'>
           <div className='flex flex-col items-center justify-center'>
