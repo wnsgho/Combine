@@ -94,7 +94,7 @@ const HeaderLogin = () => {
   
 
   const getUserInfoLink = () => {
-    return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/my-info";
+    return userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/mypage-user";
   };
 
   return (
