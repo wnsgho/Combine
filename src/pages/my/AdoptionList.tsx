@@ -64,7 +64,7 @@ const AdoptionList: React.FC = () => {
   const [isRefusalModalOpen, setRefusalModalOpen] = useState<boolean>(false);
 
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
+  const token = localStorage.getItem("access_token");
 
   const headers = {
     'Authorization': `Bearer ${token}`,
