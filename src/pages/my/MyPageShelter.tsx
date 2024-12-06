@@ -51,7 +51,7 @@ const MyPageShelter: React.FC = () => {
   const [petLists, setPetLists] = useState<Pet[]>([]);
 
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
 
 
   const headers = {
@@ -133,8 +133,7 @@ const MyPageShelter: React.FC = () => {
       }
     }
   };
-  
-  console.log(petLists[0].imageUrls[0])
+
 
   // 정보 수정 제출
 

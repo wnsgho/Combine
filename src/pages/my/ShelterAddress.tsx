@@ -12,10 +12,10 @@ declare global {
 interface ShelterInfo {
   shelterId: number;
   shelterName: string;
-  address: string;
+  shelterAddress: string;
 }
 
-interface UserId {
+interface UseId {
   Id: number;
 }
 
@@ -29,7 +29,7 @@ const ShelterAddress: React.FC = () => {
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userId, setUserId] = useState<UserId>({
+  const [useId, setUseId] = useState<UseId>({
     Id: 0
   });
   const [useRole, setUseRole] = useState<UseRole>({
@@ -38,11 +38,11 @@ const ShelterAddress: React.FC = () => {
   const [shelterInfo, setShelterInfo] = useState<ShelterInfo>({
     shelterId: 0,
     shelterName: "",
-    address: ""
+    shelterAddress: ""
   });
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
 
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -53,7 +53,7 @@ const ShelterAddress: React.FC = () => {
     const userId = async () => {
       try {
         const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
-        setUserId(response.data);
+        setUseId(response.data);
       } catch(error) {
         console.error("ID를 불러오는 중 오류 발생:", error);
         handleError(error);
@@ -103,7 +103,7 @@ const ShelterAddress: React.FC = () => {
 
       const geocoder = new window.kakao.maps.services.Geocoder();
 
-      geocoder.addressSearch(shelterInfo.address, (result:any, status:any) => {
+      geocoder.addressSearch(shelterInfo.shelterAddress, (result:any, status:any) => {
         if (status === window.kakao.maps.services.Status.OK) {
           const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
 
@@ -129,7 +129,7 @@ const ShelterAddress: React.FC = () => {
               font-size: 18px;
             ">
               ${shelterInfo.shelterName}
-              <div style="font-size: 12px; color: #888;">${shelterInfo.address}</div>
+              <div style="font-size: 12px; color: #888;">${shelterInfo.shelterAddress}</div>
             </div>
           `;
           const overlay = new window.kakao.maps.CustomOverlay({
@@ -148,7 +148,8 @@ const ShelterAddress: React.FC = () => {
         }
       });
     });
-  }, [shelterInfo.address]);
+  }, [shelterInfo.shelterAddress]);
+
 
   // 모달 열기/닫기
   const openModal = () => {
@@ -167,7 +168,7 @@ const ShelterAddress: React.FC = () => {
     if (!shelterInfo) return;
 
     try {
-      await axiosInstance.put(`/api/v1/shelter/${userId}`, shelterInfo);
+      await axiosInstance.put(`/api/v1/shelters/${useId.Id}`, shelterInfo, {headers});
       alert('정보가 수정되었습니다.');
       setIsModalOpen(false)
     } catch (error) {
@@ -192,7 +193,7 @@ const ShelterAddress: React.FC = () => {
   
 
 
-  const shelter = useRole.role == "ROLE_SHELTER" && userId.Id == shelterInfo.shelterId
+  const shelter = useRole.role == "ROLE_SHELTER" && useId.Id == shelterInfo.shelterId
 
 
   return (
@@ -209,7 +210,7 @@ const ShelterAddress: React.FC = () => {
             </div>
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">주소</p>
-              <p className="text-lg">{shelterInfo.address}</p>
+              <p className="text-lg">{shelterInfo.shelterAddress}</p>
             </div>
           </div>
         </section>
@@ -254,9 +255,9 @@ const ShelterAddress: React.FC = () => {
               <label className="block mb-2 font-bold">주소</label>
               <input
                 type="text"
-                value={tempShelterInfo.address}
+                value={tempShelterInfo.shelterAddress}
                 onChange={(e) =>
-                  setTempShelterInfo((prev) => ({ ...prev, address: e.target.value }))
+                  setTempShelterInfo((prev) => ({ ...prev, shelterAddress: e.target.value }))
                 }
                 className="w-full px-3 py-2 border rounded"
               />

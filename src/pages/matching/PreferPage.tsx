@@ -28,7 +28,7 @@ const PreferPage: React.FC = () => {
     preferredExerciseLevel: 0
   })
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQwMDkzNiwiZXhwIjoxNzMzNDg3MzM2fQ.tkMnS-erUE_oveQ4Hqj_S6L9SRcdR8bu_RBtCPDHDS4"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQ2NTY4NSwiZXhwIjoxNzMzNTUyMDg1fQ.wzC1B0lcGSTycaD6eaX4lXj2hBxDdp19d8yde1aWo2E"
 
 
   const headers = {

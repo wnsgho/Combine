@@ -6,6 +6,7 @@ import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
 
 import mainImage from '../../assets/image/mainimage.webp'
+import axios from 'axios';
 
 
 // 유저 정보 타입 정의
@@ -84,7 +85,7 @@ const MyPageUser: React.FC = () => {
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQwMDkzNiwiZXhwIjoxNzMzNDg3MzM2fQ.tkMnS-erUE_oveQ4Hqj_S6L9SRcdR8bu_RBtCPDHDS4"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQ2NTY4NSwiZXhwIjoxNzMzNTUyMDg1fQ.wzC1B0lcGSTycaD6eaX4lXj2hBxDdp19d8yde1aWo2E"
 
 
   const headers = {
@@ -122,7 +123,7 @@ const MyPageUser: React.FC = () => {
       const petInfo = async () => {
         try {
           const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
-          setPetInfo(response.data);
+          setPetInfo(response.data[0]);
         }catch(error: any) {
           console.error('동물 정보를 불러오는 중 오류 발생:', error);
           handleError(error);
@@ -138,7 +139,33 @@ const MyPageUser: React.FC = () => {
 
   const deleteApply = async() => {
     try{
-      await axiosInstance.post(`/api/v1/applypet/${petInfo.id}/cancel?userId=${useId.Id}`, {headers});
+      await axios.post(`http://15.164.103.160:8080/api/v1/applypet/${petInfo.id}/cancel?userId=${useId.Id}`, null, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          userId:useId.Id
+        }
+      }
+      );
+      alert('입양 취소가 완료되었습니다.');
+      setPetInfo({
+        id: 0,
+        pet: {
+          petId: 0,
+          species: "",
+          size: "",
+          age: "",
+          personality: "",
+          exerciseLevel: 0,
+          imageUrls: [],
+        },
+        userId: 0,
+        applyDate: "",
+        applyStatus: "",
+      });
+      setApplyModalOpen(false);
     }catch(error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
     }
@@ -282,7 +309,7 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
             <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
         </section>
-        {petInfo && petInfo.pet && (
+        {petInfo && petInfo.pet && petInfo.applyStatus !== "CANCELED" && (
           <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
             <div>
               <img 

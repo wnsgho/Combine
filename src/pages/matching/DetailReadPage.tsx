@@ -26,6 +26,22 @@ interface PetInfo {
   address: string;
 }
 
+interface PetApplyInfo {
+  id: number;
+  pet: {
+    petId: number;
+    species: string;
+    size: string;
+    age: string;
+    personality: string;
+    exerciseLevel: number;
+    imageUrls: string[];
+  };
+  userId: number;
+  applyDate: string;
+  applyStatus: string;
+}
+
 interface UseId {
   Id: number;
 }
@@ -38,6 +54,22 @@ const DetailReadPage = () => {
   const [role, setRole] = useState("");
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
+
+  const [petApplyInfo, setPetApplyInfo] = useState<PetApplyInfo>({
+    id: 0,
+    pet: {
+      petId: 0,
+      species: "",
+      size: "",
+      age: "",
+      personality: "",
+      exerciseLevel: 0,
+      imageUrls: [],
+    },
+    userId: 0,
+    applyDate: "",
+    applyStatus: ""
+  });
 
   const [petInfo, setPetInfo] = useState({
     petId: 0,
@@ -63,11 +95,11 @@ const DetailReadPage = () => {
     petId: "",
   })
 
-  const [useId, setUseId] = useState({
+  const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQwMDkzNiwiZXhwIjoxNzMzNDg3MzM2fQ.tkMnS-erUE_oveQ4Hqj_S6L9SRcdR8bu_RBtCPDHDS4"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQ2NTY4NSwiZXhwIjoxNzMzNTUyMDg1fQ.wzC1B0lcGSTycaD6eaX4lXj2hBxDdp19d8yde1aWo2E"
 
 
   const headers = {
@@ -112,7 +144,6 @@ const DetailReadPage = () => {
     }
   }, [petId]);
 
-
   // 유저 role 불러오기
   useEffect(() => {
     const roles = async () => {
@@ -126,6 +157,19 @@ const DetailReadPage = () => {
     roles();
   }, [])
 
+  useEffect(() => {
+    if(useId.Id !== 0){
+      const petApplyInfo = async () => {
+        try {
+          const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
+          setPetApplyInfo(response.data[0]);
+        }catch(error: any) {
+          console.error('동물 정보를 불러오는 중 오류 발생:', error);
+        }
+      };
+      petApplyInfo();
+    }
+  }, [useId.Id]);
 
 
   // 입양 신청 
@@ -141,6 +185,8 @@ const DetailReadPage = () => {
           userId: useId.Id
         }
       });
+      alert('입양 신청이 완료되었습니다.');
+      setApplyModalOpen(false);
     } catch (error) {
       console.error("입양 신청 보내는 중 오류 발생", error);
     }
@@ -301,9 +347,21 @@ const DetailReadPage = () => {
             <button className="px-4 py-2 text-lg text-cancelColor" onClick={Cancel}>
               취소
             </button>
-            <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={() => setApplyModalOpen(true)}>
-              입양신청
-            </button>
+            {petApplyInfo.applyStatus === "PENDING" ? (
+              <button
+                className="px-4 py-2 text-lg font-bold text-gray-500 cursor-not-allowed"
+                disabled
+              >
+                입양 신청 완료
+              </button>
+            ) : (
+              <button
+                className="px-4 py-2 text-lg font-bold text-mainColor"
+                onClick={() => setApplyModalOpen(true)}
+              >
+                입양 신청
+              </button>
+            )}
           </section>
         }
         {/* 입양 신청 모달 */}

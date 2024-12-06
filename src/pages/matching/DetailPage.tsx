@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { GoX } from "react-icons/go";
-import { RxDividerHorizontal } from "react-icons/rx";
 import Header from "../../components/Header";
 import axiosInstance from "../../utils/axiosInstance"; 
 import axios from "axios";
@@ -37,15 +36,11 @@ interface UseId {
 const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
-  const [useId, setUseId] = useState<UseId>({
-    Id: 0
-  });
-
+  const [useId, setUseId] = useState<UseId>({Id: 0});
   const [shelterInfo, setShelterInfo] = useState<Shelters>({
     shelterName: "",
     address: ""
   });
-
   const [addPet, setAddPet] = useState<PetAdd>({
     petName: "",
     species: "",
@@ -65,7 +60,7 @@ const DetailPage = () => {
     imageUrls: postImg
   });
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQwMTIxNywiZXhwIjoxNzMzNDg3NjE3fQ.DqmQSAiGpnGqXOcwIIyF8JK5RrkaT8Mx3SOnHcbmsH4"
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
 
 
   const headers = {
@@ -74,7 +69,7 @@ const DetailPage = () => {
 
 
 
-  // ID 불러오기
+  // 사용자 ID 가져오기
   useEffect(() => {
     const shelterId = async () => {
       try {
@@ -90,7 +85,7 @@ const DetailPage = () => {
   //보호소 정보 불러오기
   useEffect(() => {
     if(useId.Id !== 0){
-      const shelterInfos = async () => {
+      const fetchShelterInfo = async () => {
         try {
           const response = await axiosInstance.get(`/api/v1/shelters/${useId.Id}`, {headers});
           setShelterInfo(response.data);
@@ -98,7 +93,7 @@ const DetailPage = () => {
           console.error("보호소 정보를 불러오는 중 오류 발생:", error);
         }
       };
-      shelterInfos();
+      fetchShelterInfo();
     }
   }, [useId.Id])
 
@@ -117,8 +112,6 @@ const DetailPage = () => {
 
     if (fileArr) {
       const fileList = Array.from(fileArr); // File 객체 배열로 변환
-
-      // 기존 이미지와 새로운 이미지를 합쳐 저장
       setPostImg((prev) => [...prev, ...fileList]);
 
       // 새로운 이미지를 읽어와 미리보기 URL 추가
@@ -151,57 +144,50 @@ const DetailPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // 기본 동작 차단
-    addPetInfo();
-  };
+  // 폼 제출 처리
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const addPetInfo = async (): Promise<void> => {
     const petData = new FormData();
-  
-    // addPet 객체의 키-값 쌍을 순회하면서 FormData에 추가
-    // 'imageUrls' 키는 제외 (이미 파일로 처리되기 때문)
-    Object.entries(addPet).forEach(([key, value]) => {
-      if (key !== 'imageUrls') {
-        petData.append(key, value.toString()); // value를 문자열로 변환하여 추가
-      }
-    });
-  
-    // postImg 배열에 있는 파일들을 FormData에 추가
-    postImg.forEach((file) => {
-      petData.append('images', file); // 'images'라는 키로 파일 첨부
-    });
 
-    // FormData 내용 디버깅 출력
-    console.log("FormData Debugging:");
-    petData.forEach((value, key) => {
-      console.log(`${key}:`, value);
-    });
-  
+    // 파일 외 데이터 JSON 형태로 추가
+    petData.append("petData", JSON.stringify({
+      ...addPet,
+      imageUrls: undefined, // 파일 참조 제거
+    }));
+
+    // 파일 별도로 추가
+    postImg.forEach((file) => petData.append("images", file));
+
     try {
-      // 서버로 POST 요청 보내기
       const response = await axios.post(
-        `http://15.164.103.160:8080/api/v1/pets/${useId.Id}`, // API 엔드포인트
-        petData, // FormData 객체 전송
+        `http://15.164.103.160:8080/api/v1/pets/${useId.Id}`,
+        petData,
         {
           headers: {
-            'Authorization': `Bearer ${token}`, // 인증 토큰 추가
-            'Content-Type': 'multipart/form-data', // 멀티파트 형식 명시
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-      alert("동물 등록이 완료되었습니다."); // 성공 시 사용자에게 알림
+      alert("동물 등록이 완료되었습니다.");
     } catch (error) {
-      // 오류 처리
       if (axios.isAxiosError(error)) {
-        console.error("동물 등록 중 오류 발생:", error.response?.data); // 디버깅용 콘솔 출력
-        alert(`동물 등록에 실패했습니다. 오류: ${error.response?.data?.message || error.message}`); // 사용자에게 오류 메시지 표시
+        console.error("Error registering pet:", error.response?.data);
+        alert(`동물 등록에 실패했습니다. 오류: ${error.response?.data?.message || error.message}`);
       } else {
-        console.error("알 수 없는 오류 발생:", error); // 알 수 없는 오류 처리
-        alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다."); // 사용자에게 알림
+        console.error("Unknown error:", error);
+        alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다.");
       }
     }
+       // FormData 내용 디버깅 출력
+       console.log("FormData Debugging:");
+       petData.forEach((value, key) => {
+         console.log(`${key}:`, value);
+       });
   };
+
+
   
   
   
@@ -355,7 +341,7 @@ const DetailPage = () => {
           </div>
         </section>
         <div className="flex gap-32 my-10">
-          <button className="text-mainColor" onClick={addPetInfo}>등록</button>
+          <button className="text-mainColor" onClick={handleSubmit}>등록</button>
           <button className="text-cancelColor">취소</button>
         </div>
       </form>
