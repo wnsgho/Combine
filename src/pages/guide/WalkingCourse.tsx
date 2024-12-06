@@ -1,6 +1,7 @@
 import Walk from "../../../public/walk.png";
 import { useEffect, useRef, useState } from "react";
 import GuideNavigationMap from "../../components/GuideNavigationMap";
+import Header from "../../components/Header";
 
 declare global {
   interface Window {
@@ -160,6 +161,8 @@ const WalkingCourse = () => {
   };
 
   return (
+    <div>
+      <Header/>
     <div className="flex flex-col justify-center items-center">
       <div className="max-w-[1200px] mx-auto w-full">
         <div className="relative">
@@ -205,6 +208,7 @@ const WalkingCourse = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

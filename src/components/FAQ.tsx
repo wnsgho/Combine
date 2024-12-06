@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import FAQEdIt from "./FAQEdIt";
 import axios from "axios";
-
-//목록 전체를 가져와서 재귀방식으로 하는 방법으로 변경
+import useUserStore from "../store/store";
 
 interface TopFAQ {
   faqId: number;
   content: string | number;
   refFaqId: null | number;
+  parentId: null | number;
 }
 
 const FAQ = () => {
@@ -16,9 +16,9 @@ const FAQ = () => {
   const [selectFAQ, setSelectFAQ] = useState<string | null>(null);
   const [edit, setEdit] = useState<boolean>(false);
   const [topContent, setTopContent] = useState<TopFAQ[]>([]);
-  const [refContent, setRefContent] = useState<TopFAQ[]>([]);
+  const [allContent, setAllContent] = useState<TopFAQ[]>([]);
   const [parentId, setParentId] = useState<number | null>(null);
-
+  const role = useUserStore((state) => state.role);
   //작성창 열기
   const handleEditClick = () => {
     setEdit(!edit);
@@ -41,11 +41,17 @@ const FAQ = () => {
     }
   };
 
+  //처음으로 돌아가기
+  const handleBack = () => {
+    setSelectFAQ(null);
+    setParentId(null);
+  };
+
   //최상위 질문 불러오기
   useEffect(() => {
     const fetchTopFAQ = async () => {
       try {
-        const response = await axios.get("http://15.164.103.160:8080/api/v1/faqs");
+        const response = await axios.get("http://15.164.103.160:8080/api/v1/faqs/top-level");
         setTopContent(response.data);
       } catch (error) {
         console.error("최상위 질문 불러오기 실패", error);
@@ -54,28 +60,18 @@ const FAQ = () => {
     fetchTopFAQ();
   }, []);
 
-  //하위 질문 불러오기
-useEffect(() => {
-    const fetchRefFAQ = async () => {
-        if (!parentId) { 
-            setRefContent([]);  
-            return;
-        }
-        
-        try {
-            const response = await axios.get(`http://15.164.103.160:8080/api/v1/faqs/${parentId}`);
-            if (response.data && response.data.length > 0) {
-                setRefContent(response.data);
-            } else {
-                setRefContent([]); 
-            }
-        } catch (error) {
-            console.error("하위 질문 불러오기 실패", error);
-            setRefContent([]); 
-        }
+  //모든 질문 불러오기
+  useEffect(() => {
+    const fetchAllFAQ = async () => {
+      try {
+        const response = await axios.get(`http://15.164.103.160:8080/api/v1/faqs`);
+        setAllContent(response.data);
+      } catch (error) {
+        console.error("하위 질문 불러오기 실패", error);
+      }
     };
-    fetchRefFAQ();
-}, [parentId]);
+    fetchAllFAQ();
+  }, []);
 
   return (
     <div>
@@ -87,14 +83,16 @@ useEffect(() => {
       {open && (
         <>
           <div className="bg-white shadow-[0_0_15px_rgba(0,0,0,0.5)] w-96 h-[556px] fixed right-[90px] bottom-2 m-6 z-50 rounded-md">
-            <div className=" bg-green-500 font-bold text-xl px-3 py- flex  rounded-t-md content-center justify-between">
+            <div className=" bg-green-500 font-bold text-xl p-3 flex  rounded-t-md content-center justify-between">
               <div>FAQ</div>
               <div className="flex gap-2">
-                <div className="cursor-pointer float-end" onClick={handleEditClick}>
-                  +
-                </div>
+                {role === "ROLE_ADMIN" && (
+                  <div className="cursor-pointer float-end" onClick={handleEditClick}>
+                    +
+                  </div>
+                )}
                 <div className="cursor-pointer" onClick={() => setOpen(false)}>
-                  x
+                  ✖️
                 </div>
               </div>
             </div>
@@ -106,8 +104,8 @@ useEffect(() => {
                 <div className="ml-5 p-2 rounded-xl content-center bg-gray-200">어떤 도움이 필요하신가요?</div>
               </div>
               {!selectFAQ ? (
+                // 최상위 질문들 표시
                 <>
-                  {/* 최상위 질문 가져오기 */}
                   {topContent.map((faq) => (
                     <div className="flex px-5 py-1 justify-end" key={faq.faqId}>
                       <div
@@ -120,41 +118,56 @@ useEffect(() => {
                 </>
               ) : (
                 <>
-                {/* 질문이 한개만 있다면 전에 클릭한 질문 나타나게하기 */}
-                {refContent.length === 1 ? (
-                    <>
-                    <div className="flex px-5 py-1 justify-end" >
-                      <div
-                        className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500 cursor-pointer hover:bg-green-500 hover:text-white"
-                        >
-                        {selectFAQ}
-                      </div>
-                    </div>
-                    {/* 자식 질문이 한개일때 답변 */}
-                    {refContent.map((ref) => (
-                    <div className="flex px-5 py-3">
-                    <div className="rounded-full w-12 h-12 min-w-[48px] min-h-[48px]">
-                        <img src={logo} alt="logo" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="ml-5 p-2 rounded-xl bg-gray-200 break-words">
-                    {ref.content}
-                    </div>
-                </div>
-                  ))}
-                  </>
-                  ) : (
-                    <>
-                    {/* 자식 질문이 여러개일때 */}
-                    {refContent.map((ref) => (
-                    <div className="flex px-5 py-1 justify-end" key={ref.faqId}>
-                      <div className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500 cursor-pointer hover:bg-green-500 hover:text-white">
-                        {ref.content}
-                      </div>
-                    </div>
-                  ))}
-                  </>
-                  )}
-                  
+                  {/* 하위 질문들 */}
+                  {(() => {
+                    const filteredContent = allContent.filter((item) => item.parentId === parentId);
+
+                    if (filteredContent.length === 1) {
+                      return (
+                        <>
+                          {/* 선택된 질문 표시 */}
+                          <div className="flex px-5 py-1 justify-end">
+                            <div className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500">
+                              {selectFAQ}
+                            </div>
+                          </div>
+
+                          <div className="flex px-5 py-3">
+                            <div className="rounded-full w-12 h-12 min-w-12">
+                              <img src={logo} alt="logo" />
+                            </div>
+                            <div className="ml-5 p-2 rounded-xl content-center bg-gray-200">
+                              {filteredContent[0].content}
+                            </div>
+                          </div>
+
+                          <div
+                            onClick={handleBack}
+                            className="text-white bg-green-500 mx-20 mt-5 py-2 text-center rounded-lg font-bold text-xl cursor-pointer ">
+                            처음으로
+                          </div>
+                        </>
+                      );
+                    } else {
+                      // 하위 질문이 여러 개 일때
+                      return [
+                        ...filteredContent.map((item) => (
+                          <div className="flex px-5 py-1 justify-end" key={item.faqId}>
+                            <div
+                              className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500 cursor-pointer hover:bg-green-500 hover:text-white"
+                              onClick={() => handleSelectFAQ(item.content.toString(), item.faqId)}>
+                              {item.content}
+                            </div>
+                          </div>
+                        )),
+                        <div
+                          onClick={handleBack}
+                          className="text-white bg-green-500 mx-20 mt-5 py-2 text-center rounded-lg font-bold text-xl cursor-pointer">
+                          처음으로
+                        </div>
+                      ];
+                    }
+                  })()}
                 </>
               )}
             </div>
