@@ -53,7 +53,7 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error("로그인 실패:", error);
-      alert(error.response?.data?.message || "로그인에 실패했습니다.");
+      alert("이메일 혹은 비밀번호를 확인해주세요." || "로그인을 할 수 없습니다.");
     } finally {
       setLoading(false); 
     }
