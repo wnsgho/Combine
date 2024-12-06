@@ -5,10 +5,9 @@ import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import Header from "../../components/Header";
 
-// userID가 뭔지 알고 전역으로 설정해 놔야할듯
 const QAandAEdit = () => {
-  const [userId, setUserId] = useState(7)
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
     const navigate = useNavigate();
@@ -18,7 +17,7 @@ const QAandAEdit = () => {
     useEffect(() => {
       const fetchPost = async () => {
         try {
-          const response = await axios.get(`http://15.164.103.160:8080/api/v1/inquries/${id}`);
+          const response = await axios.get(`http://15.164.103.160:8080/api/v1/inquiries/${id}`);
           setTitle(response.data.title);
           setContent(response.data.content);
         } catch (error) {
@@ -34,10 +33,15 @@ const QAandAEdit = () => {
     //수정 요청
     const handleSubmit = async () => {
       try {
-        await axios.put(`http://15.164.103.160:8080/api/v1/inquries/${id}`, {
-          userId,
+        await axios.put(`http://15.164.103.160:8080/api/v1/inquiries/${id}`, {
           title,
           content
+        },
+        {
+          headers: {
+            Authorization : localStorage.getItem("accessToken"),
+            'Content-Type': 'application/json',
+          }
         });
         alert("수정 되었습니다.");
         navigate(`/guide/qna/${id}`);
@@ -79,6 +83,8 @@ const QAandAEdit = () => {
     ];
 
   return (
+    <div>
+      <Header/>
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto ">
         <div className=" relative">
@@ -129,6 +135,7 @@ const QAandAEdit = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

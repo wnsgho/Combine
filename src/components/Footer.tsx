@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
             "Content-Type": "application/json",
           },
         });
-        navigate(`/announcement/${currentAnnouncement.id}`);
+        navigate(`/guide/announcement/${currentAnnouncement.id}`);
       } catch (error) {
         console.error("공지사항 목록을 조회하는데 실패했습니다.", error);
       }

@@ -5,22 +5,43 @@ import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import Header from "../../components/Header";
+
+//gyutest@gmail.com
+//gyutest123
 
 const QAandApostcreate = () => {
-  const [userId, setUserId] = useState(7)
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("")
   const navigate = useNavigate()
 
     
     const handleSubmit = async() => {
+      if (!title.trim()) {
+        alert('제목을 입력해주세요.');
+        return;
+      }
+  
+      if (!content.trim()) {
+        alert('내용을 입력해주세요.');
+        return;
+      }
+
       try{
-        const response = await axios.post("http://15.164.103.160:8080/api/v1/inquries",{
-          userId,
+        const token = localStorage.getItem("accessToken")
+        const response = await axios.post("http://15.164.103.160:8080/api/v1/inquiries",{
           title,
           content,
-        })
-        if(response.status === 201){
+        },
+        {
+          headers: {
+            Authorization : token,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+        if(response.status === 200){
+          alert("작성이 완료되었습니다!")
           navigate("/guide/qna")
         }
       }catch(error){
@@ -61,6 +82,8 @@ const QAandApostcreate = () => {
   ];
 
   return (
+    <div>
+      <Header/>
     <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[1200px] mx-auto ">
         <div className=" relative">
@@ -107,6 +130,7 @@ const QAandApostcreate = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
