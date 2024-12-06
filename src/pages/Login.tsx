@@ -16,24 +16,14 @@ const Login = () => {
 
   // 일반 로그인 메세지 + 백엔드 요청
   const handleLogin = async () => {
-    if (!email && !password) {
+    if (!email || !password) {
       alert("이메일과 비밀번호를 입력해주세요.");
       return;
     }
-  
-    if (!email) {
-      alert("이메일을 입력해주세요.");
-      return;
-    }
-  
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("유효한 이메일 형식이 아닙니다.");
-      return;
-    }
-  
-    if (!password) {
-      alert("비밀번호를 입력해주세요.");
       return;
     }
 
@@ -42,55 +32,43 @@ const Login = () => {
       const formData = new FormData();
       formData.append("email", email);
       formData.append("password", password);
-  
+
       const response = await axiosInstance.post("/login", formData, {
         headers: {
-          "Content-Type": "multipart/form-data", 
+          "Content-Type": "multipart/form-data",
         },
       });
-  
-    const accessToken = response.headers.authorization;
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-      alert("로그인 되었습니다.");
-      navigate("/");
-    } else {
-      alert("토큰이 반환되지 않았습니다. 다시 시도해주세요.");
+
+      const accessToken = response.headers.authorization;
+      if (accessToken) {
+        const formattedToken = accessToken.startsWith("Bearer ")
+          ? accessToken
+          : `Bearer ${accessToken}`;
+        localStorage.setItem("accessToken", formattedToken);
+        localStorage.removeItem("isSocialLogin"); 
+        alert("로그인 되었습니다.");
+        navigate("/");
+      } else {
+        alert("토큰이 반환되지 않았습니다. 다시 시도해주세요.");
+      }
+    } catch (error: any) {
+      console.error("로그인 실패:", error);
+      alert(error.response?.data?.message || "로그인에 실패했습니다.");
+    } finally {
+      setLoading(false); 
     }
-  } catch (error) {
-    console.error("로그인 실패:", error);
-    alert("로그인에 실패했습니다.");
-  }
   };
 
   // 카카오 로그인
-  const handleKakaoLogin = async () => {
-    try {
-      const response = await axiosInstance.post("/api/v1/auth/oauth2/kakao");
-      const { accessToken } = response.data;
-
-      localStorage.setItem("accessToken", accessToken);
-      alert("카카오 로그인 되었습니다.");
-      navigate("/");
-    } catch (error) {
-      console.error("카카오 로그인 실패:", error);
-      alert("카카오 로그인을 할 수 없습니다.");
-    }
+  const handleKakaoLogin = () => {
+    localStorage.setItem("isSocialLogin", "true"); 
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/kakao`;
   };
 
   // 네이버 로그인
-  const handleNaverLogin = async () => {
-    try {
-      const response = await axiosInstance.post("/api/v1/auth/oauth2/naver");
-      const { accessToken } = response.data;
-
-      localStorage.setItem("accessToken", accessToken);
-      alert("네이버 로그인 되었습니다.");
-      navigate("/");
-    } catch (error) {
-      console.error("네이버 로그인 실패:", error);
-      alert("네이버 로그인을 할 수 없습니다.");
-    }
+  const handleNaverLogin = () => {
+    localStorage.setItem("isSocialLogin", "true"); 
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/naver`;
   };
 
   return (
@@ -122,7 +100,7 @@ const Login = () => {
             <div className="text-sm md:text-2xl lg:text-2xl xl:text-3xl text-gray-600 flex items-center gap-1">
               <p>회원이 아니신가요?</p>
               <p
-                className="font-bold cursor-pointer transition-transform transform hover:scale-105 pl-"
+                className="font-bold cursor-pointer transition-transform transform hover:scale-105 pl-3"
                 onClick={() => navigate("/signup")}
               >
                 회원가입하기
