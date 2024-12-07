@@ -62,13 +62,13 @@ const Login = () => {
   // 카카오 로그인
   const handleKakaoLogin = () => {
     localStorage.setItem("isSocialLogin", "true"); 
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/kakao`;
+    window.location.href = `${axiosInstance.defaults.baseURL}/api/v1/auth/oauth2/kakao`;
   };
 
   // 네이버 로그인
   const handleNaverLogin = () => {
     localStorage.setItem("isSocialLogin", "true"); 
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/naver`;
+    window.location.href = `${axiosInstance.defaults.baseURL}/api/v1/auth/oauth2/naver`;
   };
 
   return (
