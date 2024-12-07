@@ -260,7 +260,7 @@ const MyPageShelter: React.FC = () => {
                 petLists.map((pet) => (
                   <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
                     <img 
-                      src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://http://15.164.103.160:8080`+pet.imageUrls[0] : mainImage} 
+                      src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://15.164.103.160:8080${pet.imageUrls[0]}` : mainImage} 
                       alt="동물 사진"
                       onError={(e) => {
                         e.currentTarget.src = mainImage;

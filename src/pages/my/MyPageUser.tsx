@@ -48,6 +48,7 @@ const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
+  const [selectedPetId, setSelectedPetId] = useState<number | null>(null); // 선택된 pet.id 상태 추가
   const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
@@ -65,21 +66,7 @@ const MyPageUser: React.FC = () => {
     userRole: ""
   });
 
-  const [petInfo, setPetInfo] = useState<PetInfo>({
-    id: 0,
-    pet: {
-      petId: 0,
-      species: "",
-      size: "",
-      age: "",
-      personality: "",
-      exerciseLevel: 0,
-      imageUrls: [],
-    },
-    userId: 0,
-    applyDate: "",
-    applyStatus: ""
-  });
+  const [petInfo, setPetInfo] = useState<PetInfo[]>([]);
 
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
   const [useId, setUseId] = useState<UseId>({
@@ -129,59 +116,48 @@ const MyPageUser: React.FC = () => {
         }
       };
 
-      const petInfo = async () => {
+      const petInfos = async () => {
         try {
-          const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
-          setPetInfo(response.data[0]);
+          const response = await axiosInstance.get<PetInfo[]>(`/api/v1/applypet/${useId.Id}/list`, {headers});
+          setPetInfo(response.data);
         }catch(error: any) {
-          console.error('동물 정보를 불러오는 중 오류 발생:', error);
+          console.error('입양신청 정보를 불러오는 중 오류 발생:', error);
           // handleError(error);
         }
       };
 
       userInfo();
-      petInfo();
+      petInfos();
     }
   }, [useId.Id]);
 
+  console.log(useId.Id)
 
 
-  const deleteApply = async() => {
-    try{
-      await axios.post(`http://15.164.103.160:8080/api/v1/applypet/${petInfo.id}/cancel?userId=${useId.Id}`, null, {
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/json'
-        },
-        params: {
-          userId:useId.Id
+  const deleteApply = async (): Promise<void> => {
+    try {
+      await axios.post(
+        `http://15.164.103.160:8080/api/v1/applypet/${selectedPetId}/cancel`,
+        null,
+        {
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            userId:useId.Id
+          }
         }
-      }
       );
-      alert('입양 취소가 완료되었습니다.');
-      setPetInfo({
-        id: 0,
-        pet: {
-          petId: 0,
-          species: "",
-          size: "",
-          age: "",
-          personality: "",
-          exerciseLevel: 0,
-          imageUrls: [],
-        },
-        userId: 0,
-        applyDate: "",
-        applyStatus: "",
-      });
+      alert("입양 취소가 완료되었습니다.");
       setApplyModalOpen(false);
       window.location.reload();
-    }catch(error) {
+    } catch (error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
-      alert('입양 취소를 다시 시도해 주세요');
+      alert("입양 취소를 다시 시도해 주세요");
       setApplyModalOpen(false);
     }
-  }
+  };
 
 
   // 비밀번호 유효성 검증 함수
@@ -226,8 +202,6 @@ const MyPageUser: React.FC = () => {
       alert(passwordError);
       return;
     }
-
-
     try {
       await axiosInstance.put(`/api/v1/users/${useId.Id}`, userInfo , {headers});
       alert('정보가 수정되었습니다.');
@@ -321,43 +295,55 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
             <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
         </section>
-        {petInfo?.pet && petInfo.applyStatus !== "CANCELED" ? (
-          <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
-            <div>
-              <img 
-                src={petInfo.pet.imageUrls?.[0] || undefined} 
-                alt={`${petInfo.pet.species || "알 수 없는 동물"} 사진`} 
-              />
-            </div>
-            <div className="flex flex-col items-center gap-3 my-5">
-              <p>
-                {petInfo.pet.species} / {petInfo.pet.size} / {petInfo.pet.age} / 
-                {petInfo.pet.personality} / {petInfo.pet.exerciseLevel}
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-3 my-5">
-              <button className='text-cancelColor' onClick={() => setApplyModalOpen(true)}>
-                입양 신청 취소
-              </button>
-            </div>
-          </section>
+        {Array.isArray(petInfo) && petInfo.filter(pet => pet.applyStatus === "PENDING").length > 0 ? (
+          petInfo
+            .filter(pet => pet.applyStatus === "PENDING") // applyStatus가 "PENDING"인 것만 필터링
+            .map((pet) => (
+              <section
+                key={pet.id} // 키를 각 pet의 id로 설정
+                className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor"
+              >
+                <div>
+                  <img
+                    src={`http://15.164.103.160:8080${pet.pet.imageUrls[0]}` || undefined}
+                    alt={`${pet.pet.species || "알 수 없는 동물"} 사진`}
+                  />
+                </div>
+                <div className="flex flex-col items-center gap-3 my-5">
+                  <p>
+                    {pet.pet.species} / {pet.pet.size} / {pet.pet.age} /
+                    {pet.pet.personality} / {pet.pet.exerciseLevel}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center gap-3 my-5">
+                  <button
+                    className="text-cancelColor"
+                    onClick={() => {
+                      setSelectedPetId(pet.id); 
+                      setApplyModalOpen(true); }} 
+                  >
+                    입양 신청 취소
+                  </button>
+                </div>
+                {/* 입양 취소 모달 */}
+                <MyPageModal isOpen={isApplyModalOpen} onClose={() => setApplyModalOpen(false)}>
+                  <h3 className="mb-4 text-lg font-bold">입양 취소 하시겠습니까?</h3>
+                  <div className="flex justify-end gap-4 mt-6">
+                    <button className="text-mainColor" onClick={deleteApply}>
+                      네
+                    </button>
+                    <button className="text-cancelColor" onClick={() => setApplyModalOpen(false)}>
+                      아니오
+                    </button>
+                  </div>
+                </MyPageModal>
+              </section>
+
+
+            ))
         ) : (
-          <p className='mb-20'>입양신청 동물이 없습니다.</p>
+          <p className="mb-20">입양신청 동물이 없습니다.</p>
         )}
-
-        {/* 입양 취소 모달 */}
-        <MyPageModal isOpen={isApplyModalOpen} onClose={() => setApplyModalOpen(false)}>
-          <h3 className="mb-4 text-lg font-bold">입양 취소 하시겠습니까?</h3>
-          <div className="flex justify-end gap-4 mt-6">
-            <button className="text-mainColor" onClick={deleteApply}>
-              네
-            </button>
-            <button className="text-cancelColor" onClick={() => setApplyModalOpen(false)}>
-              아니오
-            </button>
-          </div>
-        </MyPageModal>
-
         {/* 수정 모달 */}
         <MyPageModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
           <h3 className="mb-4 text-lg font-bold">정보 수정</h3>

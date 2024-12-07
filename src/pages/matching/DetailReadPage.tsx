@@ -238,9 +238,9 @@ const DetailReadPage = () => {
 
   // 상세정보 수정 페이지로 이동하는 링크 생성 함수
   const petLink = (petId:any) => {
-    return `/adoption-list/${petId}`; // 입양신청 리스트 페이지 URL 생성
+    return `/detail-correct/${petId}`; // 입양신청 리스트 페이지 URL 생성
   };
-
+  
   const mapLink = (petId:any) => {
     return `/shelter-address/${petId}`; // 지도 페이지 URL 생성
   };
@@ -262,7 +262,7 @@ const DetailReadPage = () => {
             </button>
             <div className="flex items-center justify-center w-full h-64">
               <img
-                src={`http://http://15.164.103.160:8080`+petInfo.imageUrls[currentIndex]}
+                src={`http://15.164.103.160:8080${petInfo.imageUrls[currentIndex]}`}
                 alt={`Slide ${currentIndex + 1}`}
                 className="object-contain w-full h-full"
               />

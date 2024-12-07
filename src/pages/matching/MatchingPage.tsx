@@ -22,6 +22,7 @@ interface UseRole {
 const MatchingPage = () => {
   const [pets, setPets] = useState<ProcessedPet[]>([]); // 동물 데이터 저장 상태
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [token, setToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const [useRole, setUseRole] = useState({role: ""});
@@ -45,21 +46,33 @@ const MatchingPage = () => {
     'Authorization': `${token}`,
   };
 
-
   useEffect(() => {
     const fetchPetList = async () => {
+      setLoading(true); // 로딩 상태 시작
       try {
         const response = await axiosInstance.get('/api/v1/pets'); // API 호출
-        setPets(response.data); // API에서 받은 데이터를 상태에 저장
-        const userRole = await axiosInstance.get(`/api/v1/features/role`, {headers}); // 현재 로그인 유저 role 확인 API 호출
-        setUseRole(userRole.data)
+        setPets(response.data);
       } catch (error) {
         console.error("동물 리스트를 불러오는 중 오류 발생:", error);
         // handleError(error);
+      } finally {
+        setLoading(false); // 로딩 상태 종료
       }
     };
+    fetchPetList();
+  }, [])
 
-    fetchPetList(); // 데이터 가져오기 함수 실행
+  useEffect(() => {
+    const userRole = async () => {
+      try {
+        const response = await axiosInstance.get(`/api/v1/features/role`, {headers}); // 현재 로그인 유저 role 확인 API 호출
+        setUseRole(response.data)
+      } catch (error) {
+        console.error("유저 role 불러오는 중 오류 발생:", error);
+        // handleError(error);
+      }
+    };
+    userRole(); // 데이터 가져오기 함수 실행
   }, [token]); 
 
   const shelter = useRole.role == "ROLE_SHELTER"
@@ -94,17 +107,19 @@ const MatchingPage = () => {
     const message = error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
     navigate("/errorpage", { state: { status, message } }); // state로 에러 정보 전달
   };
+
+  if (loading) {
+    return <div>로딩 중...</div>; // 로딩 상태 표시
+  }
       
   if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링 방지
 
-  
   
   return (
     <>
       <div className='max-w-screen'>
         <Header />
-
-        <section className='flex flex-wrap items-center justify-center gap-10 p-10 mt-10'>
+        <section className='flex flex-wrap items-center justify-center gap-10 p-10 mt-10 border'>
           <p className='text-3xl text-mainColor'>선택 옵션</p>
           <form className="flex flex-wrap max-w-xl mx-10 ">
             <select id="species" className="text-3xl px-7 " onChange={filterChange}>
@@ -152,7 +167,7 @@ const MatchingPage = () => {
             {filteredPets.map((pet) => (
               <Link to={detailLink(pet.petId)}>
                 <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72'>
-                  <img src={pet.imageUrls[0]} alt="동물 사진" className='w-full h-40 rounded-t-md'/>
+                  <img src={`http://15.164.103.160:8080${pet.imageUrls[0]}`} alt="동물 사진" className='w-full h-40 rounded-t-md'/>
                   <div className='m-3'>
                     <p className='mt-2'>{pet.species} / {pet.age} / {pet.size} /<br /> {pet.personality} / {pet.exerciseLevel}</p>
                   </div>
