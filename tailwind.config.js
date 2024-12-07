@@ -4,8 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        mainColor: '#AB654B',
+        mainColor: '#f1a34a',
         cancelColor: '#FF1212',
+        bgColor: '#3c2a13',
       },
     },
   },

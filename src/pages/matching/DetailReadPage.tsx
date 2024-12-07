@@ -50,8 +50,9 @@ interface UseId {
 const DetailReadPage = () => {
   const { petId } = useParams();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate(); 
   const [roles, setRoles] = useState({role:""});
+  const [isLoading, setIsLoading] = useState(true); 
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
@@ -129,18 +130,25 @@ const DetailReadPage = () => {
     pets();
   }, [token])
 
-  // 유저 Id 불러오기
+  // ID, ROLE 불러오기
   useEffect(() => {
-    const userId = async () => {
-      try{
-        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
-        setUseId(response.data);
-      }catch(error) {
-        console.error("유저 ID 불러오는 중 오류 발생", error)
+    const fetchUserData = async () => {
+      try {
+        const userIdResponse = await axiosInstance.get(`/api/v1/features/user-id`, { headers });
+        setUseId(userIdResponse.data);
+
+        const roleResponse = await axiosInstance.get(`/api/v1/features/role`, { headers });
+        setRoles(roleResponse.data);
+      } catch (error) {
+        console.error("유저 데이터를 불러오는 중 오류 발생:", error);
+      } finally {
+        setIsLoading(false); // 로딩 상태 종료
       }
-    }
-    userId();
-  }, [token])
+    };
+  
+    fetchUserData();
+  }, [token]);
+  
 
   // petId 추가하기
   useEffect(() => {
@@ -152,18 +160,6 @@ const DetailReadPage = () => {
     }
   }, [petId]);
 
-  // 유저 role 불러오기
-  useEffect(() => {
-    const roles = async () => {
-      try{
-        const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
-        setRoles(response.data);
-      }catch(error) {
-        console.error("유저 Role 불러오는 중 오류 발생", error)
-      } 
-    }
-    roles();
-  }, [token])
 
   // 회원 입양 신청 조회
   useEffect(() => {
@@ -287,81 +283,86 @@ const DetailReadPage = () => {
           </div>
         </section>
 
-        <section className="flex flex-col w-full max-w-lg gap-8 mt-8">
+        <section className="flex flex-col w-full max-w-lg gap-3 mt-8">
           <div className="flex justify-center">
             <h3 className="text-2xl font-bold text-mainColor">{petInfo.petName}</h3>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">종류</p>
-              <p className="text-lg">{petInfo.species}</p>
+              <p className="text-lg text-white">{petInfo.species}</p>
             </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">나이</p>
-              <p className="text-lg">{petInfo.age}</p>
+              <p className="text-lg text-white">{petInfo.age}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">성별</p>
-              <p className="text-lg">{petInfo.gender}</p>
+              <p className="text-lg text-white">{petInfo.gender}</p>
             </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">접종 유무</p>
-              <p className="text-lg">{petInfo.vaccinated}</p>
+              <p className="text-lg text-white">{petInfo.vaccinated}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">중성화 유무</p>
-              <p className="text-lg">{petInfo.neutering}</p>
+              <p className="text-lg text-white">{petInfo.neutering}</p>
             </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">성격</p>
-              <p className="text-lg">{petInfo.personality}</p>
-            </div>
+                <p className="text-xl font-bold text-mainColor">성격</p>
+                <p className="text-lg text-white">{petInfo.personality}</p>
+              </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">활동량</p>
-              <p className="text-lg">{petInfo.exerciseLevel}</p>
+              <p className="text-lg text-white">{petInfo.exerciseLevel}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호소로 오게 된 이유</p>
-              <p className="text-lg">{petInfo.reason}</p>
+              <p className="text-lg text-white">{petInfo.reason}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">맡겨지기 전 가정환경</p>
-              <p className="text-lg">{petInfo.preAdoption}</p>
+              <p className="text-lg text-white">{petInfo.preAdoption}</p>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-center gap-8 p-3 bg-bgColor rounded-xl">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호 기관</p>
                 <Link to={mapLink(petId)}>
-                  <p className="flex items-center text-lg">{petInfo.shelterName}<GoChevronRight /></p>
+                  <p className="flex items-center text-lg text-white">{petInfo.shelterName}<GoChevronRight /></p>
                 </Link>
             </div>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 bg-bgColor rounded-xl">
             <p className="text-xl font-bold text-mainColor">추가정보</p>
-            <p className="text-lg">{petInfo.extra}</p>
+            <p className="text-lg text-white">{petInfo.extra}</p>
           </div>
         </section>
         {shelter ?  <section className="flex gap-24 my-8">
-            <button className="px-4 py-2 text-lg text-cancelColor"  onClick={() => setDeleteModalOpen(true)}>삭제</button>
-            <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>완료</button>
             <Link to={petLink(petId)}>
               <button className="px-4 py-2 text-lg text-cancelColor">수정</button>
             </Link>
+            <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>완료</button>
+            <button className="px-4 py-2 text-lg text-cancelColor"  onClick={() => setDeleteModalOpen(true)}>삭제</button>
           </section>
         : 
           <section className="flex gap-32 my-8">
-            <button className="px-4 py-2 text-lg text-cancelColor" onClick={Cancel}>
-              취소
-            </button>
             {petApplyInfo.applyStatus === "PENDING" ? (
               <button
                 className="px-4 py-2 text-lg font-bold text-gray-500 cursor-not-allowed"
@@ -371,12 +372,15 @@ const DetailReadPage = () => {
               </button>
             ) : (
               <button
-                className="px-4 py-2 text-lg font-bold text-mainColor"
+                className="px-4 py-2 text-lg font-bold text-mainColor hover:text-bgColor"
                 onClick={() => setApplyModalOpen(true)}
               >
                 입양 신청
               </button>
             )}
+            <button className="px-4 py-2 text-lg font-bold text-cancelColor hover:text-blue-700" onClick={Cancel}>
+              취소
+            </button>
           </section>
         }
         {/* 입양 신청 모달 */}

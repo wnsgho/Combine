@@ -12,6 +12,7 @@ interface ProcessedPet {
   personality: string;
   exerciseLevel: number;
   size: string;
+  status: string;
   imageUrls: string[];
 }
 
@@ -90,6 +91,7 @@ const MatchingPage = () => {
   // 필터링된 동물 리스트 반환
   const filteredPets = Array.isArray(pets) ? pets.filter((pet) => {
     return (
+      pet.status === "신청가능" &&
       (!filters.species || pet.species === filters.species) &&
       (!filters.age || pet.age === filters.age) &&
       (!filters.size || pet.size === filters.size)
@@ -117,29 +119,29 @@ const MatchingPage = () => {
   
   return (
     <>
-      <div className='max-w-screen'>
-        <Header />
-        <section className='flex flex-wrap items-center justify-center gap-10 p-10 mt-10 border'>
-          <p className='text-3xl text-mainColor'>선택 옵션</p>
-          <form className="flex flex-wrap max-w-xl mx-10 ">
-            <select id="species" className="text-3xl px-7 " onChange={filterChange}>
+      <Header />
+      <div className='flex flex-col items-center max-w-screen'>
+        <section className='flex flex-wrap items-center justify-center w-8/12 gap-10 p-10 mt-10 border bg-mainColor rounded-2xl'>
+          <p className='p-3 text-3xl font-bold'>선택 옵션</p>
+          <form className="flex flex-wrap max-[1041px]:justify-center max-[1041px]:gap-5 max-[790px]:gap-3 max-[726px]:justify-center mx-10 ">
+            <select id="species" className="text-3xl px-7 rounded-xl" onChange={filterChange}>
               <option value="">종류</option>
               <option value="강아지">강아지</option>
               <option value="고양이">고양이</option>
             </select>
             <div>
-              <RxDividerVertical className='w-10 h-10 ' />
+              <RxDividerVertical className='w-10 h-10 max-[850px]:hidden' />
             </div>
-            <select id="age" className="text-3xl px-7" onChange={filterChange}>
+            <select id="age" className="text-3xl px-7 rounded-xl" onChange={filterChange}>
               <option value="">연령</option>
               <option value="0~3살">0~3살</option>
               <option value="4~6살">4~6살</option>
               <option value="7~8살">7~10살</option>
             </select>
             <div>
-              <RxDividerVertical className='w-10 h-10 ' />
+              <RxDividerVertical className='w-10 h-10 max-[1041px]:hidden' />
             </div>
-            <select id="size" className="text-3xl px-7" onChange={filterChange}>
+            <select id="size" className="text-3xl px-7 rounded-xl" onChange={filterChange}>
               <option value="">크기</option>
               <option value="소형">소형</option>
               <option value="중형">중형</option>
@@ -147,10 +149,10 @@ const MatchingPage = () => {
             </select>
           </form>     
         </section>
-        <section className='flex justify-center mt-6'>
+        <section className='mt-6'>
           <div>
             <Link to="/detailadd">
-            {shelter ? <button className='text-2xl text-cancelColor'>등록</button> : null}
+              {shelter ? <button className='flex items-center justify-center text-2xl text-mainColor hover:text-orange-600'>등록 <GoChevronRight /></button> : null}
             </Link>
           </div>
         </section>
@@ -158,7 +160,7 @@ const MatchingPage = () => {
           <div className='flex flex-col items-center justify-center'>
             <h3 className='mb-5 text-4xl font-bold'>매칭이 어려우신가요?</h3>
             <Link to="/ai-matching">
-              <button className='flex items-center justify-center text-lg text-mainColor'>AI매칭 바로가기<GoChevronRight /></button>
+              <button className='flex items-center justify-center text-lg text-mainColor hover:text-orange-600'>AI매칭 바로가기<GoChevronRight /></button>
             </Link>
           </div>
         </section>
@@ -166,10 +168,24 @@ const MatchingPage = () => {
           <div className='flex flex-wrap justify-center gap-10'>
             {filteredPets.map((pet) => (
               <Link to={detailLink(pet.petId)}>
-                <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72'>
+                <div key={pet.petId} className='border border-solid rounded-lg min-w-48 max-w-48 min-h-80 max-h-80'>
                   <img src={`http://15.164.103.160:8080${pet.imageUrls[0]}`} alt="동물 사진" className='w-full h-40 rounded-t-md'/>
                   <div className='m-3'>
-                    <p className='mt-2'>{pet.species} / {pet.age} / {pet.size} /<br /> {pet.personality} / {pet.exerciseLevel}</p>
+                    <div className='flex justify-center'>
+                      <p className='mt-2 text-xl font-bold'>{pet.species}</p>
+                    </div>
+                    <div className='flex justify-between px-5'>
+                      <p className='text-neutral-500'>연령</p><p className='text-black'>{pet.age}</p>
+                    </div>
+                    <div className='flex justify-between px-5'>
+                      <p className='text-neutral-500'>크기</p><p className='text-black'>{pet.size}</p>
+                    </div>
+                    <div className='flex justify-between px-5'>
+                      <p className='text-neutral-500'>성격</p><p className='text-black'>{pet.personality}</p>
+                    </div>
+                    <div className='flex justify-between px-5'>
+                      <p className='text-neutral-500'>활동량</p><p className='text-black'>{pet.exerciseLevel}</p>
+                    </div>
                   </div>
                 </div>
               </Link>

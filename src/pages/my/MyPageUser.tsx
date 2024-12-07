@@ -131,8 +131,6 @@ const MyPageUser: React.FC = () => {
     }
   }, [useId.Id]);
 
-  console.log(useId.Id)
-
 
   const deleteApply = async (): Promise<void> => {
     try {
@@ -245,31 +243,31 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
       <div className="flex flex-col items-center">
         <section className="flex flex-col items-center w-full max-w-lg gap-4 mt-8">
           <div className="flex justify-center">
-            <h3 className='text-2xl font-bold'>마이페이지</h3>
+            <h3 className='text-2xl font-bold text-mainColor'>마이페이지</h3>
           </div>
-          <div className="flex flex-wrap justify-center gap-10">
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">이름</p>
+          <div className="flex flex-wrap justify-center gap-8 p-5 bg-bgColor rounded-2xl">
+            <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+              <p className="text-xl font-bold ">이름</p>
               <p className='text-lg'>{userInfo.username}</p>
             </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">주소</p>
+            <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+              <p className="text-xl font-bold">주소</p>
               <p className='text-lg'>{userInfo.address}</p>
             </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">메일(아이디)</p>
+            <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+              <p className="text-xl font-bold">메일(아이디)</p>
               <p className='text-lg'>{userInfo.email}</p>
             </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">생년월일</p>
+            <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+              <p className="text-xl font-bold">생년월일</p>
               <p className='text-lg'>{userInfo.birthDate}</p>
             </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">전화번호</p>
+            <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+              <p className="text-xl font-bold">전화번호</p>
               <p className='text-lg'>{userInfo.phoneNumber}</p>
             </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">선호동물</p>
+            <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+              <p className="text-xl font-bold">선호동물</p>
               <span className='text-lg'>{userInfo.preferredSize}</span>/
               <span className='text-lg'>{userInfo.preferredPersonality}</span>/
               <span className='text-lg'>{userInfo.preferredExerciseLevel}</span>
@@ -277,13 +275,13 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
           </div>
           <div className="flex gap-32 mt-10">
             <button
-              className="text-lg text-mainColor"
+              className="text-lg text-mainColor hover:text-orange-500"
               onClick={() => setEditModalOpen(true)}
             >
               정보수정
             </button>
             <button
-              className="text-lg text-cancelColor"
+              className="text-lg text-cancelColor hover:text-red-700"
               onClick={() => setDeleteModalOpen(true)}
             >
               회원탈퇴
@@ -292,16 +290,16 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
         </section>
         <section className="flex flex-col items-center justify-center w-full max-w-lg gap-4 mt-8">
           <div>
-            <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
+            <h3 className="mb-5 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
         </section>
-        {Array.isArray(petInfo) && petInfo.filter(pet => pet.applyStatus === "PENDING").length > 0 ? (
+        {Array.isArray(petInfo) && petInfo.filter(pet => pet.applyStatus === "PENDING" || pet.applyStatus === "COMPLETED").length > 0 ? (
           petInfo
-            .filter(pet => pet.applyStatus === "PENDING") // applyStatus가 "PENDING"인 것만 필터링
+            .filter(pet => pet.applyStatus === "PENDING" || pet.applyStatus === "COMPLETED") // applyStatus가 "PENDING"인 것만 필터링
             .map((pet) => (
               <section
                 key={pet.id} // 키를 각 pet의 id로 설정
-                className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor"
+                className="relative flex flex-col items-center w-full max-w-lg my-10 overflow-hidden border border-solid rounded-lg border-mainColor"
               >
                 <div>
                   <img
@@ -316,14 +314,17 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
                   </p>
                 </div>
                 <div className="flex flex-col items-center gap-3 my-5">
-                  <button
-                    className="text-cancelColor"
-                    onClick={() => {
-                      setSelectedPetId(pet.id); 
-                      setApplyModalOpen(true); }} 
-                  >
-                    입양 신청 취소
-                  </button>
+                  {pet.applyStatus == "PENDING" ? 
+                    <button
+                      className="text-cancelColor"
+                      onClick={() => {
+                        setSelectedPetId(pet.id); 
+                        setApplyModalOpen(true); }} 
+                    >
+                      입양 신청 취소
+                    </button> :
+                    <p className='text-xl font-bold'>입양 승인 완료</p>
+                  }
                 </div>
                 {/* 입양 취소 모달 */}
                 <MyPageModal isOpen={isApplyModalOpen} onClose={() => setApplyModalOpen(false)}>
@@ -338,8 +339,6 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
                   </div>
                 </MyPageModal>
               </section>
-
-
             ))
         ) : (
           <p className="mb-20">입양신청 동물이 없습니다.</p>
