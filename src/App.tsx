@@ -62,7 +62,7 @@ function App() {
         <Route path="/matching" element={<MatchingPage />} /> {/* 반려동물 매칭 페이지 */}
         <Route path="/detailadd" element={<DetailPage />} /> {/* 반려동물 상세정보 작성 페이지 (보호소) */}
         <Route path="/detail/:petId" element={<DetailReadPage />} /> {/* 반려동물 상세정보 페이지 */}
-        <Route path="/detail-correct" element={<DetailCorrect />} /> {/* 반려동물 상세정보 수정 페이지 (보호소) */}
+        <Route path="/detail-correct/:petId" element={<DetailCorrect />} /> {/* 반려동물 상세정보 수정 페이지 (보호소) */}
         <Route path="/mypage-user" element={<MyPageUser />} /> {/* 마이페이지 (유저) */}
         <Route path="/mypage-shelter" element={<MyPageShelter />} /> {/* 마이페이지 (보호소) */}
         <Route path="/shelter-address/:petId" element={<ShelterAddress />} /> {/* 보호소 주소 등록 페이지 */}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GoX } from "react-icons/go";
 import Header from "../../components/Header";
 import axiosInstance from "../../utils/axiosInstance"; 
+import MyPageModal from "../../components/MyPageModal";
 import axios from "axios";
 
 interface PetAdd {
@@ -37,6 +38,7 @@ const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
   const [useId, setUseId] = useState<UseId>({Id: 0});
+  const [isAddModalOpen, setAddModalOpen] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [shelterInfo, setShelterInfo] = useState<Shelters>({
     shelterName: "",
@@ -158,13 +160,13 @@ const DetailPage = () => {
 
     const petData = new FormData();
 
-    // 파일 외 데이터 JSON 형태로 추가
-    petData.append("petData", JSON.stringify({
-      ...addPet,
-      imageUrls: undefined, // 파일 참조 제거
-    }));
+    // JSON 데이터를 Blob으로 변환하여 추가
+    const jsonBlob = new Blob([JSON.stringify({ ...addPet })], {
+      type: "application/json",
+    });
+    petData.append("petData", jsonBlob);
 
-    // 파일 별도로 추가
+    // 파일 추가
     postImg.forEach((file) => petData.append("images", file));
 
     try {
@@ -173,12 +175,13 @@ const DetailPage = () => {
         petData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: token,
             "Content-Type": "multipart/form-data",
           },
         }
       );
       alert("동물 등록이 완료되었습니다.");
+      setAddModalOpen(false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Error registering pet:", error.response?.data);
@@ -188,6 +191,7 @@ const DetailPage = () => {
         alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다.");
       }
     }
+
     // FormData 내용 디버깅 출력
     console.log("FormData Debugging:");
     petData.forEach((value, key) => {
@@ -349,9 +353,21 @@ const DetailPage = () => {
           </div>
         </section>
         <div className="flex gap-32 my-10">
-          <button className="text-mainColor" onClick={handleSubmit}>등록</button>
+          <button className="text-mainColor" onClick={() => setAddModalOpen(true)}>등록</button>
           <button className="text-cancelColor">취소</button>
         </div>
+        {/* 등록 신청 모달 */}
+        <MyPageModal isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)}>
+          <h3 className="mb-4 text-lg font-bold">등록 하시겠습니까?</h3>
+          <div className="flex justify-end gap-4 mt-6">
+            <button className="text-mainColor" onClick={handleSubmit}>
+              네
+            </button>
+            <button className="text-cancelColor" onClick={() => setAddModalOpen(false)}>
+              아니오
+            </button>
+          </div>
+        </MyPageModal>
       </form>
     </>
   );
