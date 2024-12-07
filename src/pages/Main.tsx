@@ -83,9 +83,9 @@ const Main: React.FC = () => {
       </section>
 
       {/* 설명 섹션 */}
-<section className="relative flex flex-col items-center justify-center h-[15vh] sm:h-[20vh] md:h-[20vh] lg:h-[20vh] xl:h-[25vh] 2xl:h-[25vh] bg-[#d9c7c0]">
-   {/* 내용 */}
-   <div className="relative flex flex-col items-center justify-center w-[95] sm:w-[85%] md:w-[80%] lg:w-[85%] xl:w-[80%] 2xl:w-[90%] max-w-7xl mt-7">
+      <section className="relative flex flex-col items-center justify-center h-[15vh] sm:h-[20vh] md:h-[20vh] lg:h-[20vh] xl:h-[25vh] 2xl:h-[25vh] bg-[#d9c7c0]">
+        {/* 내용 */}
+        <div className="relative flex flex-col items-center justify-center w-[95] sm:w-[85%] md:w-[80%] lg:w-[85%] xl:w-[80%] 2xl:w-[90%] max-w-7xl mt-7">
           {/* 아이콘 및 화살표 */}
           <div className="w-full flex items-center justify-around mb-6 md:mb-10">
             {(["dog", "approve", "board", "check"] as IconType[]).map((icon, idx, arr) => (
@@ -115,46 +115,40 @@ const Main: React.FC = () => {
               </React.Fragment>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 상세 설명 */}
+      <section className="relative flex flex-col items-center justify-start h-[53vh] sm:h-[54vh] md:h-[60vh] lg:h-[70vh] xl:h-[75vh] 2xl:h-[75vh]">
+        {/* 상단 배경 */}
+        <div className="absolute top-0 left-0 w-full h-1/3 bg-[#d9c7c0]"></div>
+        {/* 하단 배경 */}
+        <div className="absolute bottom-0 left-0 w-full h-2/3 bg-[#eeeceb]"></div>
+        {/* 내용 */}
+        <div className="relative flex flex-col items-center justify-start w-[85%] sm:w-[85%] md:w-[80%] lg:w-[85%] xl:w-[80%] 2xl:w-[90%] max-w-7xl mt-0">
+          <div className="w-[460px] sm:w-[630px] md:w-[730px] lg:w-[980px] xl:w-[1200px] 2xl:w-[1400px] bg-white rounded-md shadow-md p-6 sm:p-6 md:p-8">
+            <div className="text-left mb-6">
+              <h2 className="text-3xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-4xl 2xl:text-5xl font-semibold text-gray-800 mb-4">
+                {descriptions[activeIcon].title}
+              </h2>
+              {descriptions[activeIcon].content.map((line: string, index: number) => (
+                <p
+                  key={index}
+                  className="text-xl sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl leading-relaxed mb-1 pl-4"
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+            <img
+              src={`/src/assets/page${activeIcon === "dog" ? "" : activeIcon === "approve" ? "2" : activeIcon === "board" ? "3" : "4"}.png`}
+              alt="Matching Animal Example"
+              className="w-full sm:w-[87%] md:w-[85%] lg:w-[75%] xl:w-[70%] 2xl:w-[60%] h-[290px] sm:h-[330px] md:h-[350px] lg:h-[450px] xl:h-[500px] 2xl:h-[520px] mx-auto rounded-md object-contain"
+            />
           </div>
-</section>
-{/* 상세 설명 */}
-<section className="relative flex flex-col items-center justify-start h-[53vh] sm:h-[54vh] md:h-[60vh] lg:h-[70vh] xl:h-[75vh] 2xl:h-[75vh]">
-  {/* 상단 배경 */}
-  <div className="absolute top-0 left-0 w-full h-1/3 bg-[#d9c7c0]"></div>
-
-  {/* 하단 배경 */}
-  <div className="absolute bottom-0 left-0 w-full h-2/3 bg-[#eeeceb]"></div>
-
-  {/* 내용 */}
-  <div className="relative flex flex-col items-center justify-start w-[85%] sm:w-[85%] md:w-[80%] lg:w-[85%] xl:w-[80%] 2xl:w-[90%] max-w-7xl mt-0">
-    <div className="w-[480px] sm:w-[630px] md:w-[730px] lg:w-[980px] xl:w-[1200px] 2xl:w-[1450px] bg-white rounded-md shadow-md p-6 sm:p-6 md:p-8">
-      <div className="text-left mb-6">
-        <h2 className="text-3xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-4xl 2xl:text-5xl font-semibold text-gray-800 mb-4">
-          {descriptions[activeIcon].title}
-        </h2>
-        {descriptions[activeIcon].content.map((line: string, index: number) => (
-          <p
-            key={index}
-            className="text-xl sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl leading-relaxed mb-1 pl-4"
-          >
-            {line}
-          </p>
-        ))}
-      </div>
-      <img
-        src={`/src/assets/page${activeIcon === "dog" ? "" : activeIcon === "approve" ? "2" : activeIcon === "board" ? "3" : "4"}.png`}
-        alt="Matching Animal Example"
-        className="w-full sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[70%] 2xl:w-[60%] mx-auto rounded-md object-contain"
-      />
-    </div>
-  </div>
-</section>
-
-
-
-
-
-
+        </div>
+      </section>
+      
       {/* 푸터 */}
       <Footer />
     </div>

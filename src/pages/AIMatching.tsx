@@ -125,8 +125,11 @@ const AIMatching = () => {
         }
 
         const absoluteImageUrl = data.pet.imageUrls?.[0]
-          ? `${import.meta.env.VITE_API_BASE_URL}${data.pet.imageUrls[0]}`
-          : null;
+        ? `${axiosInstance.defaults.baseURL}${data.pet.imageUrls[0]}`
+        : null;
+
+        console.log("Fetched pet data:", data);
+    console.log("Image URL:", absoluteImageUrl);
 
         setPetInfo({
           petId: data.pet.petId || null,
