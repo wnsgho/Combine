@@ -178,6 +178,8 @@ const MyPageUser: React.FC = () => {
       window.location.reload();
     }catch(error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
+      alert('입양 취소를 다시 시도해 주세요');
+      setApplyModalOpen(false);
     }
   }
 
@@ -319,23 +321,28 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
             <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
         </section>
-        {petInfo && petInfo.pet && petInfo.applyStatus !== "CANCELED" && (
+        {petInfo?.pet && petInfo.applyStatus !== "CANCELED" ? (
           <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
             <div>
               <img 
-                src={petInfo.pet.imageUrls && petInfo.pet.imageUrls.length > 0 
-                  ? petInfo.pet.imageUrls[0] 
-                  : undefined} 
-                alt="동물 사진" 
+                src={petInfo.pet.imageUrls?.[0] || undefined} 
+                alt={`${petInfo.pet.species || "알 수 없는 동물"} 사진`} 
               />
             </div>
             <div className="flex flex-col items-center gap-3 my-5">
-              <p>{petInfo.pet.species} / {petInfo.pet.size} / {petInfo.pet.age} / {petInfo.pet.personality} / {petInfo.pet.exerciseLevel}</p>
+              <p>
+                {petInfo.pet.species} / {petInfo.pet.size} / {petInfo.pet.age} / 
+                {petInfo.pet.personality} / {petInfo.pet.exerciseLevel}
+              </p>
             </div>
             <div className="flex flex-col items-center gap-3 my-5">
-              <button className='text-cancelColor' onClick={() => setApplyModalOpen(true)}>입양 신청 취소</button>
+              <button className='text-cancelColor' onClick={() => setApplyModalOpen(true)}>
+                입양 신청 취소
+              </button>
             </div>
           </section>
+        ) : (
+          <p className='mb-20'>입양신청 동물이 없습니다.</p>
         )}
 
         {/* 입양 취소 모달 */}

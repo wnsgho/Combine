@@ -114,7 +114,6 @@ const DetailPage = () => {
     }));
   }, [useId.Id, shelterInfo]);
 
-  console.log(token)
 
   const saveImgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileArr = e.target.files;

@@ -160,24 +160,26 @@ const DetailReadPage = () => {
         setRoles(response.data);
       }catch(error) {
         console.error("유저 Role 불러오는 중 오류 발생", error)
-      }
+      } 
     }
     roles();
   }, [token])
 
+  // 회원 입양 신청 조회
   useEffect(() => {
-    if(useId.Id !== 0){
+    if(useId.Id !== 0 && roles.role == "ROLE_USER"){
       const petApplyInfo = async () => {
         try {
           const response = await axiosInstance.get(`/api/v1/applypet/${useId.Id}/list`, {headers});
-          setPetApplyInfo(response.data);
+          setPetApplyInfo(response.data[0]);
+          console.log(response.data[0])
         }catch(error: any) {
-          console.error('동물 정보를 불러오는 중 오류 발생:', error);
+          console.error('동물 입양 정보를 불러오는 중 오류 발생:', error);
         }
       };
       petApplyInfo();
     }
-  }, [useId.Id]);
+  }, [roles]);
 
 
   // 입양 신청 
@@ -195,13 +197,14 @@ const DetailReadPage = () => {
       });
       alert('입양 신청이 완료되었습니다.');
       setApplyModalOpen(false);
+      window.location.reload(); // 페이지 새로 고침 추가
     } catch (error) {
       console.error("입양 신청 보내는 중 오류 발생", error);
+      alert('입양 신청을 다시 시도해 주세요');
+      setApplyModalOpen(false);
     }
   };
   
-  
-
 
   // 보호소 동물 삭제
   const deletePet = async () => {
@@ -211,6 +214,7 @@ const DetailReadPage = () => {
       setDeleteModalOpen(false);
     } catch (error) {
       console.error("동물 삭제 중 오류 발생", error);
+      alert('삭제가 실패되었습니다 다시 시도해주세요.');
     }
   };
 
