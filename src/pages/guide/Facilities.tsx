@@ -2,6 +2,8 @@ import Walk from "../../../public/walk.png";
 import { useEffect, useRef, useState } from "react";
 import GuideNavigationMap from "../../components/GuideNavigationMap";
 import Header from "../../components/Header";
+import FAQ from "../../components/FAQ";
+import Chat from "../../components/Chat";
 
 declare global {
   interface Window {
@@ -175,28 +177,30 @@ const Facilities = () => {
   const getLastCategory = (categoryName: string) => {
     return categoryName.split(">").pop()?.trim() || categoryName;
   };
-
   return (
     <div>
       <Header/>
-    <div className="flex flex-col justify-center items-center">
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className="relative">
-          <div className="bg-slate-400"></div>
-          <img src={Walk} alt="walk" className="w-full h-[400px] opacity-85 object-cover object-bottom" />
-          <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-            <div className="text-[50px] pb-2">반려동물 관련 시설</div>
-            <div className="text-[25px]">현재위치를 기반으로 반경 3km 내의 관련 시설을 찾아드립니다.</div>
+      <FAQ/>
+      <Chat/>
+      <div className="flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="relative">
+            <div className="bg-slate-400"></div>
+            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
+            <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
+              <div className="text-[50px] pb-2 text-white">반려동물 관련 시설</div>
+              <div className="text-[25px] text-white">현재위치를 기반으로 반경 3km 내의 관련 시설을 찾아드립니다.</div>
+            </div>
           </div>
-        </div>
         <div className="mb-8">
           <GuideNavigationMap />
+          
         </div>
         <div className="flex space-x-4 text-[24px] font-bold text-white justify-end mr-14">
           {categories.map((category) => (
             <div
               key={category.id}
-              className={`cursor-pointer bg-[#AB654B]/90 pt-1 px-2 rounded-t-2xl ${
+              className={`cursor-pointer bg-[#3c2a13]/90 pt-1 px-2 rounded-t-2xl ${
                 selectCategory
                   ? selectCategory === category.keyword
                     ? "text-yellow-200 opacity-100"
@@ -208,7 +212,7 @@ const Facilities = () => {
             </div>
           ))}
         </div>
-        <div className="bg-[#AB654B]/90 p-8 flex rounded-lg mb-4">
+        <div className="bg-[#3c2a13]/90 p-8 flex rounded-lg mb-4">
           <div ref={mapRef} className="w-full h-[700px] rounded-lg "></div>
           <div className="w-full pl-8 h-[700px] flex flex-col">
             <div className="overflow-y-scroll flex-1 scrollbar-hide">

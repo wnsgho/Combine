@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const GuideNavigationMap = () => {
     return (
-        <div className="flex text-[30px] space-x-28 font-bold bg-[#AB654B]/90 w-full justify-center text-white p-2">
+        <div className="flex text-[30px] space-x-28 font-bold bg-[#f1a34a]/90 w-full justify-center p-2">
           <NavLink 
             to="/guide/announcement"
             className={({ isActive }) => 

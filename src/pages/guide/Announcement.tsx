@@ -44,48 +44,55 @@ const Announcement = () => {
       <Header/>
       <FAQ/>
       <Chat/>
-    <div className="flex flex-col justify-center items-center ">
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className=" relative">
+      <div className="flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="relative">
             <div className="bg-slate-400"></div>
-            <img src={Walk} alt="walk" className="w-[1200px] h-[400px] opacity-85 object-cover object-bottom" />
+            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
             <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-          <div className="text-[50px] pb-2">공지사항</div>
-          <div className="text-[25px]">다양한 정보를 제공하고 있습니다.</div>
+              <div className="text-[50px] pb-2 text-white">공지사항</div>
+              <div className="text-[25px] text-white">다양한 정보를 제공하고 있습니다.</div>
+            </div>
+          </div>
+          <GuideNavigation/>
+          <div className="max-w-[1200px] mx-auto px-4">
+            <table className="mb-40 w-full border-t border-b border-gray-300 ">
+              <thead>
+                <tr className="text-[28px] border-b border-gray-300">
+                  <th className="px-8 py-5">구분</th>
+                  <th className="w-[748px] px-4 py-5 text-left pl-[376px]">제목</th>
+                  <th className="px-8 py-5">조회수</th>
+                  <th className="px-8 py-5">작성일</th>
+                </tr>
+              </thead>
+              <tbody>
+                {announcements.map((announcement)=>(
+                  <tr className="text-[20px] border-b border-gray-300" key={announcement.id}>
+                    <th className={`${announcement.category === "NOTICE" ? "text-red-500" : "text-blue-500"}`}>
+                      {announcement.category === "NOTICE" ? "공지" : "지원"}
+                    </th>
+                    <th onClick={() => navigate(`/guide/announcement/${announcement.id}`)} className="float-left px-4 py-4 font-normal hover:text-blue-500 cursor-pointer">
+                      {announcement.title}
+                    </th>
+                    <th className="font-normal">{announcement.viewCount}</th>
+                    <th className="font-normal">{announcement.created_at}</th>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {role === "ROLE_ADMIN" && (
+              <div className="flex justify-end mb-20">
+                <div
+                  className="bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
+                  onClick={() => navigate("/guide/announcement/create")}
+                >
+                  작성하기
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <GuideNavigation/>
-        <table className="mb-40">
-          <thead>
-            <tr className="text-[28px]">
-              <th className="px-8 pb-5">구분</th>
-              <th className="w-[784px] px-4 pb-5 text-left pl-[376px]">제목</th>
-              <th className="px-8 pb-5">조회수</th>
-              <th className="px-8 pb-5">작성일</th>
-            </tr>
-          </thead>
-          <tbody>
-            {announcements.map((announcement)=>(
-              <tr className="text-[20px] cursor-pointer" key={announcement.id}>
-              <th className={announcement.category === "NOTICE" ? ("text-red-500") : ("text-blue-500")}>{announcement.category === "NOTICE" ? ("공지") : ("지원")}</th>
-              <th onClick={() => navigate(`/guide/announcement/${announcement.id}`)}  className="float-left px-4 py-3 font-normal">{announcement.title}</th>
-              <th className="font-normal">{announcement.viewCount}</th>
-              <th className="font-normal">{announcement.created_at}</th>
-            </tr>
-            ))}
-          </tbody>
-        </table>
-            {role === "ROLE_ADMIN" && (
-              <div
-              className="float-right mr-5 my-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px] cursor-pointer"
-              onClick={() => navigate("/guide/announcement/create")}
-              >
-              작성하기
-            </div>
-            )}
       </div>
-    </div>
     </div>
   );
 };

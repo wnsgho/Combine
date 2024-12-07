@@ -85,22 +85,22 @@ const QAandAEdit = () => {
   return (
     <div>
       <Header/>
-    <div className="flex flex-col justify-center items-center ">
-      <div className="max-w-[1200px] mx-auto ">
-        <div className=" relative">
-          <div className="bg-slate-400"></div>
-          <img src={Walk} alt="walk" className="w-[1200px] h-[400px] opacity-85 object-cover object-bottom" />
-          <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-            <div className="text-[50px] pb-2">문의 게시판</div>
-            <div className="text-[25px]">무엇이든 물어보세요.</div>
+      <div className="flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="relative">
+            <div className="bg-slate-400"></div>
+            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
+            <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
+            <div className="text-[50px] pb-2 text-white">문의 게시판</div>
+            <div className="text-[25px] text-white">무엇이든 물어보세요.</div>
+            </div>
           </div>
-        </div>
-        <GuideNavigation />
+          <GuideNavigation/>
 
         <div className="max-w-[1100px] mx-auto ">
-          <div className="bg-[#AB654B]/90 p-8 rounded-lg">
+          <div className="bg-[#3c2a13]/90 p-8 rounded-xl">
             <div className="mb-6">
-              <input type="text" className="w-full p-3" value={title} onChange={(e)=> setTitle(e.target.value)}/>
+              <input type="text" className="w-full p-3 rounded-xl" value={title} onChange={(e)=> setTitle(e.target.value)}/>
             </div>
             <div className="h-[1000px] bg-white">
               <ReactQuill
@@ -116,15 +116,13 @@ const QAandAEdit = () => {
           </div>
           <div className="mt-7">
             <button
-              className="float-right   mb-20 bg-[#AB654B]
-                  /90 p-4 text-white font-bold text-[20px]"
+              className="float-right   mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] rounded-xl hover:scale-105 transition-transform"
                   onClick={handleSubmit}>
               수정하기
             </button>
 
               <button
-                className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]"
+                className="float-right mr-8 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] rounded-xl hover:scale-105 transition-transform"
               onClick={() => {
                 if (window.confirm('수정을 취소하시겠습니까?')) {
                   navigate("/guide/qna");

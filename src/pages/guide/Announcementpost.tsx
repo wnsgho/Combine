@@ -64,26 +64,26 @@ const Announcementpost = () => {
   return (
     <div>
     <Header/>
-    <div className="flex flex-col items-center scrollbar-hide">
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className="relative">
-          <div className="bg-slate-400"></div>
-          <img src={Walk} alt="walk" className="w-full h-[400px] opacity-85 object-cover object-bottom" />
-          <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-            <div className="text-[50px] pb-2">공지사항</div>
-            <div className="text-[25px]">다양한 정보를 제공하고 있습니다.</div>
+    <div className="flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="relative">
+            <div className="bg-slate-400"></div>
+            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
+            <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
+              <div className="text-[50px] pb-2 text-white">공지사항</div>
+              <div className="text-[25px] text-white">다양한 정보를 제공하고 있습니다.</div>
+            </div>
           </div>
-        </div>
-        <GuideNavigation />
+          <GuideNavigation/>
         {announcementPost && ( 
             <div className="max-w-[1000px] mx-auto" key={announcementPost.id}>
-              <div className="text-[35px] text-left border-b-[1px] border-black pb-5">{announcementPost.title}</div>
-              <div className="text-left pt-4 pb-20">
-              <span className={announcementPost.category === "NOTICE" ? ("text-red-500") : ("text-blue-500")}>{announcementPost.category === "NOTICE" ? ("공지") : ("지원")}</span> | {announcementPost.created_at} | {announcementPost.viewCount}
+              <div className="text-[35px] text-center border-t-[1px] border-black pt-5 font-bold">{announcementPost.title}</div>
+              <div className="text-center pt-4 pb-5 border-b-2">
+              <span className={announcementPost.category === "NOTICE" ? ("text-red-500") : ("text-blue-500")}>{announcementPost.category === "NOTICE" ? ("공지") : ("지원")}</span> <span className="opacity-70 text-gray-400">|</span> 작성일 {announcementPost.created_at} <span className="opacity-70 text-gray-400">|</span> 조회수 {announcementPost.viewCount}
               </div>
-              <div className="text-[20px] pb-20" dangerouslySetInnerHTML={{ __html: announcementPost.content }} />
+              <div className="text-[20px] py-10 px-5 border-b-[1px] border-black mb-10" dangerouslySetInnerHTML={{ __html: announcementPost.content }} />
               <div
-                className="float-right mb-20 bg-[#AB654B]/90 p-4 text-white font-bold text-[20px] cursor-pointer"
+                className="float-right mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
                 onClick={() => navigate("/guide/announcement")}>
                 목록으로
               </div>
@@ -91,13 +91,13 @@ const Announcementpost = () => {
               {role === "ROLE_ADMIN" && (
                 <>
                 <div
-                className="float-right mr-8 mb-20 bg-[#AB654B]/90 p-4 text-white font-bold text-[20px] cursor-pointer"
+                className="float-right mr-8 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
                 onClick={handleDelete}>
                 삭제하기
               </div>
 
               <div
-                className="float-right mr-8 mb-20 bg-[#AB654B]/90 p-4 text-white font-bold text-[20px] cursor-pointer"
+                className="float-right mr-8 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
                 onClick={() => navigate(`/guide/announcement/edit/${announcementPost.id}`)}>
                 수정하기
               </div>

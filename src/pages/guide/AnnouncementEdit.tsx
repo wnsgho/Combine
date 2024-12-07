@@ -90,27 +90,27 @@ const AnnouncementEdit = () => {
   return (
     <div>
       <Header />
-      <div className="flex flex-col justify-center items-center ">
-        <div className="max-w-[1200px] mx-auto ">
-          <div className=" relative">
+      <div className="flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="relative">
             <div className="bg-slate-400"></div>
-            <img src={Walk} alt="walk" className="w-[1200px] h-[400px] opacity-85 object-cover object-bottom" />
+            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
             <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-              <div className="text-[50px] pb-2">공지사항</div>
-              <div className="text-[25px]">다양한 정보를 제공하고 있습니다.</div>
+              <div className="text-[50px] pb-2 text-white">공지사항</div>
+              <div className="text-[25px] text-white">다양한 정보를 제공하고 있습니다.</div>
             </div>
           </div>
-          <GuideNavigation />
+          <GuideNavigation/>
           <div className="max-w-[1000px] mx-auto">
-            <div className="bg-[#AB654B]/90 p-8 rounded-lg">
-              <select className="mb-6 w-auto p-2 font-bold" onChange={(e) => setCategory(e.target.value)} value={category}>
+            <div className="bg-[#3c2a13]/90 p-8 rounded-xl ">
+              <select className="mb-6 w-auto p-2 font-bold rounded-xl" onChange={(e) => setCategory(e.target.value)} value={category}>
                 <option value="NOTICE">공지</option>
                 <option value="SUPPORT">지원</option>
               </select>
               <div className="mb-6">
                 <input
                   type="text"
-                  className="w-full p-3"
+                  className="w-full p-3 rounded-xl"
                   placeholder="제목을 입력하세요"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -130,14 +130,12 @@ const AnnouncementEdit = () => {
             </div>
             <div className="mt-7">
               <button
-                className="float-right   mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]"
+                className="float-right   mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] rounded-xl hover:scale-105 transition-transform"
                 onClick={handleSubmit}>
                 수정하기
               </button>
               <button
-                className="float-right mr-8 mb-20 bg-[#AB654B]
-              /90 p-4 text-white font-bold text-[20px]"
+                className="float-right mr-8 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] rounded-xl hover:scale-105 transition-transform"
                 onClick={() => {
                   if (window.confirm("수정을 취소하시겠습니까?")) {
                     navigate("/guide/announcement");

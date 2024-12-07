@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import logo from "../assets/logo.png";
 import axios from "axios";
+import useStore from "../store/store";
 import { Client } from "@stomp/stompjs";
 
 //gyutest@gmail.com (일반)
@@ -12,6 +13,14 @@ import { Client } from "@stomp/stompjs";
 //gyutest3@gmail.com (일반)
 //gyutest123
 
+//로그인시에 웹소켓이 연결이되게
+//채팅알람, 삭제 알람 연결되게
+
+//그리고 특정 채팅 들어가면 채팅 구독 연결
+//특정 채팅 나가면 구독 해제
+
+//로그아웃시에 웹소켓이 연결 끝기게
+//다른페이지에서도 유지가 되는지?
 
 interface userChatRoom {
   chatRoomId: number;
@@ -43,8 +52,9 @@ const Chat = () => {
   const [chatUser, setChatUser] = useState<chatUser[]>([]);
   const [chatRoomId, setChatRoomId] = useState<number | null>(null);
   const [chatMessage, setChatMessage] = useState<chatMessage[]>([]);
-  const clientRef = useRef<Client | null>(null);
   const [message, setMessage] = useState("");
+  const [currentSubscription, setCurrentSubscription] = useState<any>(null);
+  const clientRef = useRef<Client | null>(null);
 
   const handlemakechatroom = () => {
     setMakeChatRoom(!makeChatRoom);
@@ -52,24 +62,27 @@ const Chat = () => {
   };
 
   const handlechatroomopen = async (RoomId: number) => {
-    console.log('채팅방 열기 - 룸ID:', RoomId);
+    // 이미 열려있는 같은 채팅방을 클릭한 경우 닫기
+    if (chatRoomOpen && chatRoomId === RoomId) {
+      handleCloseChatRoom();
+      return;
+    }
+
+    console.log("채팅방 열기 - 룸ID:", RoomId);
     setChatRoomOpen(true);
     setMakeChatRoom(false);
     setChatRoomId(RoomId);
-    
+
     try {
-      // 이전 메시지 
-      const messageResponse = await axios.get(
-        `http://15.164.103.160:8080/api/v1/chatmessages/${RoomId}`,
-        {
-          headers: {
-            Authorization: localStorage.getItem("accessToken")
-          }
+      // 이전 메시지 조회
+      const messageResponse = await axios.get(`http://15.164.103.160:8080/api/v1/chatmessages/${RoomId}`, {
+        headers: {
+          Authorization: localStorage.getItem("accessToken")
         }
-      );
+      });
       setChatMessage(messageResponse.data);
-  
-      // 읽음 처리 
+
+      // 읽음 처리
       await axios.put(
         `http://15.164.103.160:8080/api/v1/unread/init`,
         {
@@ -82,102 +95,53 @@ const Chat = () => {
           }
         }
       );
-  
-      // 채팅방 목록 새로고침 
+
+      // 이전 구독 해제
+      if (currentSubscription) {
+        currentSubscription.unsubscribe();
+        console.log(`이전 채팅방 구독 해제 완료 - 룸ID: ${RoomId}`);
+      }
+
+      // 새로운 채팅방 구독
+      if (clientRef.current?.connected) {
+        try {
+          const subscription = clientRef.current.subscribe(`/topic/chatroom/${RoomId}`, (message) => {
+            console.log('수신된 메시지:', message.body);
+            const receivedMessage = JSON.parse(message.body);
+            setChatMessage(prev => [...prev, receivedMessage]);
+            
+            // 새 메시지가 오을 때 채팅방 목록을 새로 불러와서 unReadCount 업데이트
+            fetchChatroom().then(() => {
+              console.log('채팅방 목록 새로고침 완료');
+            }).catch(error => {
+              console.error('채팅방 목록 새로고침 실패:', error);
+            });
+          });
+          setCurrentSubscription(subscription);
+        } catch (error) {
+          console.error(`채팅방 구독 실패 - 룸ID: ${RoomId}`, error);
+        }
+      }
+
       await fetchChatroom();
-      
     } catch (error) {
       console.error("채팅방 열기 실패", error);
     }
   };
 
-  // 웹 소켓
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken")?.replace('Bearer ', '');
-    if (!token) return;
-  
-    if (clientRef.current?.connected) {
-      clientRef.current.deactivate();
-    }
-  
-    const client = new Client({
-      brokerURL: `ws://15.164.103.160:8080/ws?authorization=${token}`,
-      connectHeaders: {
-        Authorization: token
-      },
-      disconnectHeaders: {
-        Authorization: token
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
-      onConnect: () => {
-        if (chatRoomId) {
-          client.subscribe(`/topic/chatroom/${chatRoomId}`, (message) => {
-            const receivedMessage = JSON.parse(message.body);
-            setChatMessage(prev => [...prev, receivedMessage]);
-          });
-        }
-      }
-    });
-  
-    try {
-      client.activate();
-      clientRef.current = client;
-    } catch (error) {
-      console.error('WebSocket 연결 에러:', error);
-    }
-  
-    return () => {
-      if (client.connected) {
-        client.deactivate();
-      }
-    };
-  }, [chatRoomId]);
-
-  const sendMessage = () => {
-    if (!message.trim()) {
-      return;
-    }
-  
-    if (!clientRef.current?.connected) {
-      console.error('WebSocket이 연결되어 있지 않습니다.');
-      return;
-    }
-  
-    const messageData = {
-      message: message,
-      senderEmail: userEmail,
-      receiverEmail: oppositeEmail
-    };
-  
-    try {
-      clientRef.current.publish({
-        destination: `/app/chat/send/${chatRoomId}`,
-        body: JSON.stringify(messageData)
-      });
-      setMessage("");
-    } catch (error) {
-      console.error('메시지 전송 실패:', error);
-    }
-  };
-
-  //회원 목록 조회
-  useEffect(() => {
-    const fetchChatUser = async () => {
+  // 채팅방 닫을 때 구독 해제
+  const handleCloseChatRoom = () => {
+    if (currentSubscription) {
       try {
-        const response = await axios.get("http://15.164.103.160:8080/api/v1/users/chat-users", {
-          headers: {
-            Authorization: localStorage.getItem("accessToken")
-          }
-        });
-        setChatUser(response.data);
+        currentSubscription.unsubscribe();
+        console.log(`채팅방 구독 해제 완료`);
+        setCurrentSubscription(null);
       } catch (error) {
-        console.error("회원 목록 조회에 실패하였습니다.", error);
+        console.error("채팅방 구독 해제 실패:", error);
       }
-    };
-    fetchChatUser();
-  }, []);
+    }
+    setChatRoomOpen(false);
+  };
 
   // 현재 사용자의 이메일 추출
   useEffect(() => {
@@ -197,9 +161,11 @@ const Chat = () => {
           Authorization: localStorage.getItem("accessToken")
         }
       });
+      console.log('채팅방 목록 응답:', response.data);  // 응답 데이터 확인
       setUserChatRoom(response.data);
     } catch (error) {
       console.error("목록 조회 실패", error);
+      throw error;  // 에러를 다시 던져서 위에서 catch할 수 있도록
     }
   };
 
@@ -248,7 +214,7 @@ const Chat = () => {
         console.error("목록 조회 실패", error);
       }
     };
-  
+
     if (userEmail) {
       fetchChatroom();
     }
@@ -284,13 +250,96 @@ const Chat = () => {
     scrollToBottom();
   }, [chatMessage]); // chatMessage가 변경될 때마다 실행
 
+  const sendMessage = () => {
+    if (!message.trim() || !clientRef.current?.connected) {
+      return;
+    }
+
+    const messageData = {
+      message: message,
+      senderEmail: userEmail,
+      receiverEmail: oppositeEmail
+    };
+
+    try {
+      clientRef.current.publish({
+        destination: `/app/chat/send/${chatRoomId}`,
+        body: JSON.stringify(messageData)
+      });
+      setMessage("");
+    } catch (error) {
+      console.error("메시지 전송 실패:", error);
+    }
+  };
+
+  //회원 목록 조회
+  useEffect(() => {
+    const fetchChatUser = async () => {
+      try {
+        const response = await axios.get("http://15.164.103.160:8080/api/v1/users/chat-users", {
+          headers: {
+            Authorization: localStorage.getItem("accessToken")
+          }
+        });
+        setChatUser(response.data);
+      } catch (error) {
+        console.error("회원 목록 조회에 실패하였습니다.", error);
+      }
+    };
+    fetchChatUser();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken")?.replace("Bearer ", "");
+    if (!token) return;
+
+    const client = new Client({
+      brokerURL: `ws://15.164.103.160:8080/ws?authorization=${token}`,
+      connectHeaders: {
+        Authorization: token
+      },
+      onConnect: () => {
+        console.log("WebSocket 연결 성공");
+
+        // 전체 채팅 알림 구독
+        if (client.connected) {
+          try {
+            client.subscribe("/user/queue/notifications", (message) => {
+              console.log("새 메시지 알림:", message.body);
+              // 새 메시지가 오�� 채팅방 목록 새로고침
+              fetchChatroom();
+            });
+            console.log("채팅 알림 구독 성공");
+          } catch (error) {
+            console.error("채팅 알림 구독 실패:", error);
+          }
+        }
+      }
+    });
+
+    try {
+      client.activate();
+      clientRef.current = client;
+      console.log("WebSocket 클라이언트 활성화 성공");
+    } catch (error) {
+      console.error("WebSocket 연결 실�:", error);
+    }
+
+    return () => {
+      if (clientRef.current?.connected) {
+        clientRef.current.deactivate();
+        clientRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div className="fixed bottom-[89px] right-2 z-50">
       <div>
         {/* 채팅방 생성 UI*/}
 
         {makeChatRoom && (
-          <div className="bg-yellow-500 absolute -left-96 -top-16 w-96 h-56 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+          <div className="bg-[#f1a34a] absolute -left-96 -top-16 w-96 h-56 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
             <div className="p-5 ">
               <div className="pb-3 font-bold">채팅 할 대상을 선택하세요</div>
               <select
@@ -315,7 +364,7 @@ const Chat = () => {
 
         {/* 채팅방 생성 버튼 */}
         <div
-          className="bg-yellow-500 m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[35px] cursor-pointer  hover:scale-105 transition-transform"
+          className="bg-[#f1a34a] m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[35px] cursor-pointer  hover:scale-105 transition-transform"
           onClick={handlemakechatroom}>
           +
         </div>
@@ -327,13 +376,13 @@ const Chat = () => {
           <div className="bg-yellow-500 w-[384px] h-[590px] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
             {/* 헤더 */}
             {userChatRoom
-              .filter(item => item.chatRoomId === chatRoomId)
+              .filter((item) => item.chatRoomId === chatRoomId)
               .map((item) => (
                 <div className="bg-white p-3 rounded-t-lg flex justify-between" key={item.chatRoomId}>
                   <div className="font-bold">{item.oppositeName}</div>
                   <div className="cursor-pointer flex gap-3">
                     <div onClick={handleChatDelete}>🗑️</div>
-                    <div onClick={() => setChatRoomOpen(false)}>✖️</div>
+                    <div onClick={handleCloseChatRoom}>✖️</div>
                   </div>
                 </div>
               ))}
@@ -346,9 +395,6 @@ const Chat = () => {
                     <div className="flex flex-col items-end">
                       <div className="text-sm pb-1.5 pr-1">{message.senderName}</div>
                       <div className="flex items-end gap-1">
-                        <span className="text-xs text-gray-500 mb-1">
-                          {message.unRead > 0 ? "1" : ""}
-                        </span>
                         <div className="p-2 rounded-xl bg-gray-300 break-words">{message.message}</div>
                       </div>
                     </div>
@@ -366,9 +412,6 @@ const Chat = () => {
                       <div className="ml-2 pb-1.5 text-sm">{message.senderName}</div>
                       <div className="flex items-end gap-1">
                         <div className="ml-2 p-2 rounded-xl bg-gray-300 break-words">{message.message}</div>
-                        <span className="text-xs text-gray-500 mb-1">
-                          {message.unRead > 0 ? "1" : ""}
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -379,18 +422,17 @@ const Chat = () => {
             </div>
 
             <div className="bg-white mx-3 w-76 h-10 rounded-b-lg border-t-2 border-black flex justify-between">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                onKeyPress={(e) => e.key === "Enter" && sendMessage()}
                 className="w-80 focus:outline-none p-2 text-sm"
                 placeholder="메시지를 입력하세요"
               />
-              <div 
+              <div
                 onClick={sendMessage}
-                className="text-3xl px-1 cursor-pointer hover:scale-105 transition-transform duration-300"
-              >
+                className="text-3xl px-1 cursor-pointer hover:scale-105 transition-transform duration-300">
                 ➤
               </div>
             </div>
