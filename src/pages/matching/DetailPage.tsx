@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GoX } from "react-icons/go";
+import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header";
 import axiosInstance from "../../utils/axiosInstance"; 
 import MyPageModal from "../../components/MyPageModal";
@@ -38,6 +39,7 @@ const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
   const [useId, setUseId] = useState<UseId>({Id: 0});
+  const navigate = useNavigate(); 
   const [isAddModalOpen, setAddModalOpen] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [shelterInfo, setShelterInfo] = useState<Shelters>({
@@ -191,16 +193,13 @@ const DetailPage = () => {
         alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다.");
       }
     }
-
-    // FormData 내용 디버깅 출력
-    console.log("FormData Debugging:");
-    petData.forEach((value, key) => {
-      console.log(`${key}:`, value);
-    });
   };
 
 
-  
+  // 취소 버튼 클릭시 뒤로가기
+  const Cancel = () => {
+    navigate(-1); // 이전 페이지로 이동
+  };
   
   
 
@@ -353,8 +352,8 @@ const DetailPage = () => {
           </div>
         </section>
         <div className="flex gap-32 my-10">
-          <button className="text-mainColor" onClick={() => setAddModalOpen(true)}>등록</button>
-          <button className="text-cancelColor">취소</button>
+          <button type="submit" className="text-mainColor" onClick={() => setAddModalOpen(true)}>등록</button>
+          <button type="button" className="text-cancelColor" onClick={Cancel}>취소</button>
         </div>
         {/* 등록 신청 모달 */}
         <MyPageModal isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)}>

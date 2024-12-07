@@ -210,41 +210,41 @@ const MyPageShelter: React.FC = () => {
             <div className="flex justify-center">
               <h3 className='text-2xl font-bold'>마이페이지</h3>
             </div>
-            <div className="flex flex-wrap justify-center gap-10">
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">단체이름</p>
+            <div className="flex flex-wrap justify-center gap-10 p-5 bg-bgColor rounded-2xl">
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">단체이름</p>
                 <p className='text-lg'>{shelterInfo.shelterName}</p>
               </div>
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">주소</p>
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">주소</p>
                 <button className='flex items-center justify-center text-lg'>{shelterInfo.address}</button>
               </div>
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">단체 메일</p>
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">단체 메일</p>
                 <p className='text-lg'>{shelterInfo.email}</p>
               </div>
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">전화번호</p>
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">전화번호</p>
                 <p className='text-lg'>{shelterInfo.phoneNumber}</p>
               </div>
             </div>
-            <div className="flex gap-32 mt-10">
+            <div className="flex gap-32 mt-6">
               <button
-                className="text-lg text-mainColor"
+                className="text-lg text-mainColor hover:text-orange-500"
                 onClick={() => setEditModalOpen(true)}
               >
                 정보수정
               </button>
               <button
-                className="text-lg text-cancelColor"
+                className="text-lg text-cancelColor hover:text-red-700"
                 onClick={() => setDeleteModalOpen(true)}
               >
                 회원탈퇴
               </button>
             </div>
-            <div>
+            <div className='mt-5'>
               <Link to={applyListLink(useId.Id)}>
-                <button className="flex items-center justify-centert ext-lg text-mainColor">입양 신청 리스트 <GoChevronRight />
+                <button className="flex items-center justify-center text-lg font-bold hover:text-mainColor">입양 신청 리스트 <GoChevronRight />
                 </button>
               </Link>
             </div>
@@ -254,12 +254,12 @@ const MyPageShelter: React.FC = () => {
               <h3 className="mb-10 text-xl font-bold">등록 입양 정보</h3>
             </div>
           </section>
-          <section className='flex items-center justify-center m-8'>
+          <section className='flex items-center justify-center m-6'>
             <div className='flex flex-wrap justify-center gap-10'>
               {Array.isArray(petLists) && petLists.length > 0 ? (
                 petLists.map((pet) => (
-                  <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
-                    <img 
+                  <div key={pet.petId} className='overflow-hidden border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72'>
+                    <img
                       src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://15.164.103.160:8080${pet.imageUrls[0]}` : mainImage} 
                       alt="동물 사진"
                       onError={(e) => {
