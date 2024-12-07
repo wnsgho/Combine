@@ -51,8 +51,9 @@ const DetailReadPage = () => {
   const { petId } = useParams();
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate(); // useNavigate 훅 사용
-  const [role, setRole] = useState("");
+  const [roles, setRoles] = useState({role:""});
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
 
   const [petApplyInfo, setPetApplyInfo] = useState<PetApplyInfo>({
@@ -99,11 +100,18 @@ const DetailReadPage = () => {
     Id: 0
   })
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQ2NTY4NSwiZXhwIjoxNzMzNTUyMDg1fQ.wzC1B0lcGSTycaD6eaX4lXj2hBxDdp19d8yde1aWo2E"
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
 
 
@@ -119,7 +127,7 @@ const DetailReadPage = () => {
       }
     }
     pets();
-  }, [])
+  }, [token])
 
   // 유저 Id 불러오기
   useEffect(() => {
@@ -132,7 +140,7 @@ const DetailReadPage = () => {
       }
     }
     userId();
-  }, [])
+  }, [token])
 
   // petId 추가하기
   useEffect(() => {
@@ -149,27 +157,29 @@ const DetailReadPage = () => {
     const roles = async () => {
       try{
         const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
-        setRole(response.data);
+        setRoles(response.data);
       }catch(error) {
         console.error("유저 Role 불러오는 중 오류 발생", error)
-      }
+      } 
     }
     roles();
-  }, [])
+  }, [token])
 
+  // 회원 입양 신청 조회
   useEffect(() => {
-    if(useId.Id !== 0){
+    if(useId.Id !== 0 && roles.role == "ROLE_USER"){
       const petApplyInfo = async () => {
         try {
-          const response = await axiosInstance.get<PetInfo>(`/api/v1/applypet/${useId.Id}/list`, {headers});
+          const response = await axiosInstance.get(`/api/v1/applypet/${useId.Id}/list`, {headers});
           setPetApplyInfo(response.data[0]);
+          console.log(response.data[0])
         }catch(error: any) {
-          console.error('동물 정보를 불러오는 중 오류 발생:', error);
+          console.error('동물 입양 정보를 불러오는 중 오류 발생:', error);
         }
       };
       petApplyInfo();
     }
-  }, [useId.Id]);
+  }, [roles]);
 
 
   // 입양 신청 
@@ -177,7 +187,7 @@ const DetailReadPage = () => {
     try {
       await axios.post(`http://15.164.103.160:8080/api/v1/applypet`, null, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': token,
           'Content-Type': 'application/json'
         },
         params: {
@@ -187,20 +197,24 @@ const DetailReadPage = () => {
       });
       alert('입양 신청이 완료되었습니다.');
       setApplyModalOpen(false);
+      window.location.reload(); // 페이지 새로 고침 추가
     } catch (error) {
       console.error("입양 신청 보내는 중 오류 발생", error);
+      alert('입양 신청을 다시 시도해 주세요');
+      setApplyModalOpen(false);
     }
   };
   
-  
-
 
   // 보호소 동물 삭제
   const deletePet = async () => {
     try {
-      await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`);
+      await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`, {headers});
+      alert('삭제가 완료되었습니다.');
+      setDeleteModalOpen(false);
     } catch (error) {
       console.error("동물 삭제 중 오류 발생", error);
+      alert('삭제가 실패되었습니다 다시 시도해주세요.');
     }
   };
 
@@ -231,7 +245,8 @@ const DetailReadPage = () => {
     return `/shelter-address/${petId}`; // 지도 페이지 URL 생성
   };
 
-  const shelter = role == "ROLE_SHELTER" && useId.Id == petInfo.shelterId
+  const shelter = roles.role == "ROLE_SHELTER" && useId.Id == petInfo.shelterId
+
 
   return (
     <>
@@ -247,7 +262,7 @@ const DetailReadPage = () => {
             </button>
             <div className="flex items-center justify-center w-full h-64">
               <img
-                src={petInfo.imageUrls[currentIndex]}
+                src={`http://http://15.164.103.160:8080`+petInfo.imageUrls[currentIndex]}
                 alt={`Slide ${currentIndex + 1}`}
                 className="object-contain w-full h-full"
               />
@@ -325,9 +340,9 @@ const DetailReadPage = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex justify-between w-full">
               <p className="text-xl font-bold text-mainColor">보호 기관</p>
-              <Link to={mapLink(petId)}>
-                <p className="text-lg">{petInfo.shelterName}</p>
-              </Link>
+                <Link to={mapLink(petId)}>
+                  <p className="flex items-center text-lg">{petInfo.shelterName}<GoChevronRight /></p>
+                </Link>
             </div>
           </div>
           <div className="flex items-center justify-between">

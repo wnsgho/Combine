@@ -84,12 +84,12 @@ const QAandApostcreate = () => {
   return (
     <div>
       <Header/>
-    <div className="flex flex-col justify-center items-center ">
+    <div className="flex flex-col items-center justify-center ">
       <div className="max-w-[1200px] mx-auto ">
-        <div className=" relative">
+        <div className="relative ">
           <div className="bg-slate-400"></div>
           <img src={Walk} alt="walk" className="w-[1200px] h-[400px] opacity-85 object-cover object-bottom" />
-          <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
+          <div className="absolute inset-0 flex flex-col justify-center font-bold text-center">
             <div className="text-[50px] pb-2">문의 게시판</div>
             <div className="text-[25px]">무엇이든 물어보세요.</div>
           </div>

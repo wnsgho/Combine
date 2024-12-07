@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GoChevronRight } from "react-icons/go";
 import MyPageModal from '../../components/MyPageModal';
 import Header from '../../components/Header';
-
 import mainImage from '../../assets/image/mainimage.webp'
 import axios from 'axios';
 
@@ -49,6 +48,7 @@ const MyPageUser: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -85,12 +85,21 @@ const MyPageUser: React.FC = () => {
   const [useId, setUseId] = useState<UseId>({
     Id: 0
   })
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidXNlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMzQ2NTY4NSwiZXhwIjoxNzMzNTUyMDg1fQ.wzC1B0lcGSTycaD6eaX4lXj2hBxDdp19d8yde1aWo2E"
+  
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
+
 
 
   // ID 불러오기
@@ -101,11 +110,11 @@ const MyPageUser: React.FC = () => {
         setUseId(response.data);
       } catch(error: any) {
         console.error("유저 ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
     userId();
-  }, [])
+  }, [token])
 
   // 유저, 펫 정보 가져오기
   useEffect(() => {
@@ -116,7 +125,7 @@ const MyPageUser: React.FC = () => {
           setUserInfo(response.data);
         } catch (error: any) {
           console.error('유저 정보를 불러오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
       };
 
@@ -126,7 +135,7 @@ const MyPageUser: React.FC = () => {
           setPetInfo(response.data[0]);
         }catch(error: any) {
           console.error('동물 정보를 불러오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
       };
 
@@ -141,7 +150,7 @@ const MyPageUser: React.FC = () => {
     try{
       await axios.post(`http://15.164.103.160:8080/api/v1/applypet/${petInfo.id}/cancel?userId=${useId.Id}`, null, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': token,
           'Content-Type': 'application/json'
         },
         params: {
@@ -166,8 +175,11 @@ const MyPageUser: React.FC = () => {
         applyStatus: "",
       });
       setApplyModalOpen(false);
+      window.location.reload();
     }catch(error) {
       console.error("입양 취소 중 오류가 발생했습니다", error);
+      alert('입양 취소를 다시 시도해 주세요');
+      setApplyModalOpen(false);
     }
   }
 
@@ -309,23 +321,28 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
             <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
         </section>
-        {petInfo && petInfo.pet && petInfo.applyStatus !== "CANCELED" && (
+        {petInfo?.pet && petInfo.applyStatus !== "CANCELED" ? (
           <section className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor">
             <div>
               <img 
-                src={petInfo.pet.imageUrls && petInfo.pet.imageUrls.length > 0 
-                  ? petInfo.pet.imageUrls[0] 
-                  : mainImage} 
-                alt="동물 사진" 
+                src={petInfo.pet.imageUrls?.[0] || undefined} 
+                alt={`${petInfo.pet.species || "알 수 없는 동물"} 사진`} 
               />
             </div>
             <div className="flex flex-col items-center gap-3 my-5">
-              <p>{petInfo.pet.species} / {petInfo.pet.size} / {petInfo.pet.age} / {petInfo.pet.personality} / {petInfo.pet.exerciseLevel}</p>
+              <p>
+                {petInfo.pet.species} / {petInfo.pet.size} / {petInfo.pet.age} / 
+                {petInfo.pet.personality} / {petInfo.pet.exerciseLevel}
+              </p>
             </div>
             <div className="flex flex-col items-center gap-3 my-5">
-              <button className='text-cancelColor' onClick={() => setApplyModalOpen(true)}>입양 신청 취소</button>
+              <button className='text-cancelColor' onClick={() => setApplyModalOpen(true)}>
+                입양 신청 취소
+              </button>
             </div>
           </section>
+        ) : (
+          <p className='mb-20'>입양신청 동물이 없습니다.</p>
         )}
 
         {/* 입양 취소 모달 */}

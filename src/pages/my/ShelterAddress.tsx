@@ -1,7 +1,7 @@
 import axiosInstance from "../../utils/axiosInstance"; 
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import Error from "../Error";
+
 
 declare global {
   interface Window {
@@ -26,6 +26,7 @@ interface UseRole {
 const ShelterAddress: React.FC = () => {
   const { petId } = useParams();
   const mapRef = useRef<HTMLDivElement>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,11 +43,20 @@ const ShelterAddress: React.FC = () => {
   });
   const [tempShelterInfo, setTempShelterInfo] = useState<ShelterInfo>(shelterInfo);
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
+
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
+
 
   // ID, ROLE 불러오기
   useEffect(() => {
@@ -56,7 +66,7 @@ const ShelterAddress: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
 
@@ -66,7 +76,7 @@ const ShelterAddress: React.FC = () => {
         setUseRole(response.data);
       }catch(error) {
         console.error("Role 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     }
     
@@ -84,7 +94,7 @@ const ShelterAddress: React.FC = () => {
           setShelterInfo(response.data);
         } catch (error) {
           console.error("보호소 정보를 불러오는 중 오류 발생:", error);
-          handleError(error);
+          // handleError(error);
         }
       };
       shelterInfo();

@@ -37,6 +37,7 @@ const DetailPage = () => {
   const [postImg, setPostImg] = useState<File[]>([]); // 업로드된 파일 리스트
   const [previewImg, setPreviewImg] = useState<string[]>([]); // 미리보기 이미지 URL 리스트
   const [useId, setUseId] = useState<UseId>({Id: 0});
+  const [token, setToken] = useState<string | null>(null);
   const [shelterInfo, setShelterInfo] = useState<Shelters>({
     shelterName: "",
     address: ""
@@ -60,13 +61,19 @@ const DetailPage = () => {
     imageUrls: postImg
   });
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
 
 
   // 사용자 ID 가져오기
@@ -80,7 +87,7 @@ const DetailPage = () => {
       }
     };
     shelterId();
-  }, [])
+  }, [token])
 
   //보호소 정보 불러오기
   useEffect(() => {
@@ -97,6 +104,7 @@ const DetailPage = () => {
     }
   }, [useId.Id])
 
+  
   useEffect(() => {
     setAddPet((prevState) => ({
       ...prevState,
@@ -180,11 +188,11 @@ const DetailPage = () => {
         alert("동물 등록에 실패했습니다. 알 수 없는 오류가 발생했습니다.");
       }
     }
-       // FormData 내용 디버깅 출력
-       console.log("FormData Debugging:");
-       petData.forEach((value, key) => {
-         console.log(`${key}:`, value);
-       });
+    // FormData 내용 디버깅 출력
+    console.log("FormData Debugging:");
+    petData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
   };
 
 
