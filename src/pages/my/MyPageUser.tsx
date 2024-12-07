@@ -131,8 +131,6 @@ const MyPageUser: React.FC = () => {
     }
   }, [useId.Id]);
 
-  console.log(useId.Id)
-
 
   const deleteApply = async (): Promise<void> => {
     try {
@@ -292,7 +290,7 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
         </section>
         <section className="flex flex-col items-center justify-center w-full max-w-lg gap-4 mt-8">
           <div>
-            <h3 className="mb-10 text-xl font-bold">신청하신 입양 정보</h3>
+            <h3 className="mb-5 text-xl font-bold">신청하신 입양 정보</h3>
           </div>
         </section>
         {Array.isArray(petInfo) && petInfo.filter(pet => pet.applyStatus === "PENDING" || pet.applyStatus === "COMPLETED").length > 0 ? (
@@ -301,7 +299,7 @@ if (error) return null; // 이미 에러 페이지로 이동한 경우 렌더링
             .map((pet) => (
               <section
                 key={pet.id} // 키를 각 pet의 id로 설정
-                className="relative flex flex-col items-center w-full max-w-lg my-20 overflow-hidden border border-solid rounded-lg border-mainColor"
+                className="relative flex flex-col items-center w-full max-w-lg my-10 overflow-hidden border border-solid rounded-lg border-mainColor"
               >
                 <div>
                   <img

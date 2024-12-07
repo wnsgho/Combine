@@ -12,6 +12,7 @@ interface ProcessedPet {
   personality: string;
   exerciseLevel: number;
   size: string;
+  status: string;
   imageUrls: string[];
 }
 
@@ -90,6 +91,7 @@ const MatchingPage = () => {
   // 필터링된 동물 리스트 반환
   const filteredPets = Array.isArray(pets) ? pets.filter((pet) => {
     return (
+      pet.status === "신청가능" &&
       (!filters.species || pet.species === filters.species) &&
       (!filters.age || pet.age === filters.age) &&
       (!filters.size || pet.size === filters.size)
@@ -120,15 +122,15 @@ const MatchingPage = () => {
       <Header />
       <div className='flex flex-col items-center max-w-screen'>
         <section className='flex flex-wrap items-center justify-center w-8/12 gap-10 p-10 mt-10 border bg-mainColor rounded-2xl'>
-          <p className='text-3xl '>선택 옵션</p>
-          <form className="flex flex-wrap max-w-xl mx-10 ">
+          <p className='p-3 text-3xl font-bold'>선택 옵션</p>
+          <form className="flex flex-wrap max-[1041px]:justify-center max-[1041px]:gap-5 max-[790px]:gap-3 max-[726px]:justify-center mx-10 ">
             <select id="species" className="text-3xl px-7 rounded-xl" onChange={filterChange}>
               <option value="">종류</option>
               <option value="강아지">강아지</option>
               <option value="고양이">고양이</option>
             </select>
             <div>
-              <RxDividerVertical className='w-10 h-10 ' />
+              <RxDividerVertical className='w-10 h-10 max-[850px]:hidden' />
             </div>
             <select id="age" className="text-3xl px-7 rounded-xl" onChange={filterChange}>
               <option value="">연령</option>
@@ -137,7 +139,7 @@ const MatchingPage = () => {
               <option value="7~8살">7~10살</option>
             </select>
             <div>
-              <RxDividerVertical className='w-10 h-10 ' />
+              <RxDividerVertical className='w-10 h-10 max-[1041px]:hidden' />
             </div>
             <select id="size" className="text-3xl px-7 rounded-xl" onChange={filterChange}>
               <option value="">크기</option>

@@ -29,6 +29,7 @@ const ShelterAddress: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [useId, setUseId] = useState<UseId>({
     Id: 0
@@ -60,30 +61,23 @@ const ShelterAddress: React.FC = () => {
 
   // ID, ROLE 불러오기
   useEffect(() => {
-    const userId = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
-        setUseId(response.data);
-      } catch(error) {
-        console.error("ID를 불러오는 중 오류 발생:", error);
-        // handleError(error);
+        const userIdResponse = await axiosInstance.get(`/api/v1/features/user-id`, { headers });
+        setUseId(userIdResponse.data);
+
+        const roleResponse = await axiosInstance.get(`/api/v1/features/role`, { headers });
+        setUseRole(roleResponse.data);
+      } catch (error) {
+        console.error("유저 데이터를 불러오는 중 오류 발생:", error);
+        handleError(error);
+      } finally {
+        setIsLoading(false); // 로딩 상태 종료
       }
     };
 
-    const shelterRole = async () => {
-      try {
-        const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
-        setUseRole(response.data);
-      }catch(error) {
-        console.error("Role 불러오는 중 오류 발생:", error);
-        // handleError(error);
-      }
-    }
-    
-    userId();
-    shelterRole();
-  }, [])
-
+    fetchUserData();
+  }, [token]);
 
   // 보호소 정보 가져오기 (동물 상세 정보 이용)
   useEffect(() => {
@@ -213,19 +207,19 @@ const ShelterAddress: React.FC = () => {
           <h2 className="text-2xl font-bold">보호소 주소</h2>
         </section>
         <section className="flex flex-col items-center w-full max-w-lg m-8">
-          <div className="flex flex-wrap justify-center gap-10">
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">보호기관 이름</p>
+          <div className="flex flex-wrap justify-center gap-8 p-5 bg-bgColor rounded-2xl">
+            <div className="flex justify-between w-full p-3 bg-mainColor rounded-xl">
+              <p className="text-xl font-bold">보호기관 이름</p>
               <p className="text-lg">{shelterInfo.shelterName}</p>
             </div>
-            <div className="flex justify-between w-full">
-              <p className="text-xl font-bold text-mainColor">주소</p>
+            <div className="flex justify-between w-full p-3 bg-mainColor rounded-xl">
+              <p className="text-xl font-bold">주소</p>
               <p className="text-lg">{shelterInfo.shelterAddress}</p>
             </div>
           </div>
         </section>
         {shelter ? <section className="flex gap-24 my-8">
-          <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>확인</button>
+          <button className="px-4 py-2 text-lg font-bold text-mainColor hover:text-orange-600" onClick={Cancel}>확인</button>
           <button
             className="px-4 py-2 text-lg text-cancelColor"
             onClick={openModal}
@@ -235,7 +229,7 @@ const ShelterAddress: React.FC = () => {
         </section> 
         :
         <section className="flex gap-24 my-8">
-          <button className="px-4 py-2 text-lg font-bold text-mainColor" onClick={Cancel}>확인</button>
+          <button className="px-4 py-2 text-lg font-bold text-mainColor hover:text-orange-600" onClick={Cancel}>확인</button>
         </section> 
         }
 

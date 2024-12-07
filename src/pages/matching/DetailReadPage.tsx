@@ -52,6 +52,7 @@ const DetailReadPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate(); 
   const [roles, setRoles] = useState({role:""});
+  const [isLoading, setIsLoading] = useState(true); 
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [isApplyModalOpen, setApplyModalOpen] = useState<boolean>(false);
@@ -129,18 +130,25 @@ const DetailReadPage = () => {
     pets();
   }, [token])
 
-  // 유저 Id 불러오기
+  // ID, ROLE 불러오기
   useEffect(() => {
-    const userId = async () => {
-      try{
-        const response = await axiosInstance.get(`/api/v1/features/user-id`, {headers});
-        setUseId(response.data);
-      }catch(error) {
-        console.error("유저 ID 불러오는 중 오류 발생", error)
+    const fetchUserData = async () => {
+      try {
+        const userIdResponse = await axiosInstance.get(`/api/v1/features/user-id`, { headers });
+        setUseId(userIdResponse.data);
+
+        const roleResponse = await axiosInstance.get(`/api/v1/features/role`, { headers });
+        setRoles(roleResponse.data);
+      } catch (error) {
+        console.error("유저 데이터를 불러오는 중 오류 발생:", error);
+      } finally {
+        setIsLoading(false); // 로딩 상태 종료
       }
-    }
-    userId();
-  }, [token])
+    };
+  
+    fetchUserData();
+  }, [token]);
+  
 
   // petId 추가하기
   useEffect(() => {
@@ -152,18 +160,6 @@ const DetailReadPage = () => {
     }
   }, [petId]);
 
-  // 유저 role 불러오기
-  useEffect(() => {
-    const roles = async () => {
-      try{
-        const response = await axiosInstance.get(`/api/v1/features/role`, {headers});
-        setRoles(response.data);
-      }catch(error) {
-        console.error("유저 Role 불러오는 중 오류 발생", error)
-      } 
-    }
-    roles();
-  }, [token])
 
   // 회원 입양 신청 조회
   useEffect(() => {
