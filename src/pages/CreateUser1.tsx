@@ -277,8 +277,16 @@ const CreateUser1 = () => {
                   중복 확인
                 </button>
               </div>
+
+              {/* 상태 메시지 표시 */}
               {emailCheckStatus && (
-                <p className="mt-2 text-lg  text-red-600">{emailCheckStatus}</p>
+                <p
+                  className={`mt-2 text-lg ${
+                    emailStatus === "success" ? "text-blue-600" : "text-red-600"
+                  }`}
+                >
+                  {emailCheckStatus}
+                </p>
               )}
             </div>
 
