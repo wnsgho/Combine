@@ -53,7 +53,7 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error("로그인 실패:", error);
-      alert(error.response?.data?.message || "로그인에 실패했습니다.");
+      alert("이메일 혹은 비밀번호를 확인해주세요." || "로그인을 할 수 없습니다.");
     } finally {
       setLoading(false); 
     }
@@ -62,13 +62,13 @@ const Login = () => {
   // 카카오 로그인
   const handleKakaoLogin = () => {
     localStorage.setItem("isSocialLogin", "true"); 
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/kakao`;
+    window.location.href = `${axiosInstance.defaults.baseURL}/api/v1/auth/oauth2/kakao`;
   };
 
   // 네이버 로그인
   const handleNaverLogin = () => {
     localStorage.setItem("isSocialLogin", "true"); 
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/oauth2/naver`;
+    window.location.href = `${axiosInstance.defaults.baseURL}/api/v1/auth/oauth2/naver`;
   };
 
   return (

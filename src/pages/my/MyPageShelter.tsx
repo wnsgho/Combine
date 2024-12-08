@@ -6,7 +6,7 @@ import Header from '../../components/Header';
 import axiosInstance from "../../utils/axiosInstance"; 
 
 import mainImage from '../../assets/image/mainimage.webp';
-import ShelterAddress from './ShelterAddress';
+
 
 interface ShelterInfo {
   email: string;
@@ -33,9 +33,9 @@ interface UseId {
 const MyPageShelter: React.FC = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<{ status: number; message: string } | null>(null);
   const navigate = useNavigate();
-
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 오류 메시지 상태
   const [useId, setUseId] = useState<UseId>({
     Id: 0
@@ -47,17 +47,22 @@ const MyPageShelter: React.FC = () => {
     phoneNumber: '',
     password: ""
   });
-
   const [petLists, setPetLists] = useState<Pet[]>([]);
 
 
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2hlbHRlcnRlc3RAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfU0hFTFRFUiIsImlhdCI6MTczMzQ2NTk1MCwiZXhwIjoxNzMzNTUyMzUwfQ.l6uYTUmzaALdHqfT4Gw8zez-n4wl32cIKivI7Xwwbs8"
+  useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.error("로컬 스토리지에 토큰이 없습니다.");
+    }
+  }, []);
 
 
   const headers = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `${token}`,
   };
-
 
   // ID 불러오기
   useEffect(() => {
@@ -67,11 +72,11 @@ const MyPageShelter: React.FC = () => {
         setUseId(response.data);
       } catch(error) {
         console.error("보호소 ID를 불러오는 중 오류 발생:", error);
-        handleError(error);
+        // handleError(error);
       }
     };
     shelterId();
-  }, [])
+  }, [token])
 
   // 보호소 정보 가져오기 / 보호소 등록 동물 리스트
   useEffect(() => {
@@ -80,11 +85,18 @@ const MyPageShelter: React.FC = () => {
         try {
           const response = await axiosInstance.get<ShelterInfo>(`/api/v1/shelters/${useId.Id}`, {headers});
           setShelterInfo(response.data);
-        } catch (error) {
+        } catch(error) {
           console.error('보호소 정보를 불러오는 중 오류 발생:', error);
-          handleError(error);
+          // handleError(error);
         }
-      };
+      };     
+      shelterInfo();
+
+    }
+  }, [useId.Id]);
+
+  useEffect(() => {
+    if(useId.Id !== 0) {
       const petList = async () => {
         try {
           const response = await axiosInstance.get(`/api/v1/pets/${useId.Id}/list`, {headers});
@@ -95,7 +107,6 @@ const MyPageShelter: React.FC = () => {
           // handleError(error);
         }
       };      
-      shelterInfo();
       petList();
     }
   }, [useId.Id]);
@@ -179,6 +190,10 @@ const MyPageShelter: React.FC = () => {
     return <div>로딩 중...</div>;
   }
 
+  const detailLink = (petId:number) => {
+    return `/detail/${petId}`; // 상세 페이지 URL 생성
+  };
+
   // 에러 핸들링 함수
   const handleError = (error: any) => {
     const status = error.response?.status || 500;
@@ -199,41 +214,41 @@ const MyPageShelter: React.FC = () => {
             <div className="flex justify-center">
               <h3 className='text-2xl font-bold'>마이페이지</h3>
             </div>
-            <div className="flex flex-wrap justify-center gap-10">
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">단체이름</p>
+            <div className="flex flex-wrap justify-center gap-10 p-5 bg-bgColor rounded-2xl">
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">단체이름</p>
                 <p className='text-lg'>{shelterInfo.shelterName}</p>
               </div>
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">주소</p>
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">주소</p>
                 <button className='flex items-center justify-center text-lg'>{shelterInfo.address}</button>
               </div>
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">단체 메일</p>
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">단체 메일</p>
                 <p className='text-lg'>{shelterInfo.email}</p>
               </div>
-              <div className="flex justify-between w-full">
-                <p className="text-xl font-bold text-mainColor">전화번호</p>
+              <div className="flex justify-between w-full p-3 rounded-lg bg-mainColor">
+                <p className="text-xl font-bold">전화번호</p>
                 <p className='text-lg'>{shelterInfo.phoneNumber}</p>
               </div>
             </div>
-            <div className="flex gap-32 mt-10">
+            <div className="flex gap-32 mt-6">
               <button
-                className="text-lg text-mainColor"
+                className="text-lg text-mainColor hover:text-orange-500"
                 onClick={() => setEditModalOpen(true)}
               >
                 정보수정
               </button>
               <button
-                className="text-lg text-cancelColor"
+                className="text-lg text-cancelColor hover:text-red-700"
                 onClick={() => setDeleteModalOpen(true)}
               >
                 회원탈퇴
               </button>
             </div>
-            <div>
+            <div className='mt-5'>
               <Link to={applyListLink(useId.Id)}>
-                <button className="flex items-center justify-centert ext-lg text-mainColor">입양 신청 리스트 <GoChevronRight />
+                <button className="flex items-center justify-center text-lg font-bold hover:text-mainColor">입양 신청 리스트 <GoChevronRight />
                 </button>
               </Link>
             </div>
@@ -243,25 +258,27 @@ const MyPageShelter: React.FC = () => {
               <h3 className="mb-10 text-xl font-bold">등록 입양 정보</h3>
             </div>
           </section>
-          <section className='flex items-center justify-center m-8'>
+          <section className='flex items-center justify-center m-6'>
             <div className='flex flex-wrap justify-center gap-10'>
               {Array.isArray(petLists) && petLists.length > 0 ? (
                 petLists.map((pet) => (
-                  <div key={pet.petId} className='border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72 border-mainColor'>
-                    <img 
-                      src={pet.imageUrls && pet.imageUrls.length > 0 ? pet.imageUrls[0] : mainImage} 
-                      alt="동물 사진"
-                      onError={(e) => {
-                        e.currentTarget.src = mainImage;
-                        e.currentTarget.onerror = null;
-                      }}
-                    />
-                    <div className='m-3'>
-                      <p>{pet.species} / {pet.size} / {pet.age} / <br />
-                        {pet.personality} / 활동량({pet.exerciseLevel})
-                      </p>
+                  <Link to={detailLink(pet.petId)}>
+                    <div key={pet.petId} className='overflow-hidden border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72'>
+                      <img
+                        src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://15.164.103.160:8080${pet.imageUrls[0]}` : mainImage} 
+                        alt="동물 사진"
+                        onError={(e) => {
+                          e.currentTarget.src = mainImage;
+                          e.currentTarget.onerror = null;
+                        }}
+                      />
+                      <div className='m-3'>
+                        <p>{pet.species} / {pet.size} / {pet.age} / <br />
+                          {pet.personality} / 활동량({pet.exerciseLevel})
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <p>등록된 동물이 없습니다.</p>

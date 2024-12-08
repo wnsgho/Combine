@@ -150,8 +150,8 @@ const CreateUser2 = () => {
       alert("전화번호를 입력해주세요.");
       return false;
     } else if (!phoneNumberRegex.test(phoneNumber)) {
-      setPhoneNumberError("유효한 전화번호 형식이 아닙니다.");
-      alert("유효한 전화번호 형식이 아닙니다.");
+      setPhoneNumberError("유효한 전화번호 형식이 아닙니다.(예: 010-0000-0000)");
+      alert("유효한 전화번호 형식이 아닙니다.(예: 010-0000-0000)");
       return false;
     }
 
@@ -200,44 +200,52 @@ const CreateUser2 = () => {
           </h1>
           <form className="space-y-10" onSubmit={handleSubmit}>
             {/* 이메일 */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-2xl sm:text-2xl md:text-3xl font-medium text-gray-700 mb-4"
-              >
-                이메일
-              </label>
-              <div className="flex items-center space-x-4">
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="이메일을 입력해주세요."
-                  value={inputValues.email}
-                  onChange={handleInputChange}
-                  className={`w-full px-5 py-4 sm:py-5 md:py-6 border rounded-lg text-2xl sm:text-2xl md:text-2xl ${
-                    emailStatus === "error"
-                      ? "bg-red-100 border-red-500"
-                      : emailStatus === "success"
-                      ? "bg-gray-100 border-gray-500"
-                      : inputValues.email
-                      ? "bg-gray-100 border-gray-300"
-                      : "bg-white border-gray-300"
-                  } overflow-hidden truncate`}
-                />
-                <button
-                  type="button"
-                  onClick={handleEmailCheck}
-                  disabled={isEmailChecking}
-                  className="px-3 py-5 sm:px-4 sm:py-6 bg-gray-500 text-white rounded-lg sm:text-lg hover:bg-gray-600 transition text-center"
-                  style={{ whiteSpace: "pre" }}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-2xl sm:text-2xl md:text-3xl font-medium text-gray-700 mb-4"
                 >
-                  중복 확인
-                </button>
+                  이메일
+                </label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="이메일을 입력해주세요."
+                    value={inputValues.email}
+                    onChange={handleInputChange}
+                    className={`w-full px-5 py-4 sm:py-5 md:py-6 border rounded-lg text-2xl sm:text-2xl md:text-2xl ${
+                      emailStatus === "error"
+                        ? "bg-red-100 border-red-500"
+                        : emailStatus === "success"
+                        ? "bg-gray-100 border-gray-500"
+                        : inputValues.email
+                        ? "bg-gray-100 border-gray-300"
+                        : "bg-white border-gray-300"
+                    } overflow-hidden truncate`}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleEmailCheck}
+                    disabled={isEmailChecking}
+                    className="px-3 py-5 sm:px-4 sm:py-6 bg-gray-500 text-white rounded-lg sm:text-lg hover:bg-gray-600 transition text-center"
+                    style={{ whiteSpace: "pre" }}
+                  >
+                    중복 확인
+                  </button>
+                </div>
+
+                {/* 상태 메시지 표시 */}
+                {emailCheckStatus && (
+                  <p
+                    className={`mt-2 text-lg ${
+                      emailStatus === "success" ? "text-blue-600" : "text-red-600"
+                    }`}
+                  >
+                    {emailCheckStatus}
+                  </p>
+                )}
               </div>
-              {emailCheckStatus && (
-                <p className="mt-2 text-lg  text-red-600">{emailCheckStatus}</p>
-              )}
-            </div>
 
             {/* 비밀번호 */}
             <div>
