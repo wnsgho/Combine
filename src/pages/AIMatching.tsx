@@ -174,7 +174,6 @@ const AIMatching = () => {
               </button>
             )}
           </div>
-
           <div className="h-[30vh] sm:h-[35vh] md:h-[40vh] lg:h-[40vh] xl:h-[40vh] 2xl:h-[40vh] w-[30vh] sm:w-[45vh] md:w-[55vh] lg:w-[60vh] xl:w-[65vh] 2xl:w-[65vh] bg-gray-200 flex items-center justify-center rounded-md overflow-hidden min-h-[280px] min-w-[300px]">
             {petInfo.petImage ? (
               <img
