@@ -208,6 +208,7 @@ const DetailReadPage = () => {
       await axiosInstance.delete(`/api/v1/pets/${useId.Id}/${petId}`, {headers});
       alert('삭제가 완료되었습니다.');
       setDeleteModalOpen(false);
+      navigate("/matching");
     } catch (error) {
       console.error("동물 삭제 중 오류 발생", error);
       alert('삭제가 실패되었습니다 다시 시도해주세요.');

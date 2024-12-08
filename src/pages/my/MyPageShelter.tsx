@@ -190,6 +190,10 @@ const MyPageShelter: React.FC = () => {
     return <div>로딩 중...</div>;
   }
 
+  const detailLink = (petId:number) => {
+    return `/detail/${petId}`; // 상세 페이지 URL 생성
+  };
+
   // 에러 핸들링 함수
   const handleError = (error: any) => {
     const status = error.response?.status || 500;
@@ -258,21 +262,23 @@ const MyPageShelter: React.FC = () => {
             <div className='flex flex-wrap justify-center gap-10'>
               {Array.isArray(petLists) && petLists.length > 0 ? (
                 petLists.map((pet) => (
-                  <div key={pet.petId} className='overflow-hidden border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72'>
-                    <img
-                      src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://15.164.103.160:8080${pet.imageUrls[0]}` : mainImage} 
-                      alt="동물 사진"
-                      onError={(e) => {
-                        e.currentTarget.src = mainImage;
-                        e.currentTarget.onerror = null;
-                      }}
-                    />
-                    <div className='m-3'>
-                      <p>{pet.species} / {pet.size} / {pet.age} / <br />
-                        {pet.personality} / 활동량({pet.exerciseLevel})
-                      </p>
+                  <Link to={detailLink(pet.petId)}>
+                    <div key={pet.petId} className='overflow-hidden border border-solid rounded-lg min-w-40 max-w-48 min-h-72 max-h-72'>
+                      <img
+                        src={pet.imageUrls && pet.imageUrls.length > 0 ? `http://15.164.103.160:8080${pet.imageUrls[0]}` : mainImage} 
+                        alt="동물 사진"
+                        onError={(e) => {
+                          e.currentTarget.src = mainImage;
+                          e.currentTarget.onerror = null;
+                        }}
+                      />
+                      <div className='m-3'>
+                        <p>{pet.species} / {pet.size} / {pet.age} / <br />
+                          {pet.personality} / 활동량({pet.exerciseLevel})
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <p>등록된 동물이 없습니다.</p>

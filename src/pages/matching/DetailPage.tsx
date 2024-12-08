@@ -184,6 +184,7 @@ const DetailPage = () => {
       );
       alert("동물 등록이 완료되었습니다.");
       setAddModalOpen(false);
+      navigate("/matching");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Error registering pet:", error.response?.data);
@@ -206,7 +207,10 @@ const DetailPage = () => {
   return (
     <>
       <Header />
-      <form className="flex flex-col items-center mt-10" onSubmit={handleSubmit}>
+      <form
+        className="flex flex-col items-center mt-10"
+        onSubmit={(e) => e.preventDefault()} // 기본 제출 동작 막기
+      >
         <div>
           <h3 className="mb-10 text-2xl font-bold text-mainColor">정보를 입력해주세요</h3>
         </div>
@@ -352,7 +356,7 @@ const DetailPage = () => {
           </div>
         </section>
         <div className="flex gap-32 my-10">
-          <button type="submit" className="text-mainColor" onClick={() => setAddModalOpen(true)}>등록</button>
+          <button type="button" className="text-mainColor" onClick={() => setAddModalOpen(true)}>등록</button>
           <button type="button" className="text-cancelColor" onClick={Cancel}>취소</button>
         </div>
         {/* 등록 신청 모달 */}

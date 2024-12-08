@@ -190,6 +190,7 @@ const DetailCorrect = () => {
       );
       alert("동물 수정이 완료되었습니다.");
       setChangeModalOpen(false);
+      navigate(-1);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Error registering pet:", error.response?.data);
