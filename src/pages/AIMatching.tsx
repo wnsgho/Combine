@@ -138,7 +138,7 @@ const AIMatching = () => {
           details: [
             { label: "종", value: data.pet.species || "정보 없음" },
             { label: "크기", value: data.pet.size || "정보 없음" },
-            { label: "나이", value: data.pet.age ? `${data.pet.age}살` : "정보 없음" },
+            { label: "나이", value: data.pet.age ? `${data.pet.age}` : "정보 없음" },
             { label: "성격", value: data.pet.personality || "정보 없음" },
             { label: "운동량", value: data.pet.exerciseLevel || "정보 없음" },
           ],
@@ -186,16 +186,23 @@ const AIMatching = () => {
               <span className="text-gray-500 text-xl">이미지가 없습니다.</span>
             )}
           </div>
-          <span
-            className={`block text-2xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-3xl font-bold m-0 p-0 ${
-              petInfo.petName === "정보 없음" || petInfo.petName === "매칭 정보를 불러오는 중..."
-                ? "text-gray-500"
-                : "text-[#7F5546]"
-            }`}
-            style={{ marginTop: "25px", marginBottom: "-35px" }}
-          >
-            {petInfo.petName}
-          </span>
+          <div className="relative w-full flex items-center justify-center">
+            <span
+              className={`block text-2xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-3xl font-bold ${
+                petInfo.petName === "정보 없음" || petInfo.petName === "매칭 정보를 불러오는 중..."
+                  ? "text-gray-500"
+                  : "text-[#7F5546]"
+              }`}
+            >
+              {petInfo.petName}
+            </span>
+            <button
+              className="absolute right-0 text-[#7F5546] font-medium text-lg sm:text-xl lg:text-2xl hover:underline"
+              onClick={() => window.location.reload()}
+            >
+              재시도
+            </button>
+          </div>
           <div className="space-y-3 w-full">
             {petInfo.details.map((item, index) => (
               <div
