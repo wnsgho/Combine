@@ -1,5 +1,4 @@
 import GuideNavigation from "../../components/GuideNavigation";
-import Walk from "../../../public/walk.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -19,24 +18,34 @@ const Announcementpost = () => {
   const [announcementPost, setAnnouncementPost] = useState<AnnouncementPost | null>(null);
   const navigate = useNavigate();
   const { id } = useParams()
-  const [userId, setUserId] = useState<number | null>(null)
   const role = useUserStore((state)=> state.role)
 
   //조회
   useEffect(() => {
+    let isMounted = true;  // 마운트 상태를 추적하는 플래그
+
     const fetchAnnouncementPost = async () => {
       try {
         const response = await axios.get(`http://15.164.103.160:8080/api/v1/announcements/${id}`);
-        setAnnouncementPost(response.data);
+        if (isMounted) {  // 컴포넌트가 마운트된 상태일 때만 상태 업데이트
+          setAnnouncementPost(response.data);
+        }
       } catch (error) {
         console.error("불러오기 실패", error);
-        navigate("/guide/announcement")
+        if (isMounted) {
+          navigate("/guide/announcement");
+        }
       }
     };
-    if(id){
+
+    if (id) {
       fetchAnnouncementPost();
     }
-  }, [id]);
+
+    return () => {
+      isMounted = false;  // 클린업 함수에서 마운트 상태 플래그를 false로 설정
+    };
+  }, [id, navigate]);  // navigate를 의존성 배열에 추가
 
   //삭제
   const handleDelete = async () => {
@@ -64,26 +73,26 @@ const Announcementpost = () => {
   return (
     <div>
     <Header/>
-    <div className="flex flex-col items-center scrollbar-hide">
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className="relative">
-          <div className="bg-slate-400"></div>
-          <img src={Walk} alt="walk" className="w-full h-[400px] opacity-85 object-cover object-bottom" />
-          <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-            <div className="text-[50px] pb-2">공지사항</div>
-            <div className="text-[25px]">다양한 정보를 제공하고 있습니다.</div>
+    <div className="flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="relative">
+            <div className="bg-slate-400"></div>
+            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
+            <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
+              <div className="text-[50px] pb-2 text-white">공지사항</div>
+              <div className="text-[25px] text-white">다양한 정보를 제공하고 있습니다.</div>
+            </div>
           </div>
-        </div>
-        <GuideNavigation />
+          <GuideNavigation/>
         {announcementPost && ( 
             <div className="max-w-[1000px] mx-auto" key={announcementPost.id}>
-              <div className="text-[35px] text-left border-b-[1px] border-black pb-5">{announcementPost.title}</div>
-              <div className="text-left pt-4 pb-20">
-              <span className={announcementPost.category === "NOTICE" ? ("text-red-500") : ("text-blue-500")}>{announcementPost.category === "NOTICE" ? ("공지") : ("지원")}</span> | {announcementPost.created_at} | {announcementPost.viewCount}
+              <div className="text-[35px] text-center border-t-[1px] border-black pt-5 font-bold mx-3">{announcementPost.title}</div>
+              <div className="text-center pt-4 pb-5 border-b-[1px] border-gray-300 mx-3">
+              <span className={announcementPost.category === "NOTICE" ? ("text-red-500") : ("text-blue-500")}>{announcementPost.category === "NOTICE" ? ("공지") : ("지원")}</span> <span className="opacity-70 text-gray-400">|</span> 작성일 {announcementPost.created_at} <span className="opacity-70 text-gray-400">|</span> 조회수 {announcementPost.viewCount}
               </div>
-              <div className="text-[20px] pb-20" dangerouslySetInnerHTML={{ __html: announcementPost.content }} />
+              <div className="text-[20px] py-10 px-5 border-b-[1px] border-black mb-10 mx-3" dangerouslySetInnerHTML={{ __html: announcementPost.content }} />
               <div
-                className="float-right mb-20 bg-[#AB654B]/90 p-4 text-white font-bold text-[20px] cursor-pointer"
+                className="float-right mr-3 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
                 onClick={() => navigate("/guide/announcement")}>
                 목록으로
               </div>
@@ -91,13 +100,13 @@ const Announcementpost = () => {
               {role === "ROLE_ADMIN" && (
                 <>
                 <div
-                className="float-right mr-8 mb-20 bg-[#AB654B]/90 p-4 text-white font-bold text-[20px] cursor-pointer"
+                className="float-right mr-8 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
                 onClick={handleDelete}>
                 삭제하기
               </div>
 
               <div
-                className="float-right mr-8 mb-20 bg-[#AB654B]/90 p-4 text-white font-bold text-[20px] cursor-pointer"
+                className="float-right mr-8 mb-20 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
                 onClick={() => navigate(`/guide/announcement/edit/${announcementPost.id}`)}>
                 수정하기
               </div>

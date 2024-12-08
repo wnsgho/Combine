@@ -118,7 +118,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
   return (
     <div className="bg-white shadow-[0_0_15px_rgba(0,0,0,0.5)] w-96 h-[556px] fixed right-[490px] bottom-2 m-6 z-50 rounded-md">
       {/* 헤더 */}
-      <div className=" bg-green-500 font-bold text-xl p-3 flex  rounded-t-md content-center justify-between">
+      <div className=" bg-[#3c2a13] text-white font-bold text-xl p-3 flex  rounded-t-md content-center justify-between">
         <div>FAQ</div>
         <div className="flex gap-2">
           <div className="cursor-pointer float-end" onClick={() => setEdit(false)}>
@@ -167,7 +167,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
             </div>
             <div className="flex justify-end px-3">
               <div
-                className="bg-green-400 font-semibold w-12 text-center cursor-pointer px-2 py-1 rounded-md mr-3"
+                className="bg-[#3c2a13] text-white font-semibold w-12 text-center cursor-pointer px-2 py-1 rounded-md mr-3"
                 onClick={handleTopEdit}>
                 수정
               </div>
@@ -194,7 +194,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
             </div>
             <div className="flex justify-end px-3">
               <div
-                className="bg-green-400 font-semibold w-12 text-center cursor-pointer px-2 py-1 rounded-md mr-1"
+                className="bg-[#3c2a13] text-white font-semibold w-12 text-center cursor-pointer px-2 py-1 rounded-md mr-1"
                 onClick={TopHandleSubmit}>
                 작성
               </div>
@@ -234,7 +234,7 @@ const FAQEdIt = ({ Close }: FAQEdit) => {
             </div>
             <div className="flex justify-end px-3">
               <div
-                className="bg-green-400 font-semibold w-12 text-center cursor-pointer px-2 py-1 rounded-md mr-1"
+                className="bg-[#3c2a13] text-white font-semibold w-12 text-center cursor-pointer px-2 py-1 rounded-md mr-1"
                 onClick={RefHandleSubmit}>
                 작성
               </div>

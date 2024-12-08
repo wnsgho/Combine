@@ -76,14 +76,14 @@ const FAQ = () => {
   return (
     <div>
       <div
-        className="bg-green-500 m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[29px] cursor-pointer fixed bottom-0 right-2 hover:scale-105 transition-transform"
+        className="bg-[#3c2a13] text-white m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[29px] cursor-pointer fixed bottom-0 right-2 hover:scale-105 transition-transform z-50"
         onClick={handleClick}>
         {open ? "x" : "?"}
       </div>
       {open && (
         <>
           <div className="bg-white shadow-[0_0_15px_rgba(0,0,0,0.5)] w-96 h-[556px] fixed right-[90px] bottom-2 m-6 z-50 rounded-md">
-            <div className=" bg-green-500 font-bold text-xl p-3 flex  rounded-t-md content-center justify-between">
+            <div className=" bg-[#3c2a13] text-white font-bold text-xl p-3 flex  rounded-t-md content-center justify-between">
               <div>FAQ</div>
               <div className="flex gap-2">
                 {role === "ROLE_ADMIN" && (
@@ -97,7 +97,7 @@ const FAQ = () => {
               </div>
             </div>
             <div className="overflow-y-auto max-h-[500px] scrollbar-hide">
-              <div className="flex px-5 py-3">
+              <div className="flex px-5 py-5">
                 <div className="rounded-full w-12 h-12">
                   <img src={logo} alt="logo" />
                 </div>
@@ -109,7 +109,7 @@ const FAQ = () => {
                   {topContent.map((faq) => (
                     <div className="flex px-5 py-1 justify-end" key={faq.faqId}>
                       <div
-                        className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500 cursor-pointer hover:bg-green-500 hover:text-white"
+                        className="mr-2 p-2 rounded-xl content-center border-2  border-[#3c2a13] text-[#3c2a13] cursor-pointer hover:bg-[#3c2a13] hover:text-white"
                         onClick={() => handleSelectFAQ(faq.content.toString(), faq.faqId)}>
                         {faq.content}
                       </div>
@@ -127,7 +127,7 @@ const FAQ = () => {
                         <>
                           {/* 선택된 질문 표시 */}
                           <div className="flex px-5 py-1 justify-end">
-                            <div className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500">
+                            <div className="mr-2 p-2 rounded-xl content-center border-2 border-[#3c2a13] text-[#3c2a13]">
                               {selectFAQ}
                             </div>
                           </div>
@@ -143,7 +143,8 @@ const FAQ = () => {
 
                           <div
                             onClick={handleBack}
-                            className="text-white bg-green-500 mx-20 mt-5 py-2 text-center rounded-lg font-bold text-xl cursor-pointer ">
+                            className="text-white bg-[#3c2a13] mx-20 mt-5 p-2 text-center rounded-lg font-bold text-xl cursor-pointer absolute bottom-4 right-[60px]
+                          hover:scale-105 hover:transition-transform z-50">
                             처음으로
                           </div>
                         </>
@@ -154,7 +155,7 @@ const FAQ = () => {
                         ...filteredContent.map((item) => (
                           <div className="flex px-5 py-1 justify-end" key={item.faqId}>
                             <div
-                              className="mr-2 p-2 rounded-xl content-center border-2 border-green-500 text-green-500 cursor-pointer hover:bg-green-500 hover:text-white"
+                              className="mr-2 p-2 rounded-xl content-center border-2 border-[#3c2a13] text-[#3c2a13] cursor-pointer hover:bg-[#3c2a13] hover:text-white"
                               onClick={() => handleSelectFAQ(item.content.toString(), item.faqId)}>
                               {item.content}
                             </div>
@@ -162,7 +163,8 @@ const FAQ = () => {
                         )),
                         <div
                           onClick={handleBack}
-                          className="text-white bg-green-500 mx-20 mt-5 py-2 text-center rounded-lg font-bold text-xl cursor-pointer">
+                          className="text-white bg-[#3c2a13] mx-20 mt-5 p-2 text-center rounded-lg font-bold text-xl cursor-pointer absolute bottom-4 right-[60px]
+                          hover:scale-105 hover:transition-transform z-50">
                           처음으로
                         </div>
                       ];
