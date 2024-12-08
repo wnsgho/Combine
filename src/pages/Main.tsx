@@ -15,7 +15,7 @@ const descriptions: Record<IconType, Description> = {
     title: "매칭 동물 결정",
     content: [
       "필요한 조건을 골라 원하는 반려 동물들을 결정해 보세요.",
-      "고르는데 어려움이 있으시면 AI 기능을 활용해 보세요.",
+      // "고르는데 어려움이 있으시면 AI 기능을 활용해 보세요.",
     ],
   },
   approve: {
@@ -61,7 +61,7 @@ const Main: React.FC = () => {
 
      
       {/* 설명 섹션 */}
-      <section className="relative flex flex-col items-center justify-center h-[15vh] sm:h-[20vh] md:h-[20vh] lg:h-[20vh] xl:h-[25vh] 2xl:h-[25vh] bg-[#8b5b48a6]">
+      <section className="relative flex flex-col items-center justify-center h-[15vh] sm:h-[20vh] md:h-[20vh] lg:h-[20vh] xl:h-[25vh] 2xl:h-[25vh] bg-[#46291ba6]">
         {/* 내용 */}
         <div className="relative flex flex-col items-center justify-center w-[95] sm:w-[85%] md:w-[80%] lg:w-[85%] xl:w-[80%] 2xl:w-[90%] max-w-7xl mt-7">
           {/* 아이콘 및 화살표 */}
@@ -99,7 +99,7 @@ const Main: React.FC = () => {
       {/* 상세 설명 */}
       <section className="relative flex flex-col items-center justify-start h-[53vh] sm:h-[54vh] md:h-[60vh] lg:h-[70vh] xl:h-[75vh] 2xl:h-[75vh]">
         {/* 상단 배경 */}
-        <div className="absolute top-0 left-0 w-full h-1/3 bg-[#8b5b48a6]"></div>
+        <div className="absolute top-0 left-0 w-full h-1/3 bg-[#46291ba6]"></div>
         {/* 하단 배경 */}
         <div className="absolute bottom-0 left-0 w-full h-2/3 bg-[#eeeceb]"></div>
         {/* 내용 */}
