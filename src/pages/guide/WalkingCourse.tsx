@@ -2,6 +2,9 @@ import Walk from "../../../public/walk.png";
 import { useEffect, useRef, useState } from "react";
 import GuideNavigationMap from "../../components/GuideNavigationMap";
 import Header from "../../components/Header";
+import FAQ from "../../components/FAQ";
+import Chat from "../../components/Chat";
+import GuideNavigation from "../../components/GuideNavigation";
 
 declare global {
   interface Window {
@@ -16,6 +19,7 @@ const WalkingCourse = () => {
   const [markers, setMarkers] = useState<{ [key: string]: any }>({});
   const [overlays, setOverlays] = useState<{ [key: string]: any }>({});
   const [map, setMap] = useState<any>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(true);
 
   //사용자 위치 geolocation api
   useEffect(() => {
@@ -162,53 +166,52 @@ const WalkingCourse = () => {
 
   return (
     <div>
-      <Header/>
-    <div className="flex flex-col justify-center items-center">
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className="relative">
-          <div className="bg-slate-400"></div>
-          <img src={Walk} alt="walk" className="w-full h-[400px] opacity-85 object-cover object-bottom" />
-          <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-            <div className="text-[50px] pb-2">반려동물 관련 시설</div>
-            <div className="text-[25px]">현재위치를 기반으로 반경 3km 내의 산책로를 찾아드립니다.</div>
-          </div>
+      <Header />
+      <FAQ />
+      <Chat />
+      <div className="relative w-full h-[calc(100vh-64px)]">
+        {/* 지도 컨테이너 */}
+        <div className="absolute inset-0">
+          <div ref={mapRef} className="w-full h-full"></div>
         </div>
-        <div className="mb-8">
-          <GuideNavigationMap />
-        </div>
-        <div className="bg-[#AB654B]/90 p-8 flex rounded-lg mb-4">
-          <div ref={mapRef} className="w-full h-[700px] rounded-lg "></div>
-          <div className="w-full pl-8 h-[700px] flex flex-col">
-            <div className="overflow-y-scroll flex-1 scrollbar-hide">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-7">
-                {places.map((place) => (
-                  <div
-                    key={place.id}
-                    className="p-3 bg-white rounded-lg cursor-pointer transform transition-all  hover:shadow-2xl hover:bg-yellow-100"
-                    onClick={() => window.open(place.place_url, "_blank")}
-                    onMouseEnter={() => {
-                      if (overlays[place.id]) {
-                        overlays[place.id].setMap(map);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      if (overlays[place.id]) {
-                        overlays[place.id].setMap(null);
-                      }
-                    }}>
-                    <div className="text-lg text-blue-600 font-bold">{getLastCategory(place.category_name)}</div>
-                    <div className="font-bold text-[22px]">{place.place_name}</div>
-                    <div className="text-lg mt-2">{place.road_address_name}</div>
-                    <div className="text-lg">{place.phone || ""}</div>
-                    <div className="text-sm text-gray-500">현재 위치로부터 {place.distance}m</div>
-                  </div>
-                ))}
-              </div>
+
+        {/* 왼쪽 패널 */}
+        <div className={`${isPanelOpen ? "w-[400px]" : "w-0"} absolute left-0 top-0 h-full bg-white border-r transition-all duration-300 overflow-hidden z-10`}>
+          <div className="w-[400px]">
+            <div className="text-center pt-6 text-3xl font-bold">산책로</div>
+            <div className="bg-white p-3 text-md text-center font-bold text-red-500">
+              현재 위치를 기준으로 반경 3km 검색 결과입니다
+            </div>
+            
+            {/* 장소 목록 */}
+            <div className="h-[calc(100%-100px)] overflow-y-auto">
+              {places.map((place) => (
+                <div
+                  key={place.id}
+                  className="p-4 border-b hover:bg-gray-50 cursor-pointer"
+                  onClick={() => window.open(place.place_url, "_blank")}
+                  onMouseEnter={() => overlays[place.id]?.setMap(map)}
+                  onMouseLeave={() => overlays[place.id]?.setMap(null)}>
+                  <div className="text-sm text-blue-600">{getLastCategory(place.category_name)}</div>
+                  <div className="font-bold text-lg mb-1">{place.place_name}</div>
+                  <div className="text-sm text-gray-600">{place.road_address_name}</div>
+                  {place.phone && <div className="text-sm text-gray-600">{place.phone}</div>}
+                  <div className="text-sm text-gray-500 mt-1">현재 위치로부터 {place.distance}m</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* 토글 버튼 */}
+        <div
+          className={`bg-white z-50 absolute cursor-pointer hover:bg-gray-100 transition-all duration-300 rounded-r-xl
+            ${isPanelOpen ? "left-[399px]" : "left-0"} 
+            top-1/2 px-2 py-6 border-y border-r border-gray-300`}
+          onClick={() => setIsPanelOpen(!isPanelOpen)}>
+          {isPanelOpen ? "◀︎" : "▶︎"}
+        </div>
       </div>
-    </div>
     </div>
   );
 };
