@@ -174,11 +174,11 @@ const handleReplyEdit = async () => {
           <GuideNavigation/>
           {qnapost && (
             <div className="max-w-[1000px] mx-auto" key={qnapost.id}>
-              <div className="text-[35px] text-center border-t-[1px] border-black pt-4 font-bold">{qnapost.title}</div>
-              <div className="text-center pt-4 pb-5 border-b-2">
+              <div className="text-[35px] text-center border-t-[1px] border-black pt-4 font-bold mx-3">{qnapost.title}</div>
+              <div className="text-center pt-4 pb-5 border-b-[1px] border-gray-300 mx-3">
                 {qnapost.writerName} <span className="opacity-70 text-gray-400">|</span> {qnapost.created_at} <span className="opacity-70 text-gray-400">|</span> {qnapost.viewCount}
               </div>
-              <div className="text-[20px] py-10 px-5 border-b-[1px] border-black mb-10">
+              <div className="text-[20px] py-10 px-5 border-b-[1px] border-black mb-10 mx-3">
                 <div dangerouslySetInnerHTML={{ __html: qnapost.content }} />
                 
 
@@ -190,8 +190,8 @@ const handleReplyEdit = async () => {
                 {qnapost.comments.length > 0  && (
                   <>
                   
-                  <div className="bg-[#f1a34a]/90 w-full h-auto p-5 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] my-10">
-                  <div className="pb-6 pl-2 font-bold text-xl">답변 문의</div>
+                  <div className="bg-[#f1a34a]/90 w-auto h-auto p-5 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] my-10 mx-3">
+                  <div className="pb-6 pl-2 font-bold text-xl">문의 답변</div>
                   {edit ? (
                     <>
                       <textarea

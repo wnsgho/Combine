@@ -143,7 +143,8 @@ const FAQ = () => {
 
                           <div
                             onClick={handleBack}
-                            className="text-white bg-[#3c2a13] mx-20 mt-5 py-2 text-center rounded-lg font-bold text-xl cursor-pointer ">
+                            className="text-white bg-[#3c2a13] mx-20 mt-5 p-2 text-center rounded-lg font-bold text-xl cursor-pointer absolute bottom-4 right-[60px]
+                          hover:scale-105 hover:transition-transform z-50">
                             처음으로
                           </div>
                         </>
@@ -162,7 +163,8 @@ const FAQ = () => {
                         )),
                         <div
                           onClick={handleBack}
-                          className="text-white bg-[#3c2a13] mx-20 mt-5 py-2 text-center rounded-lg font-bold text-xl cursor-pointer">
+                          className="text-white bg-[#3c2a13] mx-20 mt-5 p-2 text-center rounded-lg font-bold text-xl cursor-pointer absolute bottom-4 right-[60px]
+                          hover:scale-105 hover:transition-transform z-50">
                           처음으로
                         </div>
                       ];

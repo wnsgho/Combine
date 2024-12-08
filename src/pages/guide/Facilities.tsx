@@ -4,6 +4,7 @@ import GuideNavigationMap from "../../components/GuideNavigationMap";
 import Header from "../../components/Header";
 import FAQ from "../../components/FAQ";
 import Chat from "../../components/Chat";
+import GuideNavigation from "../../components/GuideNavigation";
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ const Facilities = () => {
   const [overlays, setOverlays] = useState<{ [key: string]: any }>({});
   const [map, setMap] = useState<any>(null);
   const [selectCategory, setSelectCategory] = useState<string | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
 
   //카테고리 구분 및 거리정렬 함수
   const filterCategory = selectCategory
@@ -179,72 +181,68 @@ const Facilities = () => {
   };
   return (
     <div>
-      <Header/>
-      <FAQ/>
-      <Chat/>
-      <div className="flex flex-col justify-center items-center">
-        <div className="w-full">
-          <div className="relative">
-            <div className="bg-slate-400"></div>
-            <div className="bg-[#3c2a13]/90 h-[300px]"></div>
-            <div className="absolute inset-0 flex flex-col justify-center text-center font-bold">
-              <div className="text-[50px] pb-2 text-white">반려동물 관련 시설</div>
-              <div className="text-[25px] text-white">현재위치를 기반으로 반경 3km 내의 관련 시설을 찾아드립니다.</div>
+      <Header />
+      <FAQ />
+      <Chat />
+      <div className="relative w-full h-[calc(100vh-64px)]">
+        {/* 지도 컨테이너 */}
+        <div className="absolute inset-0">
+          <div ref={mapRef} className="w-full h-full"></div>
+        </div>
+
+        {/* 왼쪽 패널 */}
+        <div className={`${isPanelOpen ? "w-[400px]" : "w-0"} absolute left-0 top-0 h-full bg-white border-r transition-all duration-300 overflow-hidden z-10`}>
+          <div className="w-[400px]">
+            {" "}
+            {/* 고정된 너비의 컨테이너 */}
+            <div className="text-center pt-6 text-3xl font-bold">반려동물 관련 시설</div>
+            <div className="bg-white p-3 text-md text-center font-bold text-red-500">
+              현재 위치를 기준으로 반경 3km 검색 결과입니다
+            </div>
+            {/* 카테고리 탭 */}
+            <div className="flex border-b">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  className={`flex-1 p-4 text-center cursor-pointer ${
+                    selectCategory === category.keyword
+                      ? "bg-[#f1a34a]/90 text-black"
+                      : "bg-white hover:bg-[#f8b968]/40"
+                  }`}
+                  onClick={() => setSelectCategory(selectCategory === category.keyword ? null : category.keyword)}>
+                  {category.name}
+                </div>
+              ))}
+            </div>
+            {/* 장소 목록 */}
+            <div className="h-[calc(100%-160px)] overflow-y-auto">
+              {filterCategory.map((place) => (
+                <div
+                  key={place.id}
+                  className="p-4 border-b hover:bg-gray-50 cursor-pointer"
+                  onClick={() => window.open(place.place_url, "_blank")}
+                  onMouseEnter={() => overlays[place.id]?.setMap(map)}
+                  onMouseLeave={() => overlays[place.id]?.setMap(null)}>
+                  <div className="text-sm text-blue-600">{getLastCategory(place.category_name)}</div>
+                  <div className="font-bold text-lg mb-1">{place.place_name}</div>
+                  <div className="text-sm text-gray-600">{place.road_address_name}</div>
+                  {place.phone && <div className="text-sm text-gray-600">{place.phone}</div>}
+                  <div className="text-sm text-gray-500 mt-1">현재 위치로부터 {place.distance}m</div>
+                </div>
+              ))}
             </div>
           </div>
-        <div className="mb-8">
-          <GuideNavigationMap />
-          
         </div>
-        <div className="flex space-x-4 text-[24px] font-bold text-white justify-end mr-14">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className={`cursor-pointer bg-[#3c2a13]/90 pt-1 px-2 rounded-t-2xl ${
-                selectCategory
-                  ? selectCategory === category.keyword
-                    ? "text-yellow-200 opacity-100"
-                    : "hover:text-yellow-200 opacity-30"
-                  : "hover:text-yellow-200 opacity-100"
-              }`}
-              onClick={() => setSelectCategory(selectCategory === category.keyword ? null : category.keyword)}>
-              {category.name}
-            </div>
-          ))}
-        </div>
-        <div className="bg-[#3c2a13]/90 p-8 flex rounded-lg mb-4">
-          <div ref={mapRef} className="w-full h-[700px] rounded-lg "></div>
-          <div className="w-full pl-8 h-[700px] flex flex-col">
-            <div className="overflow-y-scroll flex-1 scrollbar-hide">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-7">
-                {filterCategory.map((place) => (
-                  <div
-                    key={place.id}
-                    className="p-3 bg-white rounded-lg cursor-pointer transform transition-all  hover:shadow-2xl hover:bg-yellow-100"
-                    onClick={() => window.open(place.place_url, "_blank")}
-                    onMouseEnter={() => {
-                      if (overlays[place.id]) {
-                        overlays[place.id].setMap(map);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      if (overlays[place.id]) {
-                        overlays[place.id].setMap(null);
-                      }
-                    }}>
-                    <div className="text-lg text-blue-600 font-bold">{getLastCategory(place.category_name)}</div>
-                    <div className="font-bold text-[22px]">{place.place_name}</div>
-                    <div className="text-lg mt-2">{place.road_address_name}</div>
-                    <div className="text-lg">{place.phone || ""}</div>
-                    <div className="text-sm text-gray-500">현재 위치로부터 {place.distance}m</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+
+        {/* 토글 버튼 */}
+        <div
+          className={`bg-white z-50 absolute cursor-pointer hover:bg-gray-100 transition-all duration-300 rounded-r-xl
+            ${isPanelOpen ? "left-[399px]" : "left-0"} 
+            top-1/2 px-2 py-6 border-y border-r border-gray-300`}
+          onClick={() => setIsPanelOpen(!isPanelOpen)}>
+          {isPanelOpen ? "◀︎" : "▶︎"}
         </div>
       </div>
-    </div>
     </div>
   );
 };

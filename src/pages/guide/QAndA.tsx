@@ -1,10 +1,8 @@
 import GuideNavigation from "../../components/GuideNavigation";
-import Walk from "../../../public/walk.png";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../components/Header";
-import useUserStore from "../../store/store";
 import FAQ from "../../components/FAQ";
 import Chat from "../../components/Chat";
 
@@ -60,37 +58,68 @@ const QAndA = () => {
           </div>
           <GuideNavigation/>
           <div className="max-w-[1300px] mx-auto px-4">
-          <table className="mb-40 w-full border-t border-b border-gray-300 ">
-          <thead>
-          <tr className="text-[28px] border-b border-gray-300 ">
-              <th className="px-8 py-5  text-center">번호</th>
-              <th className="w-[588px] px-4 py-5">제목</th>
-              <th className="px-10 py-5  text-center">조회수</th>
-              <th className="px-10 py-5  text-center">작성자</th>
-              <th className="px-10 py-5  text-center">작성일</th>
-            </tr>
-          </thead>
-          <tbody>
-            {QnA.map((item, num) => (
-              <tr className="text-[20px] border-b border-gray-300" key={item.id}
-              >  
-              <td className=" text-center font-bold">{QnA.length - num}</td>
-              <td className="text-left px-4 py-5 font-normal max-w-[508px] whitespace-nowrap overflow-hidden truncate cursor-pointer hover:text-blue-500"
-             onClick={()=> navigate(`/guide/qna/${item.id}`)}>
-                  {item.title}
-                </td>
-              <td className="font-norma text-center">{item.viewCount}</td>
-              <td className="font-norma text-center">{item.writerName}</td>
-              
-              <td className="font-normal text-center">{item.created_at}</td>
-            </tr>
-            ))}
-          </tbody>
-        </table>
+            <div className="hidden min-[1250px]:block">
+              <table className="mb-10 w-full border-t border-b border-gray-300">
+                <thead>
+                  <tr className="text-[28px] border-b border-gray-300">
+                    <th className="px-8 py-5 text-center">번호</th>
+                    <th className="w-[588px] px-4 py-5">제목</th>
+                    <th className="px-10 py-5 text-center">조회수</th>
+                    <th className="px-10 py-5 text-center">작성자</th>
+                    <th className="px-10 py-5 text-center">작성일</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {QnA.map((item, num) => (
+                    <tr className="text-[20px] border-b border-gray-300" key={item.id}>
+                      <td className="text-center font-bold">{QnA.length - num}</td>
+                      <td 
+                        className="text-left px-4 py-5 font-normal max-w-[508px] whitespace-nowrap overflow-hidden truncate cursor-pointer hover:text-blue-500"
+                        onClick={() => navigate(`/guide/qna/${item.id}`)}
+                      >
+                        {item.title}
+                      </td>
+                      <td className="font-normal text-center">{item.viewCount}</td>
+                      <td className="font-normal text-center">{item.writerName}</td>
+                      <td className="font-normal text-center">{item.created_at}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 반응형 1250이하 */}
+            <div className="min-[1250px]:hidden">
+              <div className="mb-10 space-y-4">
+                {QnA.map((item, num) => (
+                  <div 
+                    key={item.id}
+                    className="border border-gray-300 rounded-lg p-4 space-y-1 cursor-pointer hover:text-blue-500 "
+                    onClick={() => navigate(`/guide/qna/${item.id}`)}
+                  >
+                    <div className="text-sm font-medium">번호 {QnA.length - num}</div>
+                    <div className="flex justify-between items-center">
+                    </div>
+                    <h3 className="text-lg font-bold ">
+                      {item.title}
+                    </h3>
+                    <div className="flex text-sm text-gray-500">
+                      <span>작성자 <span className="text-black">{item.writerName}</span></span>
+                    </div>
+                    <div>
+                    <span className="text-sm text-gray-500">작성일  <span className="text-black">{item.created_at}</span> </span>
+                    <span className="text-sm text-gray-500">| 조회수  <span className="text-black">{item.viewCount}</span></span>
+                    
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div
-              className="float-right mr-5 mb-10 bg-[#3c2a13]/90
-              /90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
-              onClick={() => navigate("/guide/qna/create")}>
+              className="float-left mr-5 mb-10 bg-[#3c2a13]/90 p-4 text-white font-bold text-[20px] cursor-pointer rounded-xl hover:scale-105 transition-transform"
+              onClick={() => navigate("/guide/qna/create")}
+            >
               작성하기
             </div>
       </div>
