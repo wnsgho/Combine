@@ -169,6 +169,14 @@ const Header = () => {
                   >
                     반려동물 조회
                   </Link>
+                  {userRole === "ROLE_SHELTER" && (
+                    <Link
+                      to="/detailadd"
+                      className="font-normal text-black mb-2 text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-2xl hover:scale-105 transition-transform duration-200"
+                    >
+                      반려동물 등록
+                    </Link>
+                  )}
                   <Link
                     to="/ai-matching"
                     className="font-normal text-black mb-2 text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-2xl hover:scale-105 transition-transform duration-200"
@@ -316,6 +324,7 @@ const Header = () => {
                     link: "#",
                     items: [
                       { name: "반려동물 조회", link: "/matching" },
+                      { name: "반려동물 등록", link: "/detailadd", role: "ROLE_SHELTER" }, // ROLE_SHELTER 조건 추가
                       { name: "AI 매칭 시스템", link: "/ai-matching" },
                     ],
                   },
@@ -332,58 +341,61 @@ const Header = () => {
                     name: "내정보",
                     link: "#",
                     items: [
-                      { name: "나의 정보", link: getUserInfoLink() },
+                      { name: "나의 정보", link: userRole === "ROLE_SHELTER" ? "/mypage-shelter" : "/mypage-user" },
                       { name: "선호동물 입력 및 수정", link: "/prefer" },
-                      // { name: "나의 산책 코스", link: "/my-walking-course" },
                     ],
                   },
-                  // 로그인 상태에서만 사이드바에 알림 목록이 나타나도록 구현
                   ...(isLoggedIn
                     ? [{ name: "알림", link: "/alarm", items: [] }]
                     : []),
-                ].map((section) => (
-                  <div
-                    key={section.name}
-                    onMouseEnter={() => setExpandedSection(section.name)}
-                    onMouseLeave={() => setExpandedSection(null)}
-                    className={`relative group ${
-                      ["매칭", "안내", "내정보", "알림"].includes(section.name)
-                        ? "bg-[#FCF7F7]"
-                        : ""
-                    }`}
-                  >
-                    {section.link === "#" ? (
-                      <span
-                        className="p-5 block text-3xl transition-transform hover:scale-105 font-medium"
-                      >
-                        {section.name}
-                      </span>
-                    ) : (
-                      <Link
-                        to={section.link}
-                        className="p-5 block text-3xl transition-transform hover:scale-105 font-medium"
-                      >
-                        {section.name}
-                      </Link>
-                    )}
-                    <div className="h-px bg-[#E3E2E2]"></div>
-                    {expandedSection === section.name && section.items.length > 0 && (
-                      <div className="bg-[#ffffff]">
-                        {section.items.map((item, index) => (
-                          <div key={index}>
-                            <Link
-                              to={item.link}
-                              className="block pl-7 p-5 text-2xl transition-transform hover:scale-105"
-                            >
-                              {item.name}
-                            </Link>
-                            <div className="h-px bg-[#E3E2E2]"></div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                ]
+                  .map((section) => ({
+                    ...section,
+                    items: section.items.filter((item) => !item.role || item.role === userRole), // role 기반 필터링
+                  }))
+                  .map((section) => (
+                    <div
+                      key={section.name}
+                      onMouseEnter={() => setExpandedSection(section.name)}
+                      onMouseLeave={() => setExpandedSection(null)}
+                      className={`relative group ${
+                        ["매칭", "안내", "내정보", "알림"].includes(section.name)
+                          ? "bg-[#FCF7F7]"
+                          : ""
+                      }`}
+                    >
+                      {section.link === "#" ? (
+                        <span
+                          className="p-5 block text-3xl transition-transform hover:scale-105 font-medium"
+                        >
+                          {section.name}
+                        </span>
+                      ) : (
+                        <Link
+                          to={section.link}
+                          className="p-5 block text-3xl transition-transform hover:scale-105 font-medium"
+                        >
+                          {section.name}
+                        </Link>
+                      )}
+                      <div className="h-px bg-[#E3E2E2]"></div>
+                      {expandedSection === section.name && section.items.length > 0 && (
+                        <div className="bg-[#ffffff]">
+                          {section.items.map((item, index) => (
+                            <div key={index}>
+                              <Link
+                                to={item.link}
+                                className="block pl-7 p-5 text-2xl transition-transform hover:scale-105"
+                              >
+                                {item.name}
+                              </Link>
+                              <div className="h-px bg-[#E3E2E2]"></div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
               </nav>
             </div>
           </div>
