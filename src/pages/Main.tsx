@@ -69,7 +69,7 @@ const Main: React.FC = () => {
             {(["dog", "approve", "board", "check"] as IconType[]).map((icon, idx, arr) => (
               <React.Fragment key={icon}>
                 <div
-                  className={`flex flex-col items-center cursor-pointer ${
+                  className={`flex flex-col items-center cursor-pointer hover:scale-110 ${
                     activeIcon === icon ? "opacity-100" : "opacity-50"
                   }`}
                   onClick={() => setActiveIcon(icon)}
