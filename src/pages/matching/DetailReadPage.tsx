@@ -196,7 +196,7 @@ const DetailReadPage = () => {
       window.location.reload(); // 페이지 새로 고침 추가
     } catch (error) {
       console.error("입양 신청 보내는 중 오류 발생", error);
-      alert('입양 신청을 다시 시도해 주세요');
+      alert('오류가 발생했습니다 현재 입양신청 중인지 확인해주세요');
       setApplyModalOpen(false);
     }
   };
