@@ -76,7 +76,7 @@ const FAQ = () => {
   return (
     <div>
       <div
-        className="bg-[#3c2a13] text-white m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[29px] cursor-pointer fixed bottom-0 right-2 hover:scale-105 transition-transform z-50"
+        className="bg-[#3c2a13] text-white m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[29px] cursor-pointer fixed bottom-0 right-2 hover:scale-105 transition-transform z-50 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
         onClick={handleClick}>
         {open ? "x" : "?"}
       </div>

@@ -25,6 +25,9 @@ interface chatMessage {
 }
 
 const Chat = () => {
+  const isLoggedIn = localStorage.getItem("accessToken");
+  if (!isLoggedIn) return null;
+  
   const [makeChatRoom, setMakeChatRoom] = useState(false);
   const [chatRoomOpen, setChatRoomOpen] = useState(false);
   const [oppositeEmail, setOppositeEmail] = useState("");
@@ -42,9 +45,7 @@ const filteredUsers = chatUser.filter(user =>
   user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
   (user.username && user.username.toLowerCase().includes(searchTerm.toLowerCase()))
 );
-
-  // 현재 경로 감지를 위한 location 사용
-  const location = window.location.pathname;
+const location = window.location.pathname;
 
   const handlemakechatroom = () => {
     setMakeChatRoom(!makeChatRoom);
@@ -407,7 +408,7 @@ const filteredUsers = chatUser.filter(user =>
 
         {/* 채팅방 생성 버튼 */}
         <div
-          className="bg-[#f1a34a] m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[35px] cursor-pointer  hover:scale-105 transition-transform"
+          className="bg-[#f1a34a] m-6 p-6 rounded-full font-bold text-[40px] w-16 h-16 flex justify-center items-center pl-[24.6px] pb-[35px] cursor-pointer  hover:scale-105 transition-transform shadow-[0_0_15px_rgba(0,0,0,0.5)]"
           onClick={handlemakechatroom}>
           +
         </div>

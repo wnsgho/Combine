@@ -1,10 +1,7 @@
-import Walk from "../../../public/walk.png";
 import { useEffect, useRef, useState } from "react";
-import GuideNavigationMap from "../../components/GuideNavigationMap";
 import Header from "../../components/Header";
 import FAQ from "../../components/FAQ";
 import Chat from "../../components/Chat";
-import GuideNavigation from "../../components/GuideNavigation";
 
 declare global {
   interface Window {
@@ -176,15 +173,20 @@ const WalkingCourse = () => {
         </div>
 
         {/* 왼쪽 패널 */}
-        <div className={`${isPanelOpen ? "w-[400px]" : "w-0"} absolute left-0 top-0 h-full bg-white border-r transition-all duration-300 overflow-hidden z-10`}>
-          <div className="w-[400px]">
+        <div className={`${isPanelOpen ? "w-[400px]" : "w-0"} absolute left-0 top-0 h-[calc(100vh-64px)] bg-white border-r transition-all duration-300 overflow-hidden z-10`}>
+          <div className="w-[400px] h-full flex flex-col">
             <div className="text-center pt-6 text-3xl font-bold">산책로</div>
             <div className="bg-white p-3 text-md text-center font-bold text-red-500">
               현재 위치를 기준으로 반경 3km 검색 결과입니다
             </div>
             
             {/* 장소 목록 */}
-            <div className="h-[calc(100%-100px)] overflow-y-auto">
+            <div 
+              className="flex-1 overflow-y-auto overflow-x-hidden"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#888 #f1f1f1'
+              }}>
               {places.map((place) => (
                 <div
                   key={place.id}
